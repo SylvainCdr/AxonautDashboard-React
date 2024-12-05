@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchProjectById, fetchCompanyById } from "../../services/api";
+import { fetchProjectById } from "../../services/api/projects";
+import { fetchCompanyById } from "../../services/api/companies";
 import styles from "./style.module.scss";
 import {
   BarChart,
@@ -10,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+
 
 export default function Project() {
   const { projectId } = useParams();
@@ -39,13 +41,15 @@ export default function Project() {
   if (error) return <div className={styles.error}>{error}</div>;
 
   // Préparation des données pour le graphique
-  const difference =
-    project.actual_revenue - project.actual_expenses_cost || 0;
+  const difference = project.actual_revenue - project.actual_expenses_cost || 0;
 
   const chartData = [
     { name: "Revenu estimé", estimatedRevenue: project.estimated_revenue },
     { name: "Revenu actuel", actualRevenue: project.actual_revenue },
-    { name: "Dépenses actuelles", actualExpenses: project.actual_expenses_cost },
+    {
+      name: "Dépenses actuelles",
+      actualExpenses: project.actual_expenses_cost,
+    },
     {
       name: "Produits consommés",
       consumeProducts: project.actual_consume_products_cost,
@@ -56,6 +60,8 @@ export default function Project() {
   return (
     <div className={styles.projectContainer}>
       <h1>Détails du projet</h1>
+
+
       <div className={styles.header}>
         <div className={styles.section1}>
           <p>
@@ -94,7 +100,10 @@ export default function Project() {
       <div className={styles.graphContainer}>
         <h2>Graphique des coûts et revenus</h2>
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />

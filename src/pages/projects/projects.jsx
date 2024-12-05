@@ -2,6 +2,9 @@ import styles from "./style.module.scss";
 import React, { useEffect, useState } from "react";
 import { fetchProjects } from "../../services/api/projects";
 import { useNavigate } from "react-router-dom";
+import SearchProject from "../../components/searchProject/searchProject";
+
+
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -41,6 +44,8 @@ export default function Projects() {
     <div className={styles.projectsContainer}>
       <header className={styles.header}>
         <h1>Gestion des Projets</h1>
+
+        <SearchProject />
         <p>Découvrez tous les projets en cours et finalisés.</p>
       </header>
       <main className={styles.projectList}>
