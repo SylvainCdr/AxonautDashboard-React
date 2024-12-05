@@ -1,0 +1,114 @@
+.headerContainer {
+  // background: rgb(255, 255, 255);
+ background: var(--col1);
+  box-shadow: 0 0 10px rgba(255, 254, 254, 0.5);
+  margin-bottom: 1.5rem;
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
+
+  .nav {
+    width: 100%;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .logo {
+      width: 2.5rem;
+      margin-left: 20%;
+      margin-right: 6em;
+      cursor: pointer;
+      justify-items: center;
+      justify-self: center;
+      justify-content: center;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .navUl {
+      display: flex;
+      font-size: 1.1rem;
+      font-weight: 500;
+      font-family: "barlow", sans-serif;
+      text-transform: uppercase;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      justify-content: center;
+      padding-right: 2rem;
+    }
+
+    .navLi {
+      margin: auto;
+      text-align: center;
+      line-height: 1.4rem;
+
+      .activeLink {
+        border-bottom: 2px solid var(--col1); /* Soulignement de la page active */
+      }
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+.header__burgerMenu {
+  display: none;
+}
+
+@media screen and (max-width: 1080px) {
+  .header__burgerMenu {
+    display: flex;
+    font-size: 2.6rem;
+    cursor: pointer;
+    padding-right: 7%; /* Place it on the right */
+    align-items: center;
+    margin-left: auto; /* Ensures the burger menu aligns to the right */
+  }
+
+  .header__burgerMenu:before {
+    content: "\2630";
+    font-size: 3rem;
+  }
+
+  .active .header__burgerMenu:before {
+    content: "\2715"; /* Icône de fermeture */
+    font-size: 3rem;
+  }
+
+  .navUl {
+    position: fixed;
+    left: -110%;
+    top: 3.5em;
+    flex-direction: column;
+    transition: 0.25s ease-in-out;
+    background-color: rgb(57, 57, 57);
+    z-index: 100;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    -webkit-transition: 0.25s ease-in-out;
+    -moz-transition: 0.25s ease-in-out;
+    -ms-transition: 0.25s ease-in-out;
+    -o-transition: 0.25s ease-in-out;
+  }
+
+  .active ul {
+    left: 0;
+  }
+
+  .navLi {
+    padding: 0.8rem 0;
+  }
+}
