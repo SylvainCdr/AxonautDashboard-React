@@ -1,13 +1,27 @@
+.loaderContainer {
+  display: flex;
+  flex-direction: column; 
+  gap : 3rem;
+  justify-content: center; /* Centrage horizontal */
+  align-items: center; /* Centrage vertical */
+  min-height: 100vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+  text-align: center;
+  color : black;
+
+}
+
 .quotationsContainer {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    background-color: #f9f9f96e;
-    font-family: Arial, sans-serif;
-    padding-top : 6rem;
-    max-width: 1200px;
-    margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  background-color: #f9f9f93d;
+  font-family: Arial, sans-serif;
+  padding-top: 7rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh; /* Utilisez min-height au lieu de height pour occuper tout l'écran */
+
+
   
     .header {
       text-align: center;
@@ -15,7 +29,7 @@
   
       h1 {
         font-size: 2.2rem;
-        color: white;
+        color: rgb(63, 63, 63);
       }
   
      

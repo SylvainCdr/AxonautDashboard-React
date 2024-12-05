@@ -38,7 +38,7 @@ export default function Projects() {
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
   if (loading) return <p>Chargement des projets...</p>;
-  if (error) return <p>Erreur : {error}</p>;
+
 
   return (
     <div className={styles.projectsContainer}>

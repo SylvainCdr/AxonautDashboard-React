@@ -1,75 +1,9 @@
 import styles from "./style.module.scss";
 import { fetchQuotations } from "../../services/api/quotations";
 import React, { useEffect, useState } from "react";
+import { ClipLoader } from "react-spinners"; // Importer le composant du loader
 
 export default function Quotations() {
-
-    // [
-    //     {
-    //       "id": 55,
-    //       "number": "QUO-2022-02",
-    //       "title": "QUO-2022-02 Title",
-    //       "date": "2022-05-28T18:05:35+02:00",
-    //       "expiry_date": "2022-05-28T18:05:35+02:00",
-    //       "sent_date": "2022-05-28T18:05:35+02:00",
-    //       "last_update_date": "2022-05-28T18:05:35+02:00",
-    //       "status": "accepted",
-    //       "date_customer_answer": "2022-05-28T18:05:35+02:00",
-    //       "user_id": 58962,
-    //       "company_id": 58962,
-    //       "company_name": "My customer",
-    //       "project_id": 9842,
-    //       "contract_id": 69874,
-    //       "global_discount_amount": 489.6,
-    //       "global_discount_amount_with_tax": 589.6,
-    //       "global_discount_unit_is_percent": true,
-    //       "pre_tax_amount": 5896.1,
-    //       "tax_amount": 569,
-    //       "total_amount": 6465.1,
-    //       "margin": 256.45,
-    //       "payments_to_display_in_pdf": [
-    //         {
-    //           "amount": 10.5,
-    //           "payment_nature_id": 3,
-    //           "payment_nature_name": "string",
-    //           "reference": "string"
-    //         }
-    //       ],
-    //       "electronic_signature_date": "2022-05-28T18:05:35+02:00",
-    //       "global_discount_comments": "string",
-    //       "public_path": "https://axonaut.com/public/quotation/pdf/5eac5b8de0aac1225598e5c2a5b906f3f177a208136bb985723de032cc10bc30",
-    //       "customer_portal_url": "https://axonaut.com/document/9DTW7ZBP28AMV296",
-    //       "quotation_lines": [
-    //         {
-    //           "product_id": 489,
-    //           "product_internal_id": "FZR48-4545A-515SA",
-    //           "product_code": "PRT-12-896",
-    //           "product_name": "My Product",
-    //           "title": "quotation line",
-    //           "details": "line details",
-    //           "quantity": 2,
-    //           "unit": "KG",
-    //           "price": 4482,
-    //           "tax_rates": [
-    //             {
-    //               "rate": 5.5,
-    //               "name": "5.5%"
-    //             }
-    //           ],
-    //           "chapter": "product and services",
-    //           "line_discount_amount": 120.2,
-    //           "line_discount_amount_with_tax": 155.5,
-    //           "line_discount_unit_is_percent": true,
-    //           "tax_amount": 55.5,
-    //           "pre_tax_amount": 789.5,
-    //           "total_amount": 845,
-    //           "margin": 55,
-    //           "unit_job_costing": 23.2
-    //         }
-    //       ]
-    //     }
-    //   ]
-
     const [quotations, setQuotations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -77,14 +11,14 @@ export default function Quotations() {
 
     useEffect(() => {
         const loadQuotationsData = async () => {
+            setLoading(true); // Mettre le loading à true avant de commencer l'appel
             try {
-                setLoading(true);
                 const data = await fetchQuotations(page);
                 setQuotations(data);
             } catch (err) {
                 setError(err.message);
             } finally {
-                setLoading(false);
+                setLoading(false); // Mettre le loading à false une fois les données chargées
             }
         };
         loadQuotationsData();
@@ -93,11 +27,19 @@ export default function Quotations() {
     const handleNextPage = () => setPage((prev) => prev + 1);
     const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
-    if (loading) return <p>Chargement des devis...</p>;
+    if (loading) {
+        return (
+            <div className={styles.loaderContainer}>
+                {/* Affichage du loader pendant le chargement */}
+                <ClipLoader color="#3498db" loading={loading} size={70} />
+                <p>Chargement des devis...</p>
+            </div>
+        );
+    }
+
     if (error) return <p>Erreur : {error}</p>;
 
     return (
-
         <div className={styles.quotationsContainer}>
             <header className={styles.header}>
                 <h1>Gestion des Devis</h1>
@@ -136,8 +78,6 @@ export default function Quotations() {
                 </button>
                 <button onClick={handleNextPage}>Page suivante</button>
             </footer>
-
         </div>
-
     );
 }
