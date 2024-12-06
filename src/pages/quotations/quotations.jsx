@@ -48,9 +48,7 @@ export default function Quotations() {
 
   return (
     <div className={styles.quotationsContainer}>
-      <header className={styles.header}>
         <h1>Gestion des Devis</h1>
-      </header>
       <main className={styles.quotationsList}>
         {quotations.map((quotation) => (
           <div key={quotation.id} className={styles.quotationCard}>

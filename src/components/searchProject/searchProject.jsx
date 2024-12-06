@@ -40,7 +40,7 @@ export default function SearchProjects() {
     return (
       <div className={styles.loaderContainer}>
         <BarLoader color="#3498db" loading={loading} size={70} />
-        <p>Chargement des résultats...</p>
+        <p>Recherche en cours...</p>
       </div>
     );
   }

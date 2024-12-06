@@ -8,6 +8,7 @@
   text-align: center;
   color : black;
 
+
 }
 
 .projectsContainer {
@@ -20,18 +21,10 @@
   text-align: center;
   color : black;
   padding-top:6rem;
+  max-width: 1200px;
+width: 100%;
+margin: 0 auto;
 
-  .header {
-    text-align: center;
-    margin-bottom: 2rem;
-
-  
-
-    p {
-      font-size: 1.2rem;
-      color: #666;
-    }
-  }
 
   .projectList {
     display: flex;

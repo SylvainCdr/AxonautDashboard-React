@@ -15,18 +15,23 @@
 .searchProjectContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 0px;
   background-color: #f9f9f98e;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
   
   
   .searchBar {
-    width: 100%;
+  
+    width: 90%;
     
     display: flex;
+    margin: 0 auto;
 
- 
 
 
 
@@ -69,8 +74,10 @@
 }
 
 .searchResults {
-
-  width: 1200px;
+  display: flex;
+  flex-direction: column;
+width: 100%;
+  max-width: 1200px;
 
   .projectRow {
     margin-top: 20px;

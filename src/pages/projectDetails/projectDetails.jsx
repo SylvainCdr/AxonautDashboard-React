@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
+import { fetchQuotationByProjectId } from "../../services/api/quotations";
 import styles from "./style.module.scss";
 import {
   BarChart,
@@ -25,6 +26,7 @@ export default function ProjectDetails() {
         setLoading(true);
         const data = await fetchProjectById(projectId);
         const companyData = await fetchCompanyById(data.company_id);
+        
         setProject(data);
         setCompany(companyData);
       } catch (err) {

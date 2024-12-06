@@ -1,5 +1,3 @@
-
-
 export const fetchQuotations = async (page = 1) => {
   try {
     const response = await fetch(
@@ -30,12 +28,35 @@ export const fetchQuotations = async (page = 1) => {
 };
 
 export const fetchQuotationById = async (quotationId) => {
-  const response = await fetch(`http://localhost:3001/quotations/${quotationId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(
+    `http://localhost:3001/quotations/${quotationId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  console.log("Réponse API Axonaut :", response);
+
+  if (!response.ok) {
+    throw new Error("Erreur lors de la récupération des données du projet");
+  }
+  return response.json();
+};
+
+// router.get("/quotations/project/:projectId", getQuotationByProjectId);
+
+export const fetchQuotationByProjectId = async (projectId) => {
+  const response = await fetch(
+    `http://localhost:3001/quotations/project/${projectId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des données du projet");

@@ -52,10 +52,8 @@ export default function Projects() {
 
   return (
     <div className={styles.projectsContainer}>
-      <header className={styles.header}>
         <h1>Gestion des Projets</h1>
         <SearchProject />
-      </header>
       <main className={styles.projectList}>
         {projects.map((project) => (
           <div key={project.id} className={styles.projectCard}>
