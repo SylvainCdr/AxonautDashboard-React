@@ -27,6 +27,8 @@ export const fetchProjects = async (page = 1) => {
       throw error;
     }
   };
+
+  
   
   export const fetchProjectById = async (projectId) => {
     const response = await fetch(`http://localhost:3001/projects/${projectId}`, {

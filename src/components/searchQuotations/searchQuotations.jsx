@@ -4,7 +4,7 @@ import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 
-export default function SearchProjects() {
+export default function SearchQuotations() {
   const [projects, setProjects] = useState([]); // Projets récupérés après recherche
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

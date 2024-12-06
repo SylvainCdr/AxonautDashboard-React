@@ -3,8 +3,7 @@ import React, { useEffect, useState } from "react";
 import { fetchProjects } from "../../services/api/projects";
 import { useNavigate } from "react-router-dom";
 import SearchProject from "../../components/searchProject/searchProject";
-
-
+import { ScaleLoader } from "react-spinners";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -23,8 +22,11 @@ export default function Projects() {
     const loadProjectsData = async () => {
       try {
         setLoading(true);
-        const data = await fetchProjects(page);
-        setProjects(data);
+        // Appel API sans limit, on gère cela côté client
+        const data = await fetchProjects(page); // L'API retourne 500 éléments par page
+        // On ne garde que les 50 premiers éléments
+        const limitedData = data.slice(0, 50); // On limite à 50 éléments
+        setProjects(limitedData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,16 +39,22 @@ export default function Projects() {
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
-  if (loading) return <p>Chargement des projets...</p>;
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <ScaleLoader color="#3498db" loading={loading} size={70} />
+        <p>Chargement des projets...</p>
+      </div>
+    );
+  }
 
+  if (error) return <p>Erreur : {error}</p>;
 
   return (
     <div className={styles.projectsContainer}>
       <header className={styles.header}>
         <h1>Gestion des Projets</h1>
-
         <SearchProject />
-        <p>Découvrez tous les projets en cours et finalisés.</p>
       </header>
       <main className={styles.projectList}>
         {projects.map((project) => (
@@ -55,7 +63,8 @@ export default function Projects() {
             <p>
               <strong>ID : </strong> {project.id} <br />
               <strong>Numéro : </strong> {project.number} <br />
-              <strong>Entreprise : </strong> {companies[project.company_id] || "Inconnue"}
+              <strong>Entreprise : </strong>{" "}
+              {companies[project.company_id] || "Inconnue"}
             </p>
             <div className={styles.dates}>
               <span>

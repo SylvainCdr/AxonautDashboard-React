@@ -3,8 +3,9 @@ import Template from "./components/Template/Template";
 import Home from "./pages/Home/Home";
 import Companies from "./pages/companies/companies";
 import Projects from "./pages/projects/projects";
-import Project from "./pages/project/project";
+import ProjectDetails from "./pages/projectDetails/projectDetails";
 import Quotations from "./pages/quotations/quotations";
+import QuotationDetails from "./pages/quotationDetails/quotationDetails";
 
 function App() {
   return (
@@ -14,8 +15,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/companies" element={<Companies />} />
           <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/:projectId" element={<Project />} />
+          <Route path="/projects/:projectId" element={<ProjectDetails />} />
           <Route path="/quotations" element={<Quotations />} />
+          <Route path="/quotations/:quotationId" element={<QuotationDetails />} />
         </Route>
       </Routes>
     </BrowserRouter>

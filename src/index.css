@@ -151,6 +151,7 @@ background-repeat: no-repeat;
 
 
 
+
 :root {
     --col1: #009fe3;
     --col2: #0D0630;
@@ -160,3 +161,15 @@ background-repeat: no-repeat;
   
   }
 
+
+  h1 {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: white ;
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-align: center;
+    background-color: var(--col4);
+    padding : 10px;
+    border-radius: 10px;
+  }

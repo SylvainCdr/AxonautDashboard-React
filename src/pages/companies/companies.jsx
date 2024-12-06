@@ -1,6 +1,8 @@
 import styles from "./style.module.scss";
-import React, { useEffect, useState } from 'react';
-import { fetchCompanies } from '../../services/api/companies';
+import React, { useEffect, useState } from "react";
+import { fetchCompanies } from "../../services/api/companies";
+import { ScaleLoader } from "react-spinners";
+
 export default function Companies() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ export default function Companies() {
       try {
         setLoading(true);
         const data = await fetchCompanies(page);
-        setCompanies(data); 
+        setCompanies(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -28,7 +30,15 @@ export default function Companies() {
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
-  if (loading) return <p>Chargement des entreprises...</p>;
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        {/* Affichage du loader pendant le chargement */}
+        <ScaleLoader color="#3498db" loading={loading} size={70} />
+        <p>Chargement des entreprises...</p>
+      </div>
+    );
+  }
   if (error) return <p>Erreur : {error}</p>;
 
   // {
@@ -64,11 +74,10 @@ export default function Companies() {
   // },
 
   return (
-    <div className={styles.test1Container}>
+    <div className={styles.companiesContainer}>
       <h1>Liste des entreprises</h1>
 
       <table>
-
         <thead>
           <tr>
             <th>Nom</th>
@@ -81,7 +90,6 @@ export default function Companies() {
         </thead>
 
         <tbody>
-
           {companies.map((company) => (
             <tr key={company.id}>
               <td>{company.name}</td>
@@ -95,19 +103,12 @@ export default function Companies() {
             </tr>
           ))}
         </tbody>
-
       </table>
 
       <div>
-
         <button onClick={handlePreviousPage}>Page précédente</button>
         <button onClick={handleNextPage}>Page suivante</button>
-
       </div>
-
     </div>
   );
-
 }
-
-     

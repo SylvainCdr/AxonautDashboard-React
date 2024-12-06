@@ -12,8 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
-export default function Project() {
+export default function ProjectDetails() {
   const { projectId } = useParams();
   const [project, setProject] = useState({});
   const [company, setCompany] = useState({});
@@ -41,7 +40,7 @@ export default function Project() {
   if (error) return <div className={styles.error}>{error}</div>;
 
   // Préparation des données pour le graphique
-  const difference = project.actual_revenue - project.actual_expenses_cost || 0;
+  const difference = project.estimated_revenue - project.actual_expenses_cost || 0;
 
   const chartData = [
     { name: "Revenu estimé", estimatedRevenue: project.estimated_revenue },
@@ -50,17 +49,16 @@ export default function Project() {
       name: "Dépenses actuelles",
       actualExpenses: project.actual_expenses_cost,
     },
-    {
-      name: "Produits consommés",
-      consumeProducts: project.actual_consume_products_cost,
-    },
+    // {
+    //   name: "Produits consommés",
+    //   consumeProducts: project.actual_consume_products_cost,
+    // },
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
 
   return (
     <div className={styles.projectContainer}>
       <h1>Détails du projet</h1>
-
 
       <div className={styles.header}>
         <div className={styles.section1}>
