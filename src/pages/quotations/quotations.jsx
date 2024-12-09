@@ -16,12 +16,32 @@ export default function Quotations() {
     navigate(`/quotations/${quotationId}`);
   };
 
+  // useEffect(() => {
+  //   const loadProjectsData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       // Appel API sans limit, on gère cela côté client
+  //       const data = await fetchProjects(page); // L'API retourne 500 éléments par page
+  //       // On ne garde que les 50 premiers éléments
+  //       const limitedData = data.slice(0, 25); // On limite à 50 éléments
+  //       setProjects(limitedData);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   loadProjectsData();
+  // }, [page]);
+
+
   useEffect(() => {
     const loadQuotationsData = async () => {
-      setLoading(true); // Mettre le loading à true avant de commencer l'appel
       try {
+      setLoading(true); // Mettre le loading à true avant de commencer l'appel
         const data = await fetchQuotations(page);
-        setQuotations(data);
+        const limitedData = data.slice(0, 25); // On limite à 50 éléments
+        setQuotations(limitedData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,7 +57,6 @@ export default function Quotations() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        {/* Affichage du loader pendant le chargement */}
         <ScaleLoader color="#3498db" loading={loading} size={70} />
         <p>Chargement des devis...</p>
       </div>
@@ -46,42 +65,71 @@ export default function Quotations() {
 
   if (error) return <p>Erreur : {error}</p>;
 
+  // if status accepted => green
+  // if status pending => yellow
+  // if status refused => red
+
+  const statusColor = (status) => {
+    if (status === "accepted") return "green";
+    if (status === "pending") return "orange";
+    if (status === "refused") return "red";
+    return "black";
+  }
+
+
+
+
+
+
   return (
     <div className={styles.quotationsContainer}>
-        <h1>Gestion des Devis</h1>
-      <main className={styles.quotationsList}>
-        {quotations.map((quotation) => (
-          <div key={quotation.id} className={styles.quotationCard}>
-            <h2>{quotation.title}</h2>
-            <p>
-              <strong>ID : </strong> {quotation.id} <br />
-              <strong>Numéro : </strong> {quotation.number} <br />
-              <strong>Entreprise : </strong>{" "}
-              {quotation.company_name || "Inconnue"}
-            </p>
-            <div className={styles.dates}>
-              <span>
-                <strong>Date : </strong> {quotation.date}
-              </span>
-              <span>
-                <strong>Statut : </strong> {quotation.status}
-              </span>
-            </div>
-            <div className={styles.amounts}>
-              <span>
-                <strong>Montant HT : </strong> {quotation.pre_tax_amount} €
-              </span>
-              <span>
-                <strong>Montant TTC : </strong> {quotation.total_amount} €
-              </span>
-            </div>
-            <button onClick={() => handleClickProject(quotation.id)}>
-              Voir le devis
-            </button>
+      <h1>Gestion des Devis</h1>
 
-          </div>
-        ))}
-      </main>
+      <table className={styles.quotationTable}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Numéro</th>
+            <th>Entreprise</th>
+            <th>Commercial(e)</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Montant HT</th>
+            <th>Montant TTC</th>
+            <th>Marge (€)</th>
+            <th>Marge (%)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {quotations.map((quotation) => (
+            <tr key={quotation.id}>
+              <td>{quotation.id}</td>
+              <td>{quotation.number}</td>
+              <td>{quotation.company_name || "Inconnue"}</td>
+              <td>{quotation.user_id}</td>
+              <td>{new Date(quotation.date).toLocaleDateString()}</td>
+              <td> <span style={{color: statusColor(quotation.status)}}>{quotation.status}</span></td>
+
+              <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
+              <td>{quotation.total_amount.toFixed(2)} €</td>
+              <td>{quotation.margin.toFixed(2)} €</td>
+              <td>
+                {(
+                  (quotation.margin / quotation.pre_tax_amount) *
+                  100
+                ).toFixed(2)}{" "}
+                %
+              </td>
+              <td className={styles.actionCell}>
+                <button onClick={() => handleClickProject(quotation.id)}>
+                  Voir
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <footer className={styles.footer}>
         <button onClick={handlePreviousPage} disabled={page === 1}>
           Page précédente

@@ -1,23 +1,22 @@
 import styles from "./style.module.scss";
 import React, { useEffect, useState } from "react";
 import { fetchProjects } from "../../services/api/projects";
+import { ScaleLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import SearchProject from "../../components/searchProject/searchProject";
-import { ScaleLoader } from "react-spinners";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [companies, setCompanies] = useState({});
 
   const navigate = useNavigate();
 
   const handleClickProject = (projectId) => {
     navigate(`/projects/${projectId}`);
   };
-
+  
   useEffect(() => {
     const loadProjectsData = async () => {
       try {
@@ -25,7 +24,7 @@ export default function Projects() {
         // Appel API sans limit, on gère cela côté client
         const data = await fetchProjects(page); // L'API retourne 500 éléments par page
         // On ne garde que les 50 premiers éléments
-        const limitedData = data.slice(0, 50); // On limite à 50 éléments
+        const limitedData = data.slice(0, 25); // On limite à 50 éléments
         setProjects(limitedData);
       } catch (err) {
         setError(err.message);
@@ -52,47 +51,45 @@ export default function Projects() {
 
   return (
     <div className={styles.projectsContainer}>
-        <h1>Gestion des Projets</h1>
-        <SearchProject />
-      <main className={styles.projectList}>
-        {projects.map((project) => (
-          <div key={project.id} className={styles.projectCard}>
-            <h2>{project.name}</h2>
-            <p>
-              <strong>ID : </strong> {project.id} <br />
-              <strong>Numéro : </strong> {project.number} <br />
-              <strong>Entreprise : </strong>{" "}
-              {companies[project.company_id] || "Inconnue"}
-            </p>
-            <div className={styles.dates}>
-              <span>
-                <strong>Début : </strong> {project.estimated_start}
-              </span>
-              <span>
-                <strong>Fin : </strong> {project.estimated_end}
-              </span>
-            </div>
-            <div className={styles.financials}>
-              <span>
-                <strong>Revenus estimés : </strong> {project.estimated_revenue}€
-              </span>
-              <span>
-                <strong>Revenus réels : </strong> {project.actual_revenue}€
-              </span>
-              <span>
-                <strong>Dépenses : </strong> {project.actual_expenses_cost}€
-              </span>
-            </div>
-            <button
-              onClick={() => handleClickProject(project.id)}
-              className={styles.detailsButton}
-            >
-              Voir les détails
-            </button>
-          </div>
-        ))}
-      </main>
-      <footer className={styles.pagination}>
+      <h1>Gestion des Projets</h1>
+      <SearchProject />
+      <table >
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Numéro</th>
+            <th>Entreprise</th>
+            <th>Date Début</th>
+            <th>Date Fin</th>
+            <th>Revenus Estimés</th>
+            <th>Revenus Réels</th>
+            <th>Dépenses</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((project) => (
+            <tr key={project.id}>
+              <td>{project.id}</td>
+              <td>{project.name}</td>
+              <td>{project.number}</td>
+              <td>{project.company_name || "Inconnue"}</td>
+              <td>{new Date(project.estimated_start).toLocaleDateString()}</td>
+              <td>{new Date(project.estimated_end).toLocaleDateString()}</td>
+              <td>{project.estimated_revenue} €</td>
+              <td>{project.actual_revenue.toFixed(2)} €</td>
+              <td>{project.actual_expenses_cost.toFixed(2)} €</td>
+              <td className={styles.actionCell}>
+                <button onClick={() => handleClickProject(project.id)}>
+                  Voir
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <footer className={styles.footer}>
         <button onClick={handlePreviousPage} disabled={page === 1}>
           Page précédente
         </button>

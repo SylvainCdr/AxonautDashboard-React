@@ -58,6 +58,9 @@ export default function ProjectDetails() {
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
 
+
+
+
   return (
     <div className={styles.projectContainer}>
       <h1>Détails du projet</h1>

@@ -23,7 +23,25 @@
   width: 100%;
  
 
-
+  .filterContainer {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filterContainer button {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+  
+  .filterContainer button.active {
+    background-color: #3498db;
+    color: #fff;
+    border-color: #3498db;
+  }
+  
 
 
 

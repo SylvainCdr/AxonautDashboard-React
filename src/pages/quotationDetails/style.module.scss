@@ -87,6 +87,31 @@
     }
   }
 
+  .totals {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-top : 2rem;
+
+
+
+      p {
+        margin: 5px 0;
+        line-height: 1.5;
+        color : black;  
+
+        strong {
+          color: #0073e6;
+        }
+      }
+    
+  }
+
   .footer {
     display: flex;
     justify-content: center;

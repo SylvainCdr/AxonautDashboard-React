@@ -1,13 +1,15 @@
-import styles from "./style.module.scss";
 import React, { useEffect, useState } from "react";
 import { fetchCompanies } from "../../services/api/companies";
 import { ScaleLoader } from "react-spinners";
+import styles from "./style.module.scss";
 
 export default function Companies() {
   const [companies, setCompanies] = useState([]);
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [page, setPage] = useState(1); // Gestion de la pagination
+  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState("all"); // Filtre actif: 'all', 'supplier', 'prospect', 'customer'
 
   useEffect(() => {
     const loadCompanies = async () => {
@@ -15,6 +17,7 @@ export default function Companies() {
         setLoading(true);
         const data = await fetchCompanies(page);
         setCompanies(data);
+        setFilteredCompanies(data); // Par défaut, aucune filtration
       } catch (err) {
         setError(err.message);
       } finally {
@@ -25,7 +28,22 @@ export default function Companies() {
     loadCompanies();
   }, [page]);
 
-  console.log("Données des entreprises :", companies);
+  useEffect(() => {
+    // Filtrage des données en fonction du filtre actif
+    const filterData = () => {
+      if (filter === "all") {
+        setFilteredCompanies(companies);
+      } else if (filter === "supplier") {
+        setFilteredCompanies(companies.filter((c) => c.is_supplier));
+      } else if (filter === "prospect") {
+        setFilteredCompanies(companies.filter((c) => c.is_prospect));
+      } else if (filter === "customer") {
+        setFilteredCompanies(companies.filter((c) => c.is_customer));
+      }
+    };
+
+    filterData();
+  }, [filter, companies]);
 
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
@@ -33,7 +51,6 @@ export default function Companies() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        {/* Affichage du loader pendant le chargement */}
         <ScaleLoader color="#3498db" loading={loading} size={70} />
         <p>Chargement des entreprises...</p>
       </div>
@@ -41,41 +58,37 @@ export default function Companies() {
   }
   if (error) return <p>Erreur : {error}</p>;
 
-  // {
-  //   id: 29040704,
-  //   name: 'ATEC MULTISERVICES',
-  //   creation_date: '2024-10-29T10:59:27+01:00',
-  //   address_street: '12 bis, rue Martin Deleuze ',
-  //   address_zip_code: '93200',
-  //   address_city: 'SAINT-DENIS ',
-  //   address_region: null,
-  //   address_country: '',
-  //   comments: '',
-  //   is_supplier: true,
-  //   is_prospect: false,
-  //   is_customer: false,
-  //   currency: 'EUR',
-  //   language: 'fr',
-  //   thirdparty_code: null,
-  //   intracommunity_number: 'FR44877736165',
-  //   supplier_thirdparty_code: null,
-  //   siret: '877 736 165 00011',
-  //   internal_id: '',
-  //   isB2C: false,
-  //   business_manager: {
-  //     id: 126982,
-  //     name: 'Jessica FILIALI',
-  //     email: 'jessica.filiali@pixecurity.com'
-  //   },
-  //   custom_fields: [],
-  //   categories: [],
-  //   employees: [],
-  //   documents: []
-  // },
-
   return (
     <div className={styles.companiesContainer}>
       <h1>Liste des entreprises</h1>
+
+      {/* Toggle pour le filtrage */}
+      <div className={styles.filterContainer}>
+        <button
+          onClick={() => setFilter("all")}
+          className={filter === "all" ? styles.active : ""}
+        >
+          Toutes
+        </button>
+        <button
+          onClick={() => setFilter("supplier")}
+          className={filter === "supplier" ? styles.active : ""}
+        >
+          Fournisseurs
+        </button>
+        <button
+          onClick={() => setFilter("prospect")}
+          className={filter === "prospect" ? styles.active : ""}
+        >
+          Prospects
+        </button>
+        <button
+          onClick={() => setFilter("customer")}
+          className={filter === "customer" ? styles.active : ""}
+        >
+          Clients
+        </button>
+      </div>
 
       <table>
         <thead>
@@ -90,7 +103,7 @@ export default function Companies() {
         </thead>
 
         <tbody>
-          {companies.map((company) => (
+          {filteredCompanies.map((company) => (
             <tr key={company.id}>
               <td>{company.name}</td>
               <td>{company.address_street}</td>
