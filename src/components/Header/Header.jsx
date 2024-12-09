@@ -73,11 +73,11 @@ function Header() {
           </li>
           <li className={styles.navLi}>
             <NavLink
-              to="/test4"
+              to="/employees"
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              test4
+              Employés
             </NavLink>
           </li>
         </ul>

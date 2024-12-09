@@ -1,8 +1,9 @@
 import styles from "./style.module.scss";
 import { fetchQuotations } from "../../services/api/quotations";
 import React, { useEffect, useState } from "react";
-import { ScaleLoader } from "react-spinners";
+import { GridLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import SearchQuotations from "../../components/searchQuotations/searchQuotations";
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
@@ -34,13 +35,12 @@ export default function Quotations() {
   //   loadProjectsData();
   // }, [page]);
 
-
   useEffect(() => {
     const loadQuotationsData = async () => {
       try {
-      setLoading(true); // Mettre le loading à true avant de commencer l'appel
+        setLoading(true); // Mettre le loading à true avant de commencer l'appel
         const data = await fetchQuotations(page);
-        const limitedData = data.slice(0, 25); // On limite à 50 éléments
+        const limitedData = data.slice(0, 10); // On limite à 50 éléments
         setQuotations(limitedData);
       } catch (err) {
         setError(err.message);
@@ -57,7 +57,7 @@ export default function Quotations() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <ScaleLoader color="#3498db" loading={loading} size={70} />
+        <GridLoader color="#4520ff" loading={loading} size={20} />
         <p>Chargement des devis...</p>
       </div>
     );
@@ -65,25 +65,19 @@ export default function Quotations() {
 
   if (error) return <p>Erreur : {error}</p>;
 
-  // if status accepted => green
-  // if status pending => yellow
-  // if status refused => red
 
   const statusColor = (status) => {
     if (status === "accepted") return "green";
     if (status === "pending") return "orange";
     if (status === "refused") return "red";
     return "black";
-  }
-
-
-
-
-
+  };
 
   return (
     <div className={styles.quotationsContainer}>
       <h1>Gestion des Devis</h1>
+
+      <SearchQuotations />
 
       <table className={styles.quotationTable}>
         <thead>
@@ -109,16 +103,20 @@ export default function Quotations() {
               <td>{quotation.company_name || "Inconnue"}</td>
               <td>{quotation.user_id}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
-              <td> <span style={{color: statusColor(quotation.status)}}>{quotation.status}</span></td>
+              <td>
+                {" "}
+                <span style={{ color: statusColor(quotation.status) }}>
+                  {quotation.status}
+                </span>
+              </td>
 
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
               <td>{quotation.total_amount.toFixed(2)} €</td>
               <td>{quotation.margin.toFixed(2)} €</td>
               <td>
-                {(
-                  (quotation.margin / quotation.pre_tax_amount) *
-                  100
-                ).toFixed(2)}{" "}
+                {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                  2
+                )}{" "}
                 %
               </td>
               <td className={styles.actionCell}>

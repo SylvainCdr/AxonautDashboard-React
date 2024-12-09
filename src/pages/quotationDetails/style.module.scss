@@ -1,3 +1,16 @@
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  justify-content: center; /* Centrage horizontal */
+  align-items: center; /* Centrage vertical */
+  min-height: 100vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+  text-align: center;
+  color: black;
+}
+
+
 .quotationContainer {
 
   padding: 20px;

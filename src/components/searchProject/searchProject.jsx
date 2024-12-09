@@ -39,7 +39,7 @@ export default function SearchProjects() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <BarLoader color="#3498db" loading={loading} size={70} />
+        <BarLoader color="#4520ff" loading={loading} size={20} />
         <p>Recherche en cours...</p>
       </div>
     );

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
-import { fetchQuotationByProjectId } from "../../services/api/quotations";
 import styles from "./style.module.scss";
 import {
   BarChart,
@@ -12,9 +11,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { GridLoader } from "react-spinners";
 
 export default function ProjectDetails() {
   const { projectId } = useParams();
+  const navigate = useNavigate();
+
   const [project, setProject] = useState({});
   const [company, setCompany] = useState({});
   const [loading, setLoading] = useState(true);
@@ -24,42 +26,45 @@ export default function ProjectDetails() {
     const loadProjectData = async () => {
       try {
         setLoading(true);
-        const data = await fetchProjectById(projectId);
-        const companyData = await fetchCompanyById(data.company_id);
-        
-        setProject(data);
+        const projectData = await fetchProjectById(projectId);
+        const companyData = await fetchCompanyById(projectData.company_id);
+
+        setProject(projectData);
         setCompany(companyData);
+
+        // Récupérer le devis associé
       } catch (err) {
+        console.error(err);
         setError("Impossible de charger les données du projet.");
       } finally {
         setLoading(false);
       }
     };
+
     loadProjectData();
   }, [projectId]);
 
-  if (loading) return <div className={styles.loader}>Chargement...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <GridLoader color="#4520ff" loading={loading} size={20} />
+        <p>Chargement...</p>
+      </div>
+    );
+  }
+
+  if (error) return <p className={styles.error}>{error}</p>;
 
   // Préparation des données pour le graphique
-  const difference = project.estimated_revenue - project.actual_expenses_cost || 0;
+  const difference =
+    project.estimated_revenue - project.actual_expenses_cost || 0;
 
   const chartData = [
     { name: "Revenu estimé", estimatedRevenue: project.estimated_revenue },
     { name: "Revenu actuel", actualRevenue: project.actual_revenue },
-    {
-      name: "Dépenses actuelles",
-      actualExpenses: project.actual_expenses_cost,
-    },
-    // {
-    //   name: "Produits consommés",
-    //   consumeProducts: project.actual_consume_products_cost,
-    // },
+    { name: "Dépenses actuelles", actualExpenses: project.actual_expenses_cost },
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
-
-
-
 
   return (
     <div className={styles.projectContainer}>
@@ -76,6 +81,20 @@ export default function ProjectDetails() {
           <p>
             <strong>Nom :</strong> {project.name}
           </p>
+
+          {/* <p>
+            <strong>Devis associé :</strong>{" "}
+            {quotation ? (
+              <button
+                className={styles.quotationButton}
+                onClick={() => navigate(`/quotations/${quotation.id}`)}
+              >
+                Voir le devis
+              </button>
+            ) : (
+              "Aucun devis trouvé"
+            )}
+          </p> */}
         </div>
         <div className={styles.section2}>
           <p>
@@ -110,11 +129,10 @@ export default function ProjectDetails() {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="estimatedRevenue" fill="#4682B4" /> {/* Bleu */}
-            <Bar dataKey="actualRevenue" fill="#2E8B57" /> {/* Vert */}
-            <Bar dataKey="actualExpenses" fill="#FF69B4" /> {/* Rose */}
-            <Bar dataKey="consumeProducts" fill="#FF69B4" /> {/* Rose */}
-            <Bar dataKey="difference" fill="#FFD700" /> {/* Or */}
+            <Bar dataKey="estimatedRevenue" fill="#4682B4" />
+            <Bar dataKey="actualRevenue" fill="#2E8B57" />
+            <Bar dataKey="actualExpenses" fill="#FF69B4" />
+            <Bar dataKey="difference" fill="#FFD700" />
           </BarChart>
         </ResponsiveContainer>
       </div>

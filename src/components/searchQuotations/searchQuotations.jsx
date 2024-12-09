@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { fetchProjects } from "../../services/api/projects";
+import { fetchQuotations } from "../../services/api/quotations";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 
 export default function SearchQuotations() {
-  const [projects, setProjects] = useState([]); // Projets récupérés après recherche
+  const [quotations, setQuotations] = useState([]); // Projets récupérés après recherche
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
@@ -20,14 +20,14 @@ export default function SearchQuotations() {
     setError(null);
     setSubmittedSearch(search); // Enregistre la recherche effectuée
     try {
-      const data = await fetchProjects(); // Charger tous les projets
+      const data = await fetchQuotations(); // Charger tous les projets
       const lowerSearch = search.toLowerCase();
       const filtered = data.filter(
-        (project) =>
-          project.name.toLowerCase().includes(lowerSearch) ||
-          project.number.toLowerCase().includes(lowerSearch)
+        (quotation) =>
+          quotation.title.toLowerCase().includes(lowerSearch) ||
+          quotation.company_name.toLowerCase().includes(lowerSearch)
       );
-      setProjects(filtered);
+      setQuotations(filtered);
       setPage(1); // Réinitialiser la pagination
     } catch (err) {
       setError(err.message);
@@ -39,7 +39,7 @@ export default function SearchQuotations() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <BarLoader color="#3498db" loading={loading} size={70} />
+        <BarLoader color="#4520ff" loading={loading} size={20} />
         <p>Chargement des résultats...</p>
       </div>
     );
@@ -49,7 +49,7 @@ export default function SearchQuotations() {
     setPage((prevPage) => Math.max(1, prevPage + direction)); // Pagination (1 minimum)
   };
 
-  const paginatedProjects = projects.slice(
+  const paginatedQuotations = quotations.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
@@ -60,8 +60,16 @@ export default function SearchQuotations() {
     }
   };
 
-  const handleProjectClick = (projectId) => {
-    navigate(`/projects/${projectId}`); // Naviguer vers la page du projet
+  const handleQuotationClick = (quotationId) => {
+    navigate(`/quotations/${quotationId}`); // Naviguer vers la page du projet
+  };
+
+  
+  const statusColor = (status) => {
+    if (status === "accepted") return "green";
+    if (status === "pending") return "orange";
+    if (status === "refused") return "red";
+    return "black";
   };
 
   return (
@@ -72,7 +80,7 @@ export default function SearchQuotations() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyPress={handleKeyPress} // Recherche au clavier (Enter)
-          placeholder="Nom ou numéro du projet"
+          placeholder="Entreprise ou numéro du devis"
         />
         <button onClick={handleSearchSubmit}>Rechercher</button>
       </div>
@@ -82,28 +90,32 @@ export default function SearchQuotations() {
       {/* {!submittedSearch && !loading && <p>Veuillez entrer un terme de recherche.</p>} */}
 
       <div className={styles.searchResults}>
-        {paginatedProjects.length > 0
-          ? paginatedProjects.map((project) => (
+        {paginatedQuotations.length > 0
+          ? paginatedQuotations.map((quotation) => (
               <div
-                key={project.id}
-                onClick={() => handleProjectClick(project.id)}
+                key={quotation.id}
+                onClick={() => handleQuotationClick(quotation.id)}
                 className={styles.projectRow}
               >
                 <table>
                   <thead>
                     <tr>
-                      <th>Nom</th>
                       <th>Numéro</th>
+                      <th>Nom</th>
+                      <th> Client </th>
                       <th>Date de début</th>
-                      <th>Date de fin</th>
+                      <th>statut</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>{project.name}</td>
-                      <td>{project.number}</td>
-                      <td>{project.estimated_start}</td>
-                      <td>{project.estimated_end}</td>
+                      <td>{quotation.number}</td>
+                      <td>{quotation.title}</td>
+                      <td>{quotation.company_name}</td>
+                      <td>{new Date(quotation.date).toLocaleDateString()}</td>
+                      <td> <span style={{ color: statusColor(quotation.status) }}>
+                      {quotation.status}
+                    </span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -113,14 +125,14 @@ export default function SearchQuotations() {
             !loading && <p>Aucun projet trouvé pour "{submittedSearch}".</p>}
       </div>
 
-      {projects.length > itemsPerPage && (
+      {quotations.length > itemsPerPage && (
         <div>
           <button onClick={() => handlePageChange(-1)} disabled={page <= 1}>
             Page précédente
           </button>
           <button
             onClick={() => handlePageChange(1)}
-            disabled={page * itemsPerPage >= projects.length}
+            disabled={page * itemsPerPage >= quotations.length}
           >
             Page suivante
           </button>

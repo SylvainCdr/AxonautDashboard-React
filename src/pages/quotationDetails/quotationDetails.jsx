@@ -2,22 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchCompanyById } from "../../services/api/companies";
+import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
-
-
-
-
-
 
 export default function QuotationDetails() {
   const { quotationId } = useParams();
   const [quotation, setQuotation] = useState({});
   const [company, setCompany] = useState({});
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // on met en pplace le onClick pr aller sur le détail du projet
-
 
   const navigate = useNavigate();
 
@@ -25,16 +21,13 @@ export default function QuotationDetails() {
     navigate(`/projects/${quotation.project_id}`);
   };
 
-
-
-
-
   useEffect(() => {
     const loadQuotationData = async () => {
       try {
         setLoading(true);
         const data = await fetchQuotationById(quotationId);
         const companyData = await fetchCompanyById(data.company_id);
+
         setQuotation(data);
         setCompany(companyData);
       } catch (err) {
@@ -46,11 +39,27 @@ export default function QuotationDetails() {
     loadQuotationData();
   }, [quotationId]);
 
-  if (loading) return <div className={styles.loader}>Chargement...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <GridLoader color="#4520ff" loading={loading} size={20} />
+        <p>Chargement...</p>
+      </div>
+    );
+  }
+
+  if (error) return <p className={styles.error}>{error}</p>;
 
 
-  // 
+  const statusColor = (status) => {
+    if (status === "accepted") return "green";
+    if (status === "pending") return "orange";
+    if (status === "refused") return "red";
+    return "black";
+  }
+
+
+  //
 
   // {
   //   id: 7423684,
@@ -78,7 +87,7 @@ export default function QuotationDetails() {
   //   payments_to_display_in_pdf: null,
   //   electronic_signature_date: null,
   //   comments: '',
-  //   public_path: 'https://axonaut.com/public/quotation/pdf/7d5aae12df488f747d89bafa61d33e0b3558382162b4eeed99288e717811dbb9', 
+  //   public_path: 'https://axonaut.com/public/quotation/pdf/7d5aae12df488f747d89bafa61d33e0b3558382162b4eeed99288e717811dbb9',
   //   customer_portal_url: 'https://axonaut.com/document/DFZJ2WQXA5Q1843G',
   //   quotation_lines: [
   //     {
@@ -101,9 +110,34 @@ export default function QuotationDetails() {
   //       margin: 25.14,
   //       unit_job_costing: 326.82,
   //       chapter: ''
-  //     }, ... 
+  //     }, ...
 
 
+  // id: 29505560,
+  // name: '3DS DASSAULT SYSTEMES',       
+  // creation_date: '2024-11-14T09:39:03+01:00',
+  // address_street: '10 rue Marcel Dassault',
+  // address_zip_code: '78140',
+  // address_city: 'Velizy villacoublay', 
+  // address_region: null,
+  // address_country: '',
+  // comments: '',
+  // is_supplier: false,
+  // is_prospect: true,
+  // is_customer: false,
+  // currency: 'EUR',
+  // language: 'fr',
+  // thirdparty_code: null,
+  // supplier_thirdparty_code: null,      
+  // intracommunity_number: '',
+  // siret: '',
+  // internal_id: '',
+  // isB2C: false,
+  // business_manager: {
+  //   id: 147097,
+  //   name: 'Fabrice Vallee',
+  //   email: 'fabrice.vallee@pixecurity.com'
+  // },
 
   return (
     <div className={styles.quotationContainer}>
@@ -122,26 +156,25 @@ export default function QuotationDetails() {
             <strong>Titre :</strong> {quotation.title}
           </p>
           <p>
-            <strong>Date :</strong> {quotation.date}
+            <strong>Date :</strong> {new Date(quotation.date).toLocaleDateString()}
           </p>
           <p>
-            <strong>Date d'expiration :</strong> {quotation.expiry_date}
+            <strong>Date d'expiration :</strong> {new Date(quotation.expiry_date).toLocaleDateString()} 
           </p>
           <p>
             <strong>Date de dernière mise à jour :</strong>{" "}
-            {quotation.last_update_date}
+            {new Date(quotation.last_update_date).toLocaleDateString()} 
           </p>
           <p>
-            <strong>Statut :</strong> {quotation.status}
+            <strong>Statut :</strong> <span style={{ color: statusColor(quotation.status) }}>{quotation.status}</span>
           </p>
           <p>
-            <strong>Commentaire(s):</strong>{" "}
-            {quotation.comments}
+            <strong>Commentaire(s):</strong> {quotation.comments}
           </p>
         </div>
         <div className={styles.section2}>
           <p>
-            <strong>Id utilisateur :</strong> {quotation.user_id}
+            {/* <strong>Id utilisateur :</strong> {employee.firstname} {employee.lastname} */}
           </p>
           <p>
             <strong>Id entreprise :</strong> {quotation.company_id}
@@ -150,9 +183,15 @@ export default function QuotationDetails() {
           <p>
             <strong>Nom de l'entreprise :</strong> {quotation.company_name}
           </p>
-         
+          {/* // business_manager */}
+          <p> <strong> Commercial :</strong>  {company.business_manager?.name || "Inconnu"}</p>
+
           <p>
-            <strong>Id projet :</strong> <button onClick={() => handleClickProject(quotation.project_id)}> {quotation.project_id}</button>
+            <strong>Id projet :</strong>{" "}
+            <button onClick={() => handleClickProject(quotation.project_id)}>
+              {" "}
+              {quotation.project_id}
+            </button>
           </p>
           <p>
             <strong>Id opportunité :</strong> {quotation.opportunity_id}
@@ -171,7 +210,8 @@ export default function QuotationDetails() {
         <table>
           <thead>
             <tr>
-              <th>Produit</th>
+              <th>ID</th>
+              <th>Désignation</th>
               <th>Quantité</th>
               <th>Prix unitaire HT</th>
               <th>Montant total HT</th>
@@ -183,17 +223,14 @@ export default function QuotationDetails() {
           <tbody>
             {quotation.quotation_lines.map((line) => (
               <tr key={line.id}>
+                <td>{line.product_code}</td>
                 <td>{line.product_name}</td>
                 <td>{line.quantity}</td>
                 <td>{line.price} €</td>
                 <td>{line.pre_tax_amount} €</td>
-
-                {/* //       margin: 25.14,
-                //       unit_job_costing: 326.82, */}
                 <td> {line.unit_job_costing} €</td>
-
                 <td>{line.margin} €</td>
-                <td> {line.margin / line.pre_tax_amount * 100} %</td>
+                <td> {((line.margin / line.pre_tax_amount) * 100).toFixed(2)} %</td>
               </tr>
             ))}
           </tbody>
@@ -207,11 +244,11 @@ export default function QuotationDetails() {
             <strong>Montant total TTC :</strong> {quotation.total_amount} €
           </p>
           <p>
-            <strong>Marge totale :</strong> {quotation.margin} €
+            <strong>Marge totale :</strong> {quotation.margin.toFixed(2)} €
           </p>
           <p>
-          <strong> Marge % :</strong> {quotation.margin / quotation.pre_tax_amount * 100} %
-          
+            <strong> Marge % :</strong>{" "}
+            {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(2)} %
           </p>
         </div>
       </div>
@@ -226,8 +263,7 @@ export default function QuotationDetails() {
           Voir le devis
         </a>
         <a
-          href={quotation
-            .customer_portal_url}
+          href={quotation.customer_portal_url}
           target="_blank"
           rel="noreferrer"
           className={styles.button}

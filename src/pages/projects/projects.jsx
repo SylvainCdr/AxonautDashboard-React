@@ -1,7 +1,8 @@
 import styles from "./style.module.scss";
 import React, { useEffect, useState } from "react";
 import { fetchProjects } from "../../services/api/projects";
-import { ScaleLoader } from "react-spinners";
+import { fetchCompanyById } from "../../services/api/companies";
+import { GridLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import SearchProject from "../../components/searchProject/searchProject";
 
@@ -10,50 +11,67 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [companyCache, setCompanyCache] = useState(new Map());
 
   const navigate = useNavigate();
 
   const handleClickProject = (projectId) => {
     navigate(`/projects/${projectId}`);
   };
-  
+
   useEffect(() => {
     const loadProjectsData = async () => {
       try {
         setLoading(true);
-        // Appel API sans limit, on gère cela côté client
-        const data = await fetchProjects(page); // L'API retourne 500 éléments par page
-        // On ne garde que les 50 premiers éléments
-        const limitedData = data.slice(0, 25); // On limite à 50 éléments
+        const data = await fetchProjects(page); // Charger les projets pour la page actuelle
+        const limitedData = data.slice(0, 10); // Limiter à 15 projets
         setProjects(limitedData);
+
+        // Charger les noms des entreprises
+        const uniqueCompanyIds = [...new Set(limitedData.map((p) => p.company_id))];
+
+        const companyPromises = uniqueCompanyIds.map(async (id) => {
+          if (!companyCache.has(id)) {
+            const companyData = await fetchCompanyById(id);
+            companyCache.set(id, companyData.name); // Stocker le nom de l'entreprise
+          }
+        });
+
+        await Promise.all(companyPromises);
+        setCompanyCache(new Map(companyCache)); // Mettre à jour le cache
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+
     loadProjectsData();
   }, [page]);
 
+ 
+
+  
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <ScaleLoader color="#3498db" loading={loading} size={70} />
+        <GridLoader color="#4520ff" loading={loading} size={20} />
         <p>Chargement des projets...</p>
       </div>
     );
   }
-
+  
+  
   if (error) return <p>Erreur : {error}</p>;
 
   return (
     <div className={styles.projectsContainer}>
       <h1>Gestion des Projets</h1>
       <SearchProject />
-      <table >
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -74,7 +92,7 @@ export default function Projects() {
               <td>{project.id}</td>
               <td>{project.name}</td>
               <td>{project.number}</td>
-              <td>{project.company_name || "Inconnue"}</td>
+              <td> {companyCache.get(project.company_id)}</td>
               <td>{new Date(project.estimated_start).toLocaleDateString()}</td>
               <td>{new Date(project.estimated_end).toLocaleDateString()}</td>
               <td>{project.estimated_revenue} €</td>

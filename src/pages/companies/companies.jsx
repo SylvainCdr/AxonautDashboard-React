@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchCompanies } from "../../services/api/companies";
-import { ScaleLoader } from "react-spinners";
+import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 
 export default function Companies() {
@@ -51,7 +51,7 @@ export default function Companies() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <ScaleLoader color="#3498db" loading={loading} size={70} />
+        <GridLoader color="#4520ff" loading={loading} size={20} />
         <p>Chargement des entreprises...</p>
       </div>
     );

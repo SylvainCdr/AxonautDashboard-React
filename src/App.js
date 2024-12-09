@@ -6,6 +6,7 @@ import Projects from "./pages/projects/projects";
 import ProjectDetails from "./pages/projectDetails/projectDetails";
 import Quotations from "./pages/quotations/quotations";
 import QuotationDetails from "./pages/quotationDetails/quotationDetails";
+import Employees from "./pages/employees/employees";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/projects/:projectId" element={<ProjectDetails />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/quotations/:quotationId" element={<QuotationDetails />} />
+          <Route path="/employees" element={<Employees />} />
         </Route>
       </Routes>
     </BrowserRouter>
