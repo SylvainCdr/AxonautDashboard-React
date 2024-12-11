@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchCompanies } from "../../services/api/companies";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
+import { useNavigate } from "react-router-dom";
 
 export default function Companies() {
   const [companies, setCompanies] = useState([]);
@@ -10,6 +11,8 @@ export default function Companies() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("all"); // Filtre actif: 'all', 'supplier', 'prospect', 'customer'
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadCompanies = async () => {
@@ -111,7 +114,13 @@ export default function Companies() {
               <td>{company.address_city}</td>
               <td>{new Date(company.creation_date).toLocaleDateString()}</td>
               <td>
-                <button>Voir</button>
+                <button
+                  onClick={() => navigate(`/companies/${company.id}`)}
+                  className={styles.actionButton}
+                >
+                  Voir
+                </button>
+                
               </td>
             </tr>
           ))}

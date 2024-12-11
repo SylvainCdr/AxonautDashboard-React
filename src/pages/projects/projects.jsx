@@ -24,21 +24,21 @@ export default function Projects() {
       try {
         setLoading(true);
         const data = await fetchProjects(page); // Charger les projets pour la page actuelle
-        const limitedData = data.slice(0, 10); // Limiter à 15 projets
+        const limitedData = data.slice(0, 500); // Limiter à 15 projets
         setProjects(limitedData);
 
         // Charger les noms des entreprises
-        const uniqueCompanyIds = [...new Set(limitedData.map((p) => p.company_id))];
+        // const uniqueCompanyIds = [...new Set(limitedData.map((p) => p.company_id))];
 
-        const companyPromises = uniqueCompanyIds.map(async (id) => {
-          if (!companyCache.has(id)) {
-            const companyData = await fetchCompanyById(id);
-            companyCache.set(id, companyData.name); // Stocker le nom de l'entreprise
-          }
-        });
+        // const companyPromises = uniqueCompanyIds.map(async (id) => {
+        //   if (!companyCache.has(id)) {
+        //     const companyData = await fetchCompanyById(id);
+        //     companyCache.set(id, companyData.name); // Stocker le nom de l'entreprise
+        //   }
+        // });
 
-        await Promise.all(companyPromises);
-        setCompanyCache(new Map(companyCache)); // Mettre à jour le cache
+        // await Promise.all(companyPromises);
+        // setCompanyCache(new Map(companyCache)); // Mettre à jour le cache
       } catch (err) {
         setError(err.message);
       } finally {
@@ -92,7 +92,8 @@ export default function Projects() {
               <td>{project.id}</td>
               <td>{project.name}</td>
               <td>{project.number}</td>
-              <td> {companyCache.get(project.company_id)}</td>
+              {/* <td> {companyCache.get(project.company_id)}</td> */}
+              <td>{project.company_id}</td>
               <td>{new Date(project.estimated_start).toLocaleDateString()}</td>
               <td>{new Date(project.estimated_end).toLocaleDateString()}</td>
               <td>{project.estimated_revenue} €</td>

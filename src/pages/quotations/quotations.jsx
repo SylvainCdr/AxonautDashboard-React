@@ -17,30 +17,13 @@ export default function Quotations() {
     navigate(`/quotations/${quotationId}`);
   };
 
-  // useEffect(() => {
-  //   const loadProjectsData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       // Appel API sans limit, on gère cela côté client
-  //       const data = await fetchProjects(page); // L'API retourne 500 éléments par page
-  //       // On ne garde que les 50 premiers éléments
-  //       const limitedData = data.slice(0, 25); // On limite à 50 éléments
-  //       setProjects(limitedData);
-  //     } catch (err) {
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   loadProjectsData();
-  // }, [page]);
 
   useEffect(() => {
     const loadQuotationsData = async () => {
       try {
         setLoading(true); // Mettre le loading à true avant de commencer l'appel
         const data = await fetchQuotations(page);
-        const limitedData = data.slice(0, 10); // On limite à 50 éléments
+        const limitedData = data.slice(0, 500); // On limite à 50 éléments
         setQuotations(limitedData);
       } catch (err) {
         setError(err.message);
@@ -92,7 +75,7 @@ export default function Quotations() {
             <th>Montant TTC</th>
             <th>Marge (€)</th>
             <th>Marge (%)</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
