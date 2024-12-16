@@ -68,7 +68,7 @@ export default function ProjectDetails() {
 
   return (
     <div className={styles.projectContainer}>
-      <h1>Détails du projet</h1>
+      <h1>Détails du projet - {project.number}</h1>
 
       <div className={styles.header}>
         <div className={styles.section1}>
@@ -82,19 +82,7 @@ export default function ProjectDetails() {
             <strong>Nom :</strong> {project.name}
           </p>
 
-          {/* <p>
-            <strong>Devis associé :</strong>{" "}
-            {quotation ? (
-              <button
-                className={styles.quotationButton}
-                onClick={() => navigate(`/quotations/${quotation.id}`)}
-              >
-                Voir le devis
-              </button>
-            ) : (
-              "Aucun devis trouvé"
-            )}
-          </p> */}
+     
         </div>
         <div className={styles.section2}>
           <p>
@@ -135,6 +123,11 @@ export default function ProjectDetails() {
             <Bar dataKey="difference" fill="#FFD700" />
           </BarChart>
         </ResponsiveContainer>
+
+
+
+
+     
       </div>
     </div>
   );

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchCompanyById } from "../../services/api/companies";
+import { fetchContractById } from "../../services/api/contracts";
+import { fetchInvoiceById } from "../../services/api/invoices";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 
@@ -9,7 +11,8 @@ export default function QuotationDetails() {
   const { quotationId } = useParams();
   const [quotation, setQuotation] = useState({});
   const [company, setCompany] = useState({});
-
+  const [invoices, setInvoices] = useState([]);
+  const [contract, setContract] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,9 +30,17 @@ export default function QuotationDetails() {
         setLoading(true);
         const data = await fetchQuotationById(quotationId);
         const companyData = await fetchCompanyById(data.company_id);
+        const contractData = await fetchContractById(data.contract_id);
+        const invoicePromises = contractData.invoices_id.map((invoiceId) =>
+          fetchInvoiceById(invoiceId)
+        );
+        const invoicesData = await Promise.all(invoicePromises);
+      
 
         setQuotation(data);
         setCompany(companyData);
+        setContract(contractData);
+        setInvoices(invoicesData);
       } catch (err) {
         setError("Impossible de charger les données du projet.");
       } finally {
@@ -38,6 +49,29 @@ export default function QuotationDetails() {
     };
     loadQuotationData();
   }, [quotationId]);
+
+  // useEffect(() => {
+  //   const loadInvoicesData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const invoicePromises = contract.invoices_id.map((invoiceId) =>
+  //         fetchInvoiceById(invoiceId)
+  //       );
+  //       const invoicesData = await Promise.all(invoicePromises);
+  //       setInvoices(invoicesData);
+  //     } catch (err) {
+  //       setError("Impossible de charger les factures.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   if (contract.invoices_id?.length) {
+  //     loadInvoicesData();
+  //   }
+  // }, [contract]);
+
+  console.log("Données reçues d'Axonaut pour invoices:", invoices);
 
   if (loading) {
     return (
@@ -50,104 +84,19 @@ export default function QuotationDetails() {
 
   if (error) return <p className={styles.error}>{error}</p>;
 
-
   const statusColor = (status) => {
     if (status === "accepted") return "green";
     if (status === "pending") return "orange";
     if (status === "refused") return "red";
     return "black";
-  }
-
-
-  //
-
-  // {
-  //   id: 7423684,
-  //   number: 'Pix4627',
-  //   title: 'Pix4627',
-  //   date: '2024-12-06T00:00:00+01:00',
-  //   expiry_date: '2025-01-05T00:00:00+01:00',
-  //   sent_date: null,
-  //   last_update_date: '2024-12-06T14:32:21+01:00',
-  //   status: 'pending',
-  //   user_id: 462785,
-  //   company_id: 27714284,
-  //   company_name: 'SPIE BUILDING SOLUTIONS',
-  //   project_id: null,
-  //   opportunity_id: null,
-  //   contract_id: null,
-  //   global_discount_amount: 0,
-  //   global_discount_amount_with_tax: 0,
-  //   global_discount_unit_is_percent: null,
-  //   global_discount_comments: null,
-  //   pre_tax_amount: 1152.48,
-  //   tax_amount: 230.5,
-  //   total_amount: 1382.98,
-  //   margin: 82.31999999999991,
-  //   payments_to_display_in_pdf: null,
-  //   electronic_signature_date: null,
-  //   comments: '',
-  //   public_path: 'https://axonaut.com/public/quotation/pdf/7d5aae12df488f747d89bafa61d33e0b3558382162b4eeed99288e717811dbb9',
-  //   customer_portal_url: 'https://axonaut.com/document/DFZJ2WQXA5Q1843G',
-  //   quotation_lines: [
-  //     {
-  //       product_id: 20680908,
-  //       product_internal_id: null,
-  //       product_name: 'XND-6080R',
-  //       product_code: 'XND-6080R',
-  //       title: 'XND-6080R',
-  //       details: 'X series powered by Wisenet 5 network IR indoor dome camera, 2MP @60fps, 2.8 ~ 12.0mm motorized varifocal lens',
-  //       quantity: 1,
-  //       unit: '',
-  //       price: 351.96,
-  //       tax_rates: [Array],
-  //       line_discount_amount: '0.00',
-  //       line_discount_amount_with_tax: '0.00',
-  //       line_discount_unit_is_percent: true,
-  //       tax_amount: 70.39,
-  //       pre_tax_amount: 351.96,
-  //       total_amount: 422.35,
-  //       margin: 25.14,
-  //       unit_job_costing: 326.82,
-  //       chapter: ''
-  //     }, ...
-
-
-  // id: 29505560,
-  // name: '3DS DASSAULT SYSTEMES',       
-  // creation_date: '2024-11-14T09:39:03+01:00',
-  // address_street: '10 rue Marcel Dassault',
-  // address_zip_code: '78140',
-  // address_city: 'Velizy villacoublay', 
-  // address_region: null,
-  // address_country: '',
-  // comments: '',
-  // is_supplier: false,
-  // is_prospect: true,
-  // is_customer: false,
-  // currency: 'EUR',
-  // language: 'fr',
-  // thirdparty_code: null,
-  // supplier_thirdparty_code: null,      
-  // intracommunity_number: '',
-  // siret: '',
-  // internal_id: '',
-  // isB2C: false,
-  // business_manager: {
-  //   id: 147097,
-  //   name: 'Fabrice Vallee',
-  //   email: 'fabrice.vallee@pixecurity.com'
-  // },
+  };
 
   return (
     <div className={styles.quotationContainer}>
-      <h1>Détails du devis</h1>
+      <h1>Détails du devis - {quotation.number}</h1>
 
       <div className={styles.header}>
         <div className={styles.section1}>
-          <p>
-            <strong>Id :</strong> {quotation.id}
-          </p>
           <p>
             <strong>Numéro :</strong> {quotation.number}
           </p>
@@ -156,17 +105,22 @@ export default function QuotationDetails() {
             <strong>Titre :</strong> {quotation.title}
           </p>
           <p>
-            <strong>Date :</strong> {new Date(quotation.date).toLocaleDateString()}
+            <strong>Date :</strong>{" "}
+            {new Date(quotation.date).toLocaleDateString()}
           </p>
           <p>
-            <strong>Date d'expiration :</strong> {new Date(quotation.expiry_date).toLocaleDateString()} 
+            <strong>Date d'expiration :</strong>{" "}
+            {new Date(quotation.expiry_date).toLocaleDateString()}
           </p>
           <p>
             <strong>Date de dernière mise à jour :</strong>{" "}
-            {new Date(quotation.last_update_date).toLocaleDateString()} 
+            {new Date(quotation.last_update_date).toLocaleDateString()}
           </p>
           <p>
-            <strong>Statut :</strong> <span style={{ color: statusColor(quotation.status) }}>{quotation.status}</span>
+            <strong>Statut :</strong>{" "}
+            <span style={{ color: statusColor(quotation.status) }}>
+              {quotation.status}
+            </span>
           </p>
           <p>
             <strong>Commentaire(s):</strong> {quotation.comments}
@@ -184,7 +138,11 @@ export default function QuotationDetails() {
             <strong>Nom de l'entreprise :</strong> {quotation.company_name}
           </p>
           {/* // business_manager */}
-          <p> <strong> Commercial :</strong>  {company.business_manager?.name || "Inconnu"}</p>
+          <p>
+            {" "}
+            <strong> Commercial :</strong>{" "}
+            {company.business_manager?.name || "Inconnu"}
+          </p>
 
           <p>
             <strong>Id projet :</strong>{" "}
@@ -230,7 +188,10 @@ export default function QuotationDetails() {
                 <td>{line.pre_tax_amount} €</td>
                 <td> {line.unit_job_costing} €</td>
                 <td>{line.margin} €</td>
-                <td> {((line.margin / line.pre_tax_amount) * 100).toFixed(2)} %</td>
+                <td>
+                  {" "}
+                  {((line.margin / line.pre_tax_amount) * 100).toFixed(2)} %
+                </td>
               </tr>
             ))}
           </tbody>
@@ -260,7 +221,7 @@ export default function QuotationDetails() {
           rel="noreferrer"
           className={styles.button}
         >
-          Voir le devis
+          Voir le devis dans Axonaut
         </a>
         <a
           href={quotation.customer_portal_url}
@@ -270,6 +231,102 @@ export default function QuotationDetails() {
         >
           Voir le devis dans le portail client
         </a>
+      </div>
+
+      <div className={styles.contractContainer}>
+        <h1> Détails de la facturation </h1>
+
+        <div className={styles.contractDetails}>
+          <p>
+            <strong>Id :</strong> {contract.id}
+          </p>
+          <p>
+            <strong>Nom :</strong> {contract.name}
+          </p>
+          <p>
+            <strong>Date de début :</strong>{" "}
+            {new Date(contract.start_date).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Commentaire :</strong> {contract.comments}
+          </p>
+          <p>
+            <strong>Id utilisateur :</strong> {contract.user_id}
+          </p>
+          <p>
+            <strong>Adresse de facturation :</strong>{" "}
+            {contract.invoice_address.company_name}
+          </p>
+          <p>
+            <strong>Adresse de facturation :</strong>{" "}
+            {contract.invoice_address.street}
+          </p>
+          <p>
+            <strong>Code postal :</strong> {contract.invoice_address.zip_code}
+          </p>
+          <p>
+            <strong>Ville :</strong> {contract.invoice_address.city}
+          </p>
+
+          <p>
+            <strong>Date de dernière mise à jour :</strong>{" "}
+            {new Date(contract.last_update_date).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Id projet :</strong> {contract.project.id}
+          </p>
+          <p>
+            <strong>Numéro projet :</strong> {contract.project.number}
+          </p>
+          <p>
+            <strong>Nom projet :</strong> {contract.project.name}
+          </p>
+          <p>
+            <strong>Id devis :</strong> {contract.quotation.id}
+          </p>
+          <p>
+            <strong>Montant total HT :</strong>{" "}
+            {contract.quotation.pre_tax_amount.toFixed(2)}  €
+          </p>
+
+          <h2>Factures liées au contrat</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Numéro facture </th>
+                <th>Montant HT</th>
+                <th>Date de création</th>
+                <th>Date de Paiement</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoices.map((invoice) => (
+                <tr key={invoice.id}>
+                  <td>
+                    {invoice.number}{" "}
+                    {invoice.mandatory_mentions && (
+                      <strong>{invoice.mandatory_mentions}</strong>
+                    )}
+                  </td>
+
+                  <td>{invoice.pre_tax_amount} €</td>
+                  <td>{new Date(invoice.date).toLocaleDateString()}</td>
+                  <td>{new Date(invoice.paid_date).toLocaleDateString()}</td>
+                  <td>
+                    <a
+                      href={invoice.public_path}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Voir la facture
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

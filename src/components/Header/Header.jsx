@@ -53,7 +53,7 @@ function Header() {
               Entreprises
             </NavLink>
           </li>
-          <li className={styles.navLi}>
+          {/* <li className={styles.navLi}>
             <NavLink
               to="/projects"
               onClick={handleLinkClick}
@@ -61,14 +61,14 @@ function Header() {
             >
               Projets
             </NavLink>
-          </li>
+          </li> */}
           <li className={styles.navLi}>
             <NavLink
               to="/quotations"
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              Devis
+              Devis & Projets
             </NavLink>
           </li>
           <li className={styles.navLi}>

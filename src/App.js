@@ -8,6 +8,7 @@ import Quotations from "./pages/quotations/quotations";
 import QuotationDetails from "./pages/quotationDetails/quotationDetails";
 import Employees from "./pages/employees/employees";
 import CompanyDetails from "./pages/companyDetails/companyDetails";
+import QuotationAndProjectDetails from "./pages/quotationAndProjectDetails/quotationAndProjectDetails";
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
           <Route path="/quotations/:quotationId" element={<QuotationDetails />} />
           <Route path="/employees" element={<Employees />} />
           <Route path="/companies/:companyId" element={<CompanyDetails />} />
+          <Route path="/quotations/:quotationId/project/:projectId" element={<QuotationAndProjectDetails />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

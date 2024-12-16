@@ -7,16 +7,23 @@ import SearchQuotations from "../../components/searchQuotations/searchQuotations
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
-  const handleClickProject = (quotationId) => {
-    navigate(`/quotations/${quotationId}`);
-  };
+  // const handleClickProject = (quotationId, projectId) => {
+  //   // navigate(`/quotations/${quotationId}`);
+  //   navigate(`/quotations/${quotationId}/project`);
+  // };
 
+  const handleClickProject = (quotationId, projectId) => {
+    // On passe à la fois quotationId et projectId dans le chemin de l'URL
+    navigate(`/quotations/${quotationId}/project/${projectId}`);
+  };
+  
 
   useEffect(() => {
     const loadQuotationsData = async () => {
@@ -40,7 +47,7 @@ export default function Quotations() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={20} />
+        <GridLoader color="#4520ff" loading={loading} size={50} />
         <p>Chargement des devis...</p>
       </div>
     );
@@ -58,7 +65,7 @@ export default function Quotations() {
 
   return (
     <div className={styles.quotationsContainer}>
-      <h1>Gestion des Devis</h1>
+      <h1>Gestion des Devis & Projets</h1>
 
       <SearchQuotations />
 
@@ -103,9 +110,12 @@ export default function Quotations() {
                 %
               </td>
               <td className={styles.actionCell}>
-                <button onClick={() => handleClickProject(quotation.id)}>
+                {/* <button onClick={() => handleClickProject(quotation.id)}>
                   Voir
-                </button>
+                </button> */}
+                 <button onClick={() => handleClickProject(quotation.id, quotation.project_id)}>
+          Voir
+        </button>
               </td>
             </tr>
           ))}

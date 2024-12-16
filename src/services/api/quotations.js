@@ -27,6 +27,27 @@ export const fetchQuotations = async (page = 1) => {
   }
 };
 
+// export const fetchQuotationByIdAndProjectId = async (quotationId, projectId) => {
+//   const response = await fetch(
+//     `http://localhost:3001/quotations/${quotationId}/projects/${projectId}`,
+//     {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//         "page": "1",
+//       },
+//     }
+//   );
+//   console.log("Réponse API Axonaut :", response);
+
+//   if (!response.ok) {
+//     throw new Error("Erreur lors de la récupération des données du projet");
+//   }
+//   return response.json();
+// };
+
+
+
 export const fetchQuotationById = async (quotationId) => {
   const response = await fetch(
     `http://localhost:3001/quotations/${quotationId}`,
@@ -45,7 +66,7 @@ export const fetchQuotationById = async (quotationId) => {
   return response.json();
 };
 
-// router.get("/quotations/project/:projectId", getQuotationByProjectId);
+
 
 export const fetchQuotationByProjectId = async (projectId) => {
   const response = await fetch(
