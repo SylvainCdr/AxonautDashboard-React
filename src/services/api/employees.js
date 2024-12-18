@@ -10,7 +10,7 @@ export const fetchEmployees = async (page = 1) => {
         }
       );
   
-      console.log("Réponse API Axonaut :", response);
+
   
       if (!response.ok) {
         throw new Error(`Erreur HTTP ! Status : ${response.status}`);
@@ -28,14 +28,12 @@ export const fetchEmployees = async (page = 1) => {
   };
 
   export const fetchEmployeeById = async (employeeId) => {
-    console.log ("fetchEmployeeById", employeeId);
     const response = await fetch(`http://localhost:3001/employees/${employeeId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
-    console.log("Réponse API Axonaut :", response);
   
     if (!response.ok) {
       throw new Error("Erreur lors de la récupération des données du projet");

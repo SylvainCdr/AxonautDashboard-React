@@ -11,7 +11,6 @@ export const fetchProjects = async (page = 1) => {
         }
       );
   
-      console.log("Réponse API Axonaut :", response);
   
       if (!response.ok) {
         throw new Error(`Erreur HTTP ! Status : ${response.status}`);

@@ -50,28 +50,7 @@ export default function QuotationDetails() {
     loadQuotationData();
   }, [quotationId]);
 
-  // useEffect(() => {
-  //   const loadInvoicesData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const invoicePromises = contract.invoices_id.map((invoiceId) =>
-  //         fetchInvoiceById(invoiceId)
-  //       );
-  //       const invoicesData = await Promise.all(invoicePromises);
-  //       setInvoices(invoicesData);
-  //     } catch (err) {
-  //       setError("Impossible de charger les factures.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
 
-  //   if (contract.invoices_id?.length) {
-  //     loadInvoicesData();
-  //   }
-  // }, [contract]);
-
-  console.log("Données reçues d'Axonaut pour invoices:", invoices);
 
   if (loading) {
     return (
@@ -168,7 +147,7 @@ export default function QuotationDetails() {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Référence</th>
               <th>Désignation</th>
               <th>Quantité</th>
               <th>Prix unitaire HT</th>
@@ -238,7 +217,7 @@ export default function QuotationDetails() {
 
         <div className={styles.contractDetails}>
           <p>
-            <strong>Id :</strong> {contract.id}
+            <strong>Id contrat :</strong> {contract.id}
           </p>
           <p>
             <strong>Nom :</strong> {contract.name}

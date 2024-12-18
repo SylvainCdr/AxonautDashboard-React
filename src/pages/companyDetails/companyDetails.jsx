@@ -2,8 +2,10 @@ import styles from "./style.module.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchCompanyById } from "../../services/api/companies";
 import { useEffect, useState } from "react";
-import { fetchQuotationsByCompanyId, fetchInvoicesByCompanyId } from "../../services/api/companies";
-
+import {
+  fetchQuotationsByCompanyId,
+  fetchInvoicesByCompanyId,
+} from "../../services/api/companies";
 import { Link } from "react-router-dom";
 
 export default function CompanyDetails() {
@@ -48,7 +50,6 @@ export default function CompanyDetails() {
       try {
         const data = await fetchInvoicesByCompanyId(companyId);
         setInvoices(data);
-        console.log("invoices", data);
       } catch (err) {
         console.error(
           "Erreur lors de la récupération des factures de l'entreprise :",
@@ -59,65 +60,17 @@ export default function CompanyDetails() {
     loadInvoices();
   }, [companyId]);
 
-
-
-  // {
-  //     "id": 55,
-  //     "name": "foo",
-  //     "creation_date": "2022-05-31\\T18:56:22P",
-  //     "address_street": "5 rue de la gare",
-  //     "address_zip_code": "31500",
-  //     "address_city": "Toulouse",
-  //     "address_country": "France",
-  //     "comments": "string",
-  //     "is_prospect": true,
-  //     "is_customer": false,
-  //     "currency": "EUR",
-  //     "language": "fr",
-  //     "thirdparty_code": "411000",
-  //     "supplier_thirdparty_code": "401000",
-  //     "intracommunity_number": "FR1X123456789",
-  //     "siret": "1234567891012",
-  //     "internal_id": "A254-5851-486H-HEA5",
-  //     "isB2C": false,
-  //     "business_manager": {
-  //       "id": 55,
-  //       "name": "Claire Rousseau",
-  //       "email": "claire@axonaut.com"
-  //     },
-  //     "custom_fields": {
-  //       "myCustomField": 1
-  //     },
-  //     "categories": {
-  //       "id": 55,
-  //       "name": "B2B"
-  //     },
-  //     "employees": [
-  //       {
-  //         "id": 55,
-  //         "gender": 1,
-  //         "firstname": "Claire",
-  //         "lastname": "Rousseau",
-  //         "email": "claire@axonaut.com",
-  //         "phone_number": "0102030405",
-  //         "cellphone_number": "0605040302",
-  //         "job": "CEO",
-  //         "is_billing_contact": true,
-  //         "company_id": 33,
-  //         "custom_fields": {
-  //           "myCustomField": 1
-  //         }
-  //       }
-  //     ],
-  //     "documents": [
-  //       0
-  //     ]
-  //   }
+  const statusColor = (status) => {
+    if (status === "accepted") return "green";
+    if (status === "pending") return "orange";
+    if (status === "refused") return "red";
+    return "black";
+  };
 
   return (
     <div className={styles.companyDetailsContainer}>
       <div className={styles.section1}>
-        <h1>Company details</h1>
+        <h1>Détails de l'entreprise</h1>
         <p>Company name: {company.name}</p>
         <p>
           Creation date: {new Date(company.creation_date).toLocaleDateString()}
@@ -145,10 +98,9 @@ export default function CompanyDetails() {
           {company.employees?.map((employee) => employee.firstname).join(", ")}
         </p>
         <p>Documents: {company.documents?.length}</p>
-        <button onClick={() => navigate(-1)}>Back</button>
       </div>
       <div className={styles.section2}>
-        <h2>Quotations</h2>
+        <h1>Devis & projet </h1>
         <table>
           <thead>
             <tr>
@@ -166,11 +118,19 @@ export default function CompanyDetails() {
                 <td>{quotation.number}</td>
                 <td>{new Date(quotation.date).toLocaleDateString()}</td>
                 <td>{quotation.title}</td>
-                <td>{quotation.pre_tax_amount}</td>
-                <td>{quotation.status}</td>
+                <td>{quotation.pre_tax_amount} €</td>
+                <td>
+                  <span style={{ color: statusColor(quotation.status) }}>
+                    {quotation.status}
+                  </span>
+                </td>
                 <td>
                   <button
-                    onClick={() => navigate(`/quotations/${quotation.id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/quotations/${quotation.id}/project/${quotation.project_id}`
+                      )
+                    }
                   >
                     Voir
                   </button>
@@ -179,95 +139,39 @@ export default function CompanyDetails() {
             ))}
           </tbody>
         </table>
-
- 
       </div>
 
       <div className={styles.section3}>
-
-        <h2>Invoices</h2>
-
-        {/* {
-    "id": 55,
-    "number": "FAC2022-08-00001",
-    "date": "1653955200",
-    "sent_date": "1653955200",
-    "due_date": "1653955200",
-    "paid_date": "1653955200",
-    "delivery_date": "1653955200",
-    "last_update_date": "1653955200",
-    "tax_amount": 55.02,
-    "total": 552,
-    "deposits": {
-      "deposit_percent": 50,
-      "deposit_flat": 250
-    },
-    "discounts": {
-      "amount": 50,
-      "amount_with_tax": 52,
-      "comments": "commercial gesture"
-    },
-    "taxes": [
-      {
-        "rate": 5.5,
-        "amount": 105.25
-      }
-    ],
-    "currency": "EUR",
-    "margin": 0,
-    "mandatory_mentions": "string",
-    "payment_terms": "string",
-    "theme_id": 1020,
-    "outstanding_amount": 0,
-    "frequency_in_months": 0,
-    "business_user": "Claire Rousseau",
-    "public_path": "https://axonaut.com/public/invoice/pdf/XDJC51321",
-    "paid_invoice_pdf": "https://axonaut.com/utilities/invoice/paidDownload/XDJC51321",
-    "customer_portal_url": "https://axonaut.com/document/XDJC51321",
-    "contract_id": 995,
-    "project_id": 995,
-    
-  }
-] */}
+        <h1>Factures </h1>
 
         <table>
-
           <thead>
             <tr>
               <th>Number</th>
               <th>Date</th>
-              <th>Montant HT</th>
               <th>Statut</th>
+              <th>Montant HT</th>
               <th>Voir </th>
-
             </tr>
           </thead>
 
           <tbody>
-
-      {invoices.map((invoice) => (
-        <tr key={invoice.id}>
-          <td>{invoice.number}</td>
-          <td>{new Date(invoice.date).toLocaleDateString()}</td>
-          <td>{invoice.pre_tax_amount}</td>
-          <td>{invoice.status}</td>
-          <td>
-            <Link  to={invoice.paid_invoice_pdf}>Voir</Link>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-
-        
-
-
-
-
+            {invoices.map((invoice) => (
+              <tr key={invoice.id}>
+                <td>{invoice.number}</td>
+                <td>{new Date(invoice.date).toLocaleDateString()}</td>
+                <td>{new Date(invoice.due_date).toLocaleDateString()}</td>
+                <td>{invoice.pre_tax_amount} €</td>
+                <td>
+                  <Link to={invoice.paid_invoice_pdf}>Voir</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <button onClick={() => navigate(-1)}>Back</button>
 
     </div>
-
-    </div>
-
   );
 }

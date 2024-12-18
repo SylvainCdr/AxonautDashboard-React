@@ -10,7 +10,6 @@ export const fetchQuotations = async (page = 1) => {
       }
     );
 
-    console.log("Réponse API Axonaut :", response);
 
     if (!response.ok) {
       throw new Error(`Erreur HTTP ! Status : ${response.status}`);
@@ -58,7 +57,6 @@ export const fetchQuotationById = async (quotationId) => {
       },
     }
   );
-  console.log("Réponse API Axonaut :", response);
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des données du projet");

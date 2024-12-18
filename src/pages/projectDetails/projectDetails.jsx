@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
+import { fetchExpensesByProject } from "../../services/api/expenses";
 import styles from "./style.module.scss";
 import {
   BarChart,
@@ -21,6 +22,7 @@ export default function ProjectDetails() {
   const [company, setCompany] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expenses, setExpenses] = useState([]);
 
   useEffect(() => {
     const loadProjectData = async () => {
@@ -28,22 +30,98 @@ export default function ProjectDetails() {
         setLoading(true);
         const projectData = await fetchProjectById(projectId);
         const companyData = await fetchCompanyById(projectData.company_id);
-
+        const expensesData = await fetchExpensesByProject(
+          projectData.estimated_start,
+          projectData.estimated_end
+        );
+       
+        console.log(expensesData); // Log des données des dépenses pour vérifier
+  
         setProject(projectData);
         setCompany(companyData);
-
-        // Récupérer le devis associé
+        // Vérification si expensesData est un tableau
+        if (Array.isArray(expensesData)) {
+          setExpenses(expensesData);
+        } else {
+          setExpenses([]); // Si ce n'est pas un tableau, initialiser comme un tableau vide
+          setError("Les données des dépenses sont incorrectes.");
+        }
       } catch (err) {
         console.error(err);
-        setError("Impossible de charger les données du projet.");
+        if (err.message.includes("expenses")) {
+          setError("Erreur lors du chargement des dépenses.");
+        } else if (err.message.includes("companies")) {
+          setError("Erreur lors du chargement de l'entreprise.");
+        } else {
+          setError("Erreur lors du chargement des données du projet.");
+        }
       } finally {
         setLoading(false);
       }
     };
-
+  
     loadProjectData();
   }, [projectId]);
+  
+  // Affichage des dépenses avec une vérification préalable
+  return (
+    <div className={styles.expensesContainer}>
+      <h1>Dépenses</h1>
+  
+      <table>
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Titre</th>
+            <th>Date</th>
+            <th>Montant HT</th>
+            <th>Montant TTC</th>
+            <th>Reste à payer</th>
+            <th>Code comptable</th>
+            <th>Code comptable nom</th>
+            <th>Contrat fournisseur</th>
+            <th>Fournisseur</th>
+            <th>Entreprise</th>
+            <th>Projet</th>
+            <th>Public path</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {Array.isArray(expenses) && expenses.length > 0 ? (
+            expenses.map((expense) => (
+              <tr key={expense.id}>
+                <td>{expense.id}</td>
+                <td>{expense.title}</td>
+                <td>{new Date(expense.date).toLocaleDateString()}</td>
+                <td>{expense.pre_tax_amount.toFixed(2)} €</td>
+                <td>{expense.total_amount.toFixed(2)} €</td>
+                <td>{expense.left_to_pay.toFixed(2)} €</td>
+                <td>{expense.accounting_code}</td>
+                <td>{expense.accounting_code_name}</td>
+                <td>{expense.supplier_contract_id}</td>
+                <td>{expense.supplier_name}</td>
+                <td>{expense.company_id}</td>
+                <td>{expense.project_id}</td>
+                <td>{expense.public_path}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="13">Aucune dépense disponible.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+  
 
+
+
+
+
+  console.log (expenses);
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -62,7 +140,10 @@ export default function ProjectDetails() {
   const chartData = [
     { name: "Revenu estimé", estimatedRevenue: project.estimated_revenue },
     { name: "Revenu actuel", actualRevenue: project.actual_revenue },
-    { name: "Dépenses actuelles", actualExpenses: project.actual_expenses_cost },
+    {
+      name: "Dépenses actuelles",
+      actualExpenses: project.actual_expenses_cost,
+    },
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
 
@@ -81,8 +162,6 @@ export default function ProjectDetails() {
           <p>
             <strong>Nom :</strong> {project.name}
           </p>
-
-     
         </div>
         <div className={styles.section2}>
           <p>
@@ -123,11 +202,50 @@ export default function ProjectDetails() {
             <Bar dataKey="difference" fill="#FFD700" />
           </BarChart>
         </ResponsiveContainer>
+      </div>
 
+      <div className={styles.expensesContainer}>
+        <h1>Dépenses</h1>
 
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Titre</th>
+              <th>Date</th>
+              <th>Montant HT</th>
+              <th>Montant TTC</th>
+              <th>Reste à payer</th>
+              <th>Code comptable</th>
+              <th>Code comptable nom</th>
+              <th>Contrat fournisseur</th>
+              <th>Fournisseur</th>
+              <th>Entreprise</th>
+              <th>Projet</th>
+              <th>Public path</th>
+            </tr>
+          </thead>
 
-
-     
+          <tbody>
+            {expenses.map((expense) => (
+              <tr key={expense.id}>
+                <td>{expense.id}</td>
+                <td>{expense.title}</td>
+                <td>{new Date(expense.date).toLocaleDateString()}</td>
+                <td>{expense.pre_tax_amount.toFixed(2)} €</td>
+                <td>{expense.total_amount.toFixed(2)} €</td>
+                <td>{expense.left_to_pay.toFixed(2)} €</td>
+                <td>{expense.accounting_code}</td>
+                <td>{expense.accounting_code_name}</td>
+                <td>{expense.supplier_contract_id}</td>
+                <td>{expense.supplier_name}</td>
+                <td>{expense.company_id}</td>
+                <td>{expense.project_id}</td>
+                <td>{expense.public_path}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

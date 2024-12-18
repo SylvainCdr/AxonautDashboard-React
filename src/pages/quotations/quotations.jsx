@@ -7,23 +7,16 @@ import SearchQuotations from "../../components/searchQuotations/searchQuotations
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
-  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
-  // const handleClickProject = (quotationId, projectId) => {
-  //   // navigate(`/quotations/${quotationId}`);
-  //   navigate(`/quotations/${quotationId}/project`);
-  // };
-
   const handleClickProject = (quotationId, projectId) => {
     // On passe à la fois quotationId et projectId dans le chemin de l'URL
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
-  
 
   useEffect(() => {
     const loadQuotationsData = async () => {
@@ -47,14 +40,13 @@ export default function Quotations() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={50} />
+        <GridLoader color="#4520ff" loading={loading} size={20} />
         <p>Chargement des devis...</p>
       </div>
     );
   }
 
   if (error) return <p>Erreur : {error}</p>;
-
 
   const statusColor = (status) => {
     if (status === "accepted") return "green";
@@ -113,9 +105,13 @@ export default function Quotations() {
                 {/* <button onClick={() => handleClickProject(quotation.id)}>
                   Voir
                 </button> */}
-                 <button onClick={() => handleClickProject(quotation.id, quotation.project_id)}>
-          Voir
-        </button>
+                <button
+                  onClick={() =>
+                    handleClickProject(quotation.id, quotation.project_id)
+                  }
+                >
+                  Voir
+                </button>
               </td>
             </tr>
           ))}
