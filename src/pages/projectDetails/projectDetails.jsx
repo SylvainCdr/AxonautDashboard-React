@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
 import { fetchExpensesByProject } from "../../services/api/expenses";
 import styles from "./style.module.scss";
+import { GridLoader } from "react-spinners";
 import {
   BarChart,
   Bar,
@@ -12,54 +13,17 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { GridLoader } from "react-spinners";
-import { Link } from "react-router-dom";
+
 
 export default function ProjectDetails() {
   const { projectId } = useParams();
-  const navigate = useNavigate();
 
   const [project, setProject] = useState({});
   const [company, setCompany] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expenses, setExpenses] = useState([]);
-
-  // useEffect(() => {
-  //   const loadProjectData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const projectData = await fetchProjectById(projectId);
-  //       const companyData = await fetchCompanyById(projectData.company_id);
-  //       const expensesData = await fetchExpensesByProject(projectId);
-
-  //       console.log(expensesData); // Log des données des dépenses pour vérifier
-
-  //       setProject(projectData);
-  //       setCompany(companyData);
-  //       // Vérification si expensesData est un tableau
-  //       if (expensesData && Array.isArray(expensesData)) {
-  //         setExpenses(expensesData);
-  //       } else {
-  //         setError("Format inattendu des données des dépenses.");
-  //       }
-  //     } catch (err) {
-  //       console.error(err);
-  //       if (err.message.includes("expenses")) {
-  //         setError("Erreur lors du chargement des dépenses.");
-  //       } else if (err.message.includes("companies")) {
-  //         setError("Erreur lors du chargement de l'entreprise.");
-  //       } else {
-  //         setError("Erreur lors du chargement des données du projet.");
-  //       }
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   loadProjectData();
-  // }, [projectId]);
-
+  const [expandedExpenses, setExpandedExpenses] = useState({}); // Suivre l'état déployé des dépenses
 
   useEffect(() => {
     const loadProjectData = async () => {
@@ -67,14 +31,12 @@ export default function ProjectDetails() {
         setLoading(true);
         const projectData = await fetchProjectById(projectId);
         const companyData = await fetchCompanyById(projectData.company_id);
-  
-        // Appel de l'API avec les dates estimées
         const expensesData = await fetchExpensesByProject(
           projectData.estimated_start,
           projectData.estimated_end,
           projectId
         );
-  
+
         setProject(projectData);
         setCompany(companyData);
         setExpenses(expensesData);
@@ -85,22 +47,16 @@ export default function ProjectDetails() {
         setLoading(false);
       }
     };
-  
+
     loadProjectData();
   }, [projectId]);
-  
-  console.log('dépenses', expenses);
 
-  if (loading) {
-    return (
-      <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={20} />
-        <p>Chargement...</p>
-      </div>
-    );
-  }
-
-  if (error) return <p className={styles.error}>{error}</p>;
+  const toggleExpense = (expenseId) => {
+    setExpandedExpenses((prev) => ({
+      ...prev,
+      [expenseId]: !prev[expenseId],
+    }));
+  };
 
   // Préparation des données pour le graphique
   const difference =
@@ -116,7 +72,17 @@ export default function ProjectDetails() {
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
 
-  // Affichage des dépenses avec une vérification préalable
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <GridLoader color="#4520ff" loading={loading} size={20} />
+        <p>Chargement...</p>
+      </div>
+    );
+  }
+
+  if (error) return <p className={styles.error}>{error}</p>;
+
   return (
     <div className={styles.projectContainer}>
       <h1>Détails du projet - {project.number}</h1>
@@ -174,7 +140,7 @@ export default function ProjectDetails() {
       {/* Section Graphique */}
       <div className={styles.graphContainer}>
         <h2>Graphique des coûts et revenus</h2>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={350}>
           <BarChart
             data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -188,46 +154,98 @@ export default function ProjectDetails() {
             <Bar dataKey="difference" fill="#FFD700" />
           </BarChart>
         </ResponsiveContainer>
+
+
+
+      {/* <ResponsiveContainer width="100%" height="100%">
+      <BarChart width={150} height={40} data={chartData}>
+        <Bar dataKey="estimatedRevenue" fill="#8884d8" />
+        <Bar dataKey="actualRevenue" fill="#82ca9d" />
+        <Bar dataKey="actualExpenses" fill="#FF69B4" />
+        <Bar dataKey="difference" fill="#FFD700" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+      </BarChart>
+    </ResponsiveContainer> */}
       </div>
+
+
+
+
+
 
       <div className={styles.expensesContainer}>
         <h1>Dépenses</h1>
 
-
         <table>
           <thead>
             <tr>
-              {/* <th>Id</th> */}
               <th>Titre</th>
               <th>Date</th>
               <th>Montant HT</th>
               <th>Montant TTC</th>
               <th>Reste à payer</th>
-              <th> Nom comptable</th>
-              <th>Contrat fournisseur</th>
+              <th>Nom comptable</th>
               <th>Fournisseur</th>
               <th>Projet</th>
-              <th>Public path</th>
+              <th>Détails</th>
             </tr>
           </thead>
 
           <tbody>
             {expenses.map((expense) => (
-              <tr key={expense.id}>
-                {/* <td>{expense.id}</td> */}
-                <td>{expense.title}</td>
-                <td>{new Date(expense.date).toLocaleDateString()}</td>
-                <td>{expense.pre_tax_amount.toFixed(2)} €</td>
-                <td>{expense.total_amount.toFixed(2)} €</td>
-                <td>{expense.left_to_pay.toFixed(2)} €</td>
-                <td>{expense.accounting_code_name}</td>
-                <td>{expense.supplier_contract_id}</td>
-                <td>{expense.supplier_name}</td>
-                <td>{expense.project_id}</td>
-                {/* <td> <a href={expense.public_path} target="_blank"   dans une autre fenetre ></a> </td> */}
-                <td> <a href={expense.public_path} target="_blank">Lien</a> </td>
-               
-              </tr>
+              <React.Fragment key={expense.id}>
+                {/* Ligne principale */}
+                <tr onClick={() => toggleExpense(expense.id)}>
+                  <td>
+                    <span>+</span>
+                    {expense.title}
+                  </td>
+                  <td>{new Date(expense.date).toLocaleDateString()}</td>
+                  <td>{expense.pre_tax_amount.toFixed(2)} €</td>
+                  <td>{expense.total_amount.toFixed(2)} €</td>
+                  <td>{expense.left_to_pay.toFixed(2)} €</td>
+                  <td>{expense.accounting_code_name}</td>
+                  <td>{expense.supplier_name}</td>
+                  <td>{expense.project_id}</td>
+                  <td>
+                    <a
+                      href={expense.public_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Lien
+                    </a>
+                  </td>
+                </tr>
+
+                {/* Détails déroulants */}
+                {expandedExpenses[expense.id] && (
+                  <tr>
+                    <td colSpan="9">
+                      <table className={styles.expenseDetails}>
+                        <thead>
+                          <tr>
+                            <th>Article</th>
+                            <th>Quantité</th>
+                            <th>Montant HT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {expense.expense_lines.map((line, index) => (
+                            <tr key={index}>
+                              <td>{line.title}</td>
+                              <td>{line.quantity}</td>
+                              <td>{line.total_pre_tax_amount.toFixed(2)} €</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
