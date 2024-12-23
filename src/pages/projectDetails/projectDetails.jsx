@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
 import { fetchExpensesByProject } from "../../services/api/expenses";
+import { fetchDeliveryNotesByProject } from "../../services/deliveryNotes";
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 import {
@@ -14,16 +15,16 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
 export default function ProjectDetails() {
   const { projectId } = useParams();
-
   const [project, setProject] = useState({});
   const [company, setCompany] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [expandedExpenses, setExpandedExpenses] = useState({}); // Suivre l'état déployé des dépenses
+  const [deliveryNotes, setDeliveryNotes] = useState([]);
+  const [expandedNotes, setExpandedNotes] = useState({}); // Pour gérer les BL déroulés
 
   useEffect(() => {
     const loadProjectData = async () => {
@@ -36,10 +37,15 @@ export default function ProjectDetails() {
           projectData.estimated_end,
           projectId
         );
+        const deliveryNotesData = await fetchDeliveryNotesByProject(projectId);
+        console.log("Données brutes des bons de livraison :", deliveryNotesData);
+        setDeliveryNotes(deliveryNotesData);
+        
 
         setProject(projectData);
         setCompany(companyData);
         setExpenses(expensesData);
+        setDeliveryNotes(deliveryNotesData);
       } catch (err) {
         console.error(err);
         setError("Erreur lors du chargement des données du projet.");
@@ -51,10 +57,19 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
+  console.log("deliveryNotes", deliveryNotes);
+
   const toggleExpense = (expenseId) => {
     setExpandedExpenses((prev) => ({
       ...prev,
       [expenseId]: !prev[expenseId],
+    }));
+  };
+
+  const toggleDeliveryNote = (noteId) => {
+    setExpandedNotes((prev) => ({
+      ...prev,
+      [noteId]: !prev[noteId],
     }));
   };
 
@@ -154,26 +169,7 @@ export default function ProjectDetails() {
             <Bar dataKey="difference" fill="#FFD700" />
           </BarChart>
         </ResponsiveContainer>
-
-
-
-      {/* <ResponsiveContainer width="100%" height="100%">
-      <BarChart width={150} height={40} data={chartData}>
-        <Bar dataKey="estimatedRevenue" fill="#8884d8" />
-        <Bar dataKey="actualRevenue" fill="#82ca9d" />
-        <Bar dataKey="actualExpenses" fill="#FF69B4" />
-        <Bar dataKey="difference" fill="#FFD700" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-      </BarChart>
-    </ResponsiveContainer> */}
       </div>
-
-
-
-
-
 
       <div className={styles.expensesContainer}>
         <h1>Dépenses</h1>
@@ -249,6 +245,71 @@ export default function ProjectDetails() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className={styles.deliveryNotesContainer}>
+        <h2>Bons de livraison</h2>
+
+        {deliveryNotes.length === 0 ? (
+          <p>Aucun bon de livraison disponible.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Date</th>
+                <th>Adresse de livraison</th>
+                <th>Commentaire</th>
+                <th>Produits</th>
+              </tr>
+            </thead>
+            <tbody>
+              {deliveryNotes.map((note) => (
+                <React.Fragment key={note.id}>
+                  {/* Ligne principale */}
+                  <tr onClick={() => toggleDeliveryNote(note.id)}>
+                    <td>{note.title}</td>
+                    <td>
+                      {new Date(
+                        note.delivery_form_date.date
+                      ).toLocaleDateString()}
+                    </td>
+                    <td>
+                      {note.address.delivery_address_company_name},{" "}
+                      {note.address.delivery_address_street},{" "}
+                      {note.address.delivery_address_zip_code}{" "}
+                      {note.address.delivery_address_town},{" "}
+                      {note.address.delivery_address_country}
+                    </td>
+                    <td>{note.comment || "Aucun commentaire"}</td>
+                    <td>
+                      <button>
+                        {expandedNotes[note.id] ? "Réduire" : "Voir"}
+                      </button>
+                    </td>
+                  </tr>
+
+                  {/* Détails déroulants */}
+                  {expandedNotes[note.id] && (
+                    <tr>
+                      <td colSpan="5">
+                        <ul className={styles.productsList}>
+                          {note.products.map((product) => (
+                            <li key={product.id}>
+                              <strong>{product.name}</strong> -{" "}
+                              {product.description} -{" "}
+                              {parseFloat(product.price).toFixed(2)} €
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
