@@ -3,7 +3,10 @@ import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
 import { fetchExpensesByProject } from "../../services/api/expenses";
-import { fetchDeliveryNotesByProject } from "../../services/deliveryNotes";
+import {
+  fetchDeliveryNotesByProject,
+  downloadDeliveryNote,
+} from "../../services/deliveryNotes";
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 import {
@@ -38,9 +41,11 @@ export default function ProjectDetails() {
           projectId
         );
         const deliveryNotesData = await fetchDeliveryNotesByProject(projectId);
-        console.log("Données brutes des bons de livraison :", deliveryNotesData);
+        console.log(
+          "Données brutes des bons de livraison :",
+          deliveryNotesData
+        );
         setDeliveryNotes(deliveryNotesData);
-        
 
         setProject(projectData);
         setCompany(companyData);
@@ -57,8 +62,40 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
-  console.log("deliveryNotes", deliveryNotes);
+  // Fonction pour télécharger un bon de livraison, on transforme le base64 en Blob puis on crée un lien pour le télécharger
+  const handleDownloadDeliveryNote = async (deliveryNoteId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/downloadDeliveryNote?deliveryNoteId=${deliveryNoteId}`
+      );
+      const data = await response.json();
+      const base64PDF = data.deliveryNote;
 
+      // Convert base64 to Blob
+      const byteCharacters = atob(base64PDF);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+
+      // Create a link to download the PDF
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `delivery_note_${deliveryNoteId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      console.error("Error downloading the delivery note:", err);
+    }
+  };
+
+  // Fonction pour déployer ou réduire les détails d'une dépense
   const toggleExpense = (expenseId) => {
     setExpandedExpenses((prev) => ({
       ...prev,
@@ -66,6 +103,7 @@ export default function ProjectDetails() {
     }));
   };
 
+  // Fonction pour déployer ou réduire les détails d'un bon de livraison
   const toggleDeliveryNote = (noteId) => {
     setExpandedNotes((prev) => ({
       ...prev,
@@ -248,7 +286,7 @@ export default function ProjectDetails() {
       </div>
 
       <div className={styles.deliveryNotesContainer}>
-        <h2>Bons de livraison</h2>
+        <h1>Bons de livraison</h1>
 
         {deliveryNotes.length === 0 ? (
           <p>Aucun bon de livraison disponible.</p>
@@ -261,6 +299,7 @@ export default function ProjectDetails() {
                 <th>Adresse de livraison</th>
                 <th>Commentaire</th>
                 <th>Produits</th>
+                <th>Télécharger</th>
               </tr>
             </thead>
             <tbody>
@@ -285,6 +324,13 @@ export default function ProjectDetails() {
                     <td>
                       <button>
                         {expandedNotes[note.id] ? "Réduire" : "Voir"}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleDownloadDeliveryNote(note.id)}
+                      >
+                        Télécharger
                       </button>
                     </td>
                   </tr>
