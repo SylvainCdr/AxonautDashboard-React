@@ -62,6 +62,11 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
+
+console.log ("Dépenses du projet :", expenses);
+console.log ("Bons de livraison du projet :", deliveryNotes);
+
+
   // Fonction pour télécharger un bon de livraison, on transforme le base64 en Blob puis on crée un lien pour le télécharger
   const handleDownloadDeliveryNote = async (deliveryNoteId) => {
     try {
@@ -124,6 +129,32 @@ export default function ProjectDetails() {
     },
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
+
+ // Calcul des totaux pour les dépenses TTC
+const totalExpensesTTC = expenses.reduce(
+  (acc, expense) => acc + expense.total_amount,
+  0
+);
+const totalLeftToPayTTC = expenses.reduce(
+  (acc, expense) => acc + expense.left_to_pay,
+  0
+);
+
+// Calcul du pourcentage restant à payer
+const percentageLeftToPay = totalExpensesTTC
+  ? (totalLeftToPayTTC / totalExpensesTTC) * 100
+  : 0;
+
+
+
+
+
+
+
+  
+
+
+
 
   if (loading) {
     return (
@@ -219,7 +250,7 @@ export default function ProjectDetails() {
               <th>Date</th>
               <th>Montant HT</th>
               <th>Montant TTC</th>
-              <th>Reste à payer</th>
+              <th>Reste à payer TTC</th>
               <th>Nom comptable</th>
               <th>Fournisseur</th>
               <th>Projet</th>
@@ -252,7 +283,9 @@ export default function ProjectDetails() {
                       Lien
                     </a>
                   </td>
+                  
                 </tr>
+              
 
                 {/* Détails déroulants */}
                 {expandedExpenses[expense.id] && (
@@ -282,6 +315,53 @@ export default function ProjectDetails() {
               </React.Fragment>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan="2">Total des dépenses</td>
+              <td>
+                {expenses.reduce(
+                  (acc, expense) => acc + expense.pre_tax_amount,
+                  0
+                ).toFixed(2)}{" "}
+                €
+              </td>
+              <td>
+                {expenses.reduce(
+                  (acc, expense) => acc + expense.total_amount,
+                  0
+                ).toFixed(2)}{" "}
+                €
+              </td>
+              <td>
+                {expenses.reduce(
+                  (acc, expense) => acc + expense.left_to_pay,
+                  0
+                ).toFixed(2)}{" "}
+                €
+              </td>
+              {/* // jauge avec le reste des dépenses a payer */}
+           {/* Jauge */}
+          {/* Jauge */}
+          <td colSpan="4">
+              <div className={styles.gaugeContainer}>
+                <div
+                  className={styles.gaugeFill}
+                  style={{
+                    width: `${percentageLeftToPay}%`,
+                    backgroundColor: percentageLeftToPay === 0 ? 'green' : 'red', // Vert si tout est payé, rouge sinon
+                  }}
+                ></div>
+              </div>
+              <p>
+                Reste à payer :{" "}
+                {totalLeftToPayTTC.toFixed(2)} €
+              </p>
+            </td>
+
+
+            </tr>
+          </tfoot>
+
         </table>
       </div>
 
@@ -294,7 +374,7 @@ export default function ProjectDetails() {
           <table>
             <thead>
               <tr>
-                <th>Titre</th>
+                <th>Nom du document</th>
                 <th>Date</th>
                 <th>Adresse de livraison</th>
                 <th>Commentaire</th>
@@ -307,7 +387,7 @@ export default function ProjectDetails() {
                 <React.Fragment key={note.id}>
                   {/* Ligne principale */}
                   <tr onClick={() => toggleDeliveryNote(note.id)}>
-                    <td>{note.title}</td>
+                    <td>{note.file_name}</td>
                     <td>
                       {new Date(
                         note.delivery_form_date.date

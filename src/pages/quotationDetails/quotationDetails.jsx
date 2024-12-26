@@ -51,6 +51,9 @@ export default function QuotationDetails() {
   }, [quotationId]);
 
 
+  console.log ('factures :', invoices)
+
+
 
   if (loading) {
     return (
@@ -69,6 +72,16 @@ export default function QuotationDetails() {
     if (status === "refused") return "red";
     return "black";
   };
+
+  // si la date de paiement est inférieur à la date de création alors la facture est pas payée et donc rouge sinon verte
+  const isPaidInvoice = (invoice) => {
+    if (new Date(invoice.paid_date) < new Date(invoice.date)) {
+      return "red";
+    }
+    return "green";
+  };
+  
+
 
   return (
     <div className={styles.quotationContainer}>
@@ -232,20 +245,20 @@ export default function QuotationDetails() {
           <p>
             <strong>Id utilisateur :</strong> {contract.user_id}
           </p>
+          {/* <p>
+            <strong>Adresse de facturation :</strong>{" "}
+            {contract?.invoice_address.company_name}
+          </p>
           <p>
             <strong>Adresse de facturation :</strong>{" "}
-            {contract.invoice_address.company_name}
+            {contract?.invoice_address.street}
           </p>
           <p>
-            <strong>Adresse de facturation :</strong>{" "}
-            {contract.invoice_address.street}
+            <strong>Code postal :</strong> {contract?.invoice_address.zip_code}
           </p>
           <p>
-            <strong>Code postal :</strong> {contract.invoice_address.zip_code}
-          </p>
-          <p>
-            <strong>Ville :</strong> {contract.invoice_address.city}
-          </p>
+            <strong>Ville :</strong> {contract?.invoice_address.city}
+          </p> */}
 
           <p>
             <strong>Date de dernière mise à jour :</strong>{" "}
@@ -264,9 +277,13 @@ export default function QuotationDetails() {
             <strong>Id devis :</strong> {contract.quotation.id}
           </p>
           <p>
-            <strong>Montant total HT :</strong>{" "}
+            <strong>Montant total HT du devis :</strong>{" "}
             {contract.quotation.pre_tax_amount.toFixed(2)}  €
           </p>
+          {/* <p>
+            <strong>Montant total à facturer :</strong>{" "}
+            {project.actual_revenue.toFixed(2)}  €
+          </p> */}
 
           <h2>Factures liées au contrat</h2>
           <table>
@@ -291,7 +308,14 @@ export default function QuotationDetails() {
 
                   <td>{invoice.pre_tax_amount} €</td>
                   <td>{new Date(invoice.date).toLocaleDateString()}</td>
-                  <td>{new Date(invoice.paid_date).toLocaleDateString()}</td>
+                  {/* <td>{new Date(invoice.paid_date).toLocaleDateString()}</td> */}
+                  <td>
+                    <span style={{ color: isPaidInvoice(invoice) }}>
+                      {invoice.paid_date
+                        ? new Date(invoice.paid_date).toLocaleDateString()
+                        : "Non payée"}
+                    </span>
+                  </td>
                   <td>
                     <a
                       href={invoice.public_path}
