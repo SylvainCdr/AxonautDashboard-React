@@ -1,0 +1,72 @@
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  justify-content: center; /* Centrage horizontal */
+  align-items: center; /* Centrage vertical */
+  min-height: 50vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+  text-align: center;
+  color: black;
+ 
+}
+
+
+.deliveryNotesDetailsContainer {
+
+  padding: 4rem 2rem;
+  background: #ffffffe0;
+  font-family: "Roboto", sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+
+
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+
+  .productsList {
+    list-style: none;
+    margin: 10px 0;
+    padding: 0;
+
+    li {
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #555;
+
+      strong {
+        color: #333;
+      }
+    }
+  }
+}

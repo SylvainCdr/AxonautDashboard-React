@@ -4,6 +4,7 @@ import { fetchQuotationById } from "../../services/api/quotations";
 import QuotationDetails from "../../components/quotationDetails/quotationDetails";
 import ProjectDetails from "../../components/projectDetails/projectDetails";
 import ContractInvoicesDetails from "../../components/contractInvoicesDetails/contractInvoicesDetails";
+import DeliveryNotesDetails from "../../components/deliveryNotesDetails/deliveryNotesDetails";
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 
@@ -53,8 +54,10 @@ export default function QuotationAndProjectDetails() {
         </div>
       <div className={styles.section}>
       <ProjectDetails projectId={quotation.project_id} />
-
       </div>
+      <div className={styles.section}>
+        <DeliveryNotesDetails projectId={quotation.project_id} />
+        </div>
 
     </div>
   );

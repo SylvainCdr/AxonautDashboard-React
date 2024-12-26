@@ -4,28 +4,25 @@
   gap: 3rem;
   justify-content: center; /* Centrage horizontal */
   align-items: center; /* Centrage vertical */
-  min-height: 100vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+  min-height: 60vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
   text-align: center;
   color: black;
- 
 }
 
 .projectContainer {
-  min-height: 100vh;
   padding: 7rem 2rem;
   background: #f8f9fa1d;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   max-width: 1200px;
-  margin : 0 auto;
-
-
+  margin: 0 auto;
 
   .header {
     display: flex;
-    width : 100%;
+    width: 100%;
     justify-content: space-between;
   }
-  .section2, .section1 {
+  .section2,
+  .section1 {
     width: 40%;
     margin: 0 auto;
     background: #ffffff;
@@ -80,44 +77,41 @@
   }
 
   .expensesContainer {
-    
     padding: 20px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 8px;
     max-width: 1200px;
-    margin : 3rem auto;
-  
+    margin: 3rem auto;
 
-  
     table {
       width: 100%;
       border-collapse: collapse;
-  
+
       thead {
         background-color: #007bff;
-  
+
         tr {
           th {
             padding: 10px;
             text-align: left;
-            color:#007bff;
+            color: #007bff;
             font-weight: bold;
             border-bottom: 2px solid #0056b3;
           }
         }
       }
-  
+
       tbody {
         tr {
           &:nth-child(even) {
             background-color: #f2f2f2;
           }
-  
+
           &:hover {
             background-color: #e9ecef;
           }
-  
+
           td {
             padding: 10px;
             text-align: left;
@@ -125,11 +119,11 @@
             color: #555;
             font-size: 14px;
             line-height: 1.5rem;
-  
+
             &:first-child {
               font-weight: bold;
             }
-  
+
             &:last-child {
               font-style: italic;
               color: #888;
@@ -141,51 +135,48 @@
               background-color: #007bff;
               font-size: 1rem;
               padding: 0.2em 0.5rem;
-              margin-right : 1rem
-
-
+              margin-right: 1rem;
             }
           }
         }
       }
-   
+
       .expenseDetails {
         width: 100%;
         margin-top: 10px;
         background-color: #f9f9f9;
         border: 1px solid #ddd;
-      
-        th, td {
+
+        th,
+        td {
           padding: 8px;
           text-align: left;
         }
-      
+
         th {
           background-color: #f2f2f2;
         }
       }
-      }
+    }
 
-      .gaugeContainer {
-        width: 100%;
-        height: 20px;
-        background-color: #b5b5b5; /* Couleur de fond gris */
-        border-radius: 10px;
-        overflow: hidden;
-      }
-      
-      .gaugeFill {
-        height: 100%;
-        transition: width 0.3s ease-in-out;
-      }
-      
-      .gaugeContainer p {
-        margin-top: 5px;
-        text-align: center;
-      }
-      
+    .gaugeContainer {
+      width: 100%;
+      height: 20px;
+      background-color: #b5b5b5; /* Couleur de fond gris */
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .gaugeFill {
+      height: 100%;
+      transition: width 0.3s ease-in-out;
+    }
+
+    .gaugeContainer p {
+      margin-top: 5px;
+      text-align: center;
+    }
   }
-  
 
   .deliveryNotesContainer {
     margin: 20px;
@@ -194,28 +185,27 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     width: 100%;
-  
 
-  
     table {
       width: 100%;
       border-collapse: collapse;
-  
-      th, td {
+
+      th,
+      td {
         padding: 12px;
         text-align: left;
         border-bottom: 1px solid #ddd;
       }
-  
+
       th {
         background-color: #007bff;
         color: #fff;
       }
-  
+
       tbody tr:hover {
         background-color: #f1f1f1;
       }
-  
+
       button {
         background-color: #007bff;
         color: #fff;
@@ -223,30 +213,27 @@
         padding: 5px 10px;
         border-radius: 4px;
         cursor: pointer;
-  
+
         &:hover {
           background-color: #0056b3;
         }
       }
     }
-  
+
     .productsList {
       list-style: none;
       margin: 10px 0;
       padding: 0;
-  
+
       li {
         margin-bottom: 5px;
         font-size: 14px;
         color: #555;
-  
+
         strong {
           color: #333;
         }
       }
     }
   }
-  
-
-
 }
