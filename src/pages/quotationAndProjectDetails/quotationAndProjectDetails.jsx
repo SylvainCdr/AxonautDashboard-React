@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import QuotationDetails from "../quotationDetails/quotationDetails";
-import ProjectDetails from "../projectDetails/projectDetails";
 import { fetchQuotationById } from "../../services/api/quotations";
+import QuotationDetails from "../../components/quotationDetails/quotationDetails";
+import ProjectDetails from "../../components/projectDetails/projectDetails";
+import ContractInvoicesDetails from "../../components/contractInvoicesDetails/contractInvoicesDetails";
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 
@@ -48,9 +49,13 @@ export default function QuotationAndProjectDetails() {
         <QuotationDetails quotation={quotation} />
       </div>
       <div className={styles.section}>
+        <ContractInvoicesDetails contractId={quotation.contract_id} />
+        </div>
+      <div className={styles.section}>
       <ProjectDetails projectId={quotation.project_id} />
 
       </div>
+
     </div>
   );
 }

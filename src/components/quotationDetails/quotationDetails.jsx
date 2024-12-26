@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchCompanyById } from "../../services/api/companies";
-import { fetchContractById } from "../../services/api/contracts";
-import { fetchInvoiceById } from "../../services/api/invoices";
+// import { fetchContractById } from "../../services/api/contracts";
+// import { fetchInvoiceById } from "../../services/api/invoices";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 
@@ -11,8 +11,8 @@ export default function QuotationDetails() {
   const { quotationId } = useParams();
   const [quotation, setQuotation] = useState({});
   const [company, setCompany] = useState({});
-  const [invoices, setInvoices] = useState([]);
-  const [contract, setContract] = useState({});
+  // const [invoices, setInvoices] = useState([]);
+  // const [contract, setContract] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,17 +30,17 @@ export default function QuotationDetails() {
         setLoading(true);
         const data = await fetchQuotationById(quotationId);
         const companyData = await fetchCompanyById(data.company_id);
-        const contractData = await fetchContractById(data.contract_id);
-        const invoicePromises = contractData.invoices_id.map((invoiceId) =>
-          fetchInvoiceById(invoiceId)
-        );
-        const invoicesData = await Promise.all(invoicePromises);
+        // const contractData = await fetchContractById(data.contract_id);
+        // const invoicePromises = contractData.invoices_id.map((invoiceId) =>
+        //   fetchInvoiceById(invoiceId)
+        // );
+        // const invoicesData = await Promise.all(invoicePromises);
       
 
         setQuotation(data);
         setCompany(companyData);
-        setContract(contractData);
-        setInvoices(invoicesData);
+        // setContract(contractData);
+        // setInvoices(invoicesData);
       } catch (err) {
         setError("Impossible de charger les données du projet.");
       } finally {
@@ -51,7 +51,7 @@ export default function QuotationDetails() {
   }, [quotationId]);
 
 
-  console.log ('factures :', invoices)
+
 
 
 
@@ -223,113 +223,6 @@ export default function QuotationDetails() {
         >
           Voir le devis dans le portail client
         </a>
-      </div>
-
-      <div className={styles.contractContainer}>
-        <h1> Détails de la facturation </h1>
-
-        <div className={styles.contractDetails}>
-          <p>
-            <strong>Id contrat :</strong> {contract.id}
-          </p>
-          <p>
-            <strong>Nom :</strong> {contract.name}
-          </p>
-          <p>
-            <strong>Date de début :</strong>{" "}
-            {new Date(contract.start_date).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Commentaire :</strong> {contract.comments}
-          </p>
-          <p>
-            <strong>Id utilisateur :</strong> {contract.user_id}
-          </p>
-          {/* <p>
-            <strong>Adresse de facturation :</strong>{" "}
-            {contract?.invoice_address.company_name}
-          </p>
-          <p>
-            <strong>Adresse de facturation :</strong>{" "}
-            {contract?.invoice_address.street}
-          </p>
-          <p>
-            <strong>Code postal :</strong> {contract?.invoice_address.zip_code}
-          </p>
-          <p>
-            <strong>Ville :</strong> {contract?.invoice_address.city}
-          </p> */}
-
-          <p>
-            <strong>Date de dernière mise à jour :</strong>{" "}
-            {new Date(contract.last_update_date).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Id projet :</strong> {contract.project.id}
-          </p>
-          <p>
-            <strong>Numéro projet :</strong> {contract.project.number}
-          </p>
-          <p>
-            <strong>Nom projet :</strong> {contract.project.name}
-          </p>
-          <p>
-            <strong>Id devis :</strong> {contract.quotation.id}
-          </p>
-          <p>
-            <strong>Montant total HT du devis :</strong>{" "}
-            {contract.quotation.pre_tax_amount.toFixed(2)}  €
-          </p>
-          {/* <p>
-            <strong>Montant total à facturer :</strong>{" "}
-            {project.actual_revenue.toFixed(2)}  €
-          </p> */}
-
-          <h2>Factures liées au contrat</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Numéro facture </th>
-                <th>Montant HT</th>
-                <th>Date de création</th>
-                <th>Date de Paiement</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.map((invoice) => (
-                <tr key={invoice.id}>
-                  <td>
-                    {invoice.number}{" "}
-                    {invoice.mandatory_mentions && (
-                      <strong>{invoice.mandatory_mentions}</strong>
-                    )}
-                  </td>
-
-                  <td>{invoice.pre_tax_amount} €</td>
-                  <td>{new Date(invoice.date).toLocaleDateString()}</td>
-                  {/* <td>{new Date(invoice.paid_date).toLocaleDateString()}</td> */}
-                  <td>
-                    <span style={{ color: isPaidInvoice(invoice) }}>
-                      {invoice.paid_date
-                        ? new Date(invoice.paid_date).toLocaleDateString()
-                        : "Non payée"}
-                    </span>
-                  </td>
-                  <td>
-                    <a
-                      href={invoice.public_path}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Voir la facture
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   );
