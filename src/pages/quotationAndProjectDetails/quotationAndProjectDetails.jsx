@@ -47,6 +47,13 @@ export default function QuotationAndProjectDetails() {
 
   return (
     <div className={styles.quotationAndProjectContainer}>
+
+
+      <div className={styles.test}>
+
+      
+
+      </div>
       <div className={styles.section}>
         <QuotationDetails quotation={quotation} />
       </div>

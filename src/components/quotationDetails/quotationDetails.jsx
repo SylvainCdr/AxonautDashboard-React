@@ -4,6 +4,7 @@ import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchCompanyById } from "../../services/api/companies";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
+import GaugeChart from "react-gauge-chart";
 
 export default function QuotationDetails() {
   const { quotationId } = useParams();
@@ -55,13 +56,6 @@ export default function QuotationDetails() {
     return "black";
   };
 
-  const isPaidInvoice = (invoice) => {
-    if (new Date(invoice.paid_date) < new Date(invoice.date)) {
-      return "red";
-    }
-    return "green";
-  };
-
   return (
     <div className={styles.quotationContainer}>
       <h1>Détails du devis - {quotation.number}</h1>
@@ -79,14 +73,14 @@ export default function QuotationDetails() {
             <strong>Date :</strong>{" "}
             {new Date(quotation.date).toLocaleDateString()}
           </p>
-          <p>
+          {/* <p>
             <strong>Date d'expiration :</strong>{" "}
             {new Date(quotation.expiry_date).toLocaleDateString()}
-          </p>
-          <p>
+          </p> */}
+          {/* <p>
             <strong>Date de dernière mise à jour :</strong>{" "}
             {new Date(quotation.last_update_date).toLocaleDateString()}
-          </p>
+          </p> */}
           <p>
             <strong>Statut :</strong>{" "}
             <span style={{ color: statusColor(quotation.status) }}>
@@ -96,12 +90,6 @@ export default function QuotationDetails() {
           <p>
             <strong>Commentaire(s):</strong> {quotation.comments}
           </p>
-        </div>
-        <div className={styles.section2}>
-          <p>
-            <strong>Id entreprise :</strong> {quotation.company_id}
-          </p>
-
           <p>
             <strong>Nom de l'entreprise :</strong> {quotation.company_name}
           </p>
@@ -117,15 +105,36 @@ export default function QuotationDetails() {
               {quotation.project_id}
             </button>
           </p>
-          <p>
+          {/* <p>
             <strong>Id opportunité :</strong> {quotation.opportunity_id}
           </p>
           <p>
             <strong>Id contrat :</strong> {quotation.contract_id}
-          </p>
+          </p> */}
+        </div>
+        <div className={styles.section2}>
+          {/* <p>
+            <strong>Id entreprise :</strong> {quotation.company_id}
+          </p> */}
+
           <p>
             <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
           </p>
+          <p>
+            <strong>Marge total :</strong>  {quotation.margin.toFixed(2)} €
+          </p>
+          <p>
+            {" "}
+            <strong>Marge (%) </strong>
+          </p>
+          <GaugeChart
+            id="margin-gauge"
+            nrOfLevels={5}
+            percent={quotation.margin / quotation.pre_tax_amount}
+            colors={["#f78800", "#109f00"]}
+            textColor="#000"
+            needleColor="#4520ff"
+          />
         </div>
       </div>
 
@@ -134,8 +143,8 @@ export default function QuotationDetails() {
         <button
           onClick={() => setShowDetails(!showDetails)} // Toggle visibility on click
           className={styles.toggleButton}
-        >
-          {showDetails ? "Cacher les détails" : "Voir les détails"}
+        > <i class="fa-solid fa-bars"></i> 
+          {showDetails ?  "  Cacher les détails" : "  Voir les détails"}
         </button>
 
         {/* Conditionally render the table based on `showDetails` */}
