@@ -13,13 +13,14 @@
 
 
 .contractInvoicesDetailsContainer {
-  padding: 7rem 2rem;
-  background: #f8f9fac7;
-  font-family: "Roboto", sans-serif;
-  max-width: 1200px;
+  padding: 20px;
+  background-color: #f9f9f9aa;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding-top: 2rem;
   margin: 0 auto;
-  border-radius: 12px;
- 
+  max-width: 1200px;
+  margin-bottom : 5rem;
   
     h2 {
       font-size: 1.5rem;

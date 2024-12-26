@@ -8,6 +8,7 @@ import DeliveryNotesDetails from "../../components/deliveryNotesDetails/delivery
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 
+
 export default function QuotationAndProjectDetails() {
   const { quotationId } = useParams();
   const [quotation, setQuotation] = useState(null);
@@ -45,7 +46,7 @@ export default function QuotationAndProjectDetails() {
   if (error) return <p className={styles.error}>{error}</p>;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.quotationAndProjectContainer}>
       <div className={styles.section}>
         <QuotationDetails quotation={quotation} />
       </div>
