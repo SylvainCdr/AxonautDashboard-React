@@ -17,8 +17,7 @@
   padding-top: 2rem;
   margin: 0 auto;
   max-width: 1200px;
-  margin-bottom : 5rem;
-
+  margin-bottom: 5rem;
 
   .header {
     display: flex;
@@ -51,6 +50,29 @@
   .quotationLines {
     margin-bottom: 30px;
 
+    .toggleButton {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: #0073e6;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+      margin-bottom: 10px;
+
+      &:hover {
+        background-color: #005bb5;
+      }
+
+      &:active {
+        background-color: #004494;
+      }
+    }
+
     h2 {
       font-size: 1.5rem;
       color: #333;
@@ -73,7 +95,7 @@
           padding: 10px;
           text-align: left;
           font-size: 0.9rem;
-          color: #0073e6;
+          color: white;
         }
       }
 
@@ -121,10 +143,10 @@
 
   .footer {
     display: flex;
-    justify-content: center;
+    justify-content: right;
     gap: 20px;
     margin-top: 20px;
-    margin-bottom: 5rem;
+    margin-bottom: 2rem;
 
     .button {
       display: inline-block;

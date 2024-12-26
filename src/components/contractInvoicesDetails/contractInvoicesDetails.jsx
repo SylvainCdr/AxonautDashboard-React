@@ -13,7 +13,6 @@ export default function ContractInvoicesDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
   useEffect(() => {
     const loadQuotationData = async () => {
       try {
@@ -24,7 +23,6 @@ export default function ContractInvoicesDetails() {
           fetchInvoiceById(invoiceId)
         );
         const invoicesData = await Promise.all(invoicePromises);
-      
 
         setContract(contractData);
         setInvoices(invoicesData);
@@ -37,10 +35,29 @@ export default function ContractInvoicesDetails() {
     loadQuotationData();
   }, [quotationId]);
 
+  // Calculer le montant total payé
+  const totalPaidAmount = invoices.reduce((acc, invoice) => {
+    if (invoice.paid_date) {
+      return acc + invoice.pre_tax_amount;
+    }
+    return acc;
+  }, 0);
 
-  console.log ('factures :', invoices)
+  const totalInvoiceAmount = invoices.reduce(
+    (acc, invoice) => acc + invoice.pre_tax_amount,
+    0
+  );
 
+  const paymentPercentage =
+    totalInvoiceAmount === 0 ? 0 : (totalPaidAmount / totalInvoiceAmount) * 100;
 
+  // si la date de paiement est inférieur à la date de création alors la facture est pas payée et donc rouge sinon verte
+  const isPaidInvoice = (invoice) => {
+    if (new Date(invoice.paid_date) < new Date(invoice.date)) {
+      return "red";
+    }
+    return "green";
+  };
 
   if (loading) {
     return (
@@ -53,121 +70,85 @@ export default function ContractInvoicesDetails() {
 
   if (error) return <p className={styles.error}>{error}</p>;
 
-
-
-  // si la date de paiement est inférieur à la date de création alors la facture est pas payée et donc rouge sinon verte
-  const isPaidInvoice = (invoice) => {
-    if (new Date(invoice.paid_date) < new Date(invoice.date)) {
-      return "red";
-    }
-    return "green";
-  };
-  
-
-
   return (
     <div className={styles.contractInvoicesDetailsContainer}>
-    <h1> Détails de la facturation </h1>
+      <h1> Détails de la facturation </h1>
 
-    <div className={styles.contractDetails}>
-      <p>
-        <strong>Id contrat :</strong> {contract.id}
-      </p>
-      <p>
-        <strong>Nom :</strong> {contract.name}
-      </p>
-      <p>
-        <strong>Date de début :</strong>{" "}
-        {new Date(contract.start_date).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>Commentaire :</strong> {contract.comments}
-      </p>
-      <p>
-        <strong>Id utilisateur :</strong> {contract.user_id}
-      </p>
-      {/* <p>
-        <strong>Adresse de facturation :</strong>{" "}
-        {contract?.invoice_address.company_name}
-      </p>
-      <p>
-        <strong>Adresse de facturation :</strong>{" "}
-        {contract?.invoice_address.street}
-      </p>
-      <p>
-        <strong>Code postal :</strong> {contract?.invoice_address.zip_code}
-      </p>
-      <p>
-        <strong>Ville :</strong> {contract?.invoice_address.city}
-      </p> */}
+      <div className={styles.contractDetails}>
+        <p>
+          <strong>Nom :</strong> {contract.name}
+        </p>
+        <p>
+          <strong>Commentaire :</strong> {contract.comments}
+        </p>
+        <p>
+          <strong>Montant total HT du devis :</strong>{" "}
+          {contract.quotation.pre_tax_amount.toFixed(2)} €
+        </p>
 
-      <p>
-        <strong>Date de dernière mise à jour :</strong>{" "}
-        {new Date(contract.last_update_date).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>Id projet :</strong> {contract.project.id}
-      </p>
-      <p>
-        <strong>Numéro projet :</strong> {contract.project.number}
-      </p>
-      <p>
-        <strong>Nom projet :</strong> {contract.project.name}
-      </p>
-      <p>
-        <strong>Id devis :</strong> {contract.quotation.id}
-      </p>
-      <p>
-        <strong>Montant total HT du devis :</strong>{" "}
-        {contract.quotation.pre_tax_amount.toFixed(2)}  €
-      </p>
-  
-
-      <h2>Factures liées au contrat</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Numéro facture </th>
-            <th>Montant HT</th>
-            <th>Date de création</th>
-            <th>Date de Paiement</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoices.map((invoice) => (
-            <tr key={invoice.id}>
-              <td>
-                {invoice.number}{" "}
-                {invoice.mandatory_mentions && (
-                  <strong>{invoice.mandatory_mentions}</strong>
-                )}
-              </td>
-
-              <td>{invoice.pre_tax_amount} €</td>
-              <td>{new Date(invoice.date).toLocaleDateString()}</td>
-              {/* <td>{new Date(invoice.paid_date).toLocaleDateString()}</td> */}
-              <td>
-                <span style={{ color: isPaidInvoice(invoice) }}>
-                  {invoice.paid_date
-                    ? new Date(invoice.paid_date).toLocaleDateString()
-                    : "Non payée"}
-                </span>
-              </td>
-              <td>
-                <a
-                  href={invoice.public_path}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Voir la facture
-                </a>
-              </td>
+        <h2>Factures liées au contrat</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Numéro facture </th>
+              <th>Montant HT</th>
+              <th>Date de création</th>
+              <th>Date de Paiement</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {invoices.map((invoice) => (
+              <tr key={invoice.id}>
+                <td>
+                  {invoice.number}{" "}
+                  {invoice.mandatory_mentions && (
+                    <strong>{invoice.mandatory_mentions}</strong>
+                  )}
+                </td>
+                <td>{invoice.pre_tax_amount} €</td>
+                <td>{new Date(invoice.date).toLocaleDateString()}</td>
+                <td>
+                  <span style={{ color: isPaidInvoice(invoice) }}>
+                    {invoice.paid_date
+                      ? new Date(invoice.paid_date).toLocaleDateString()
+                      : "Non payée"}
+                  </span>
+                </td>
+                <td>
+                  <a
+                    href={invoice.public_path}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Voir la facture
+                  </a>
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <td>Montant total des factures :</td>
+              <td>{totalInvoiceAmount.toFixed(2)} €</td>
+              <td>Montant total payé :</td>
+              <td>{totalPaidAmount.toFixed(2)} €</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* Jauge de progression */}
+      <div className={styles.progressBarContainer}>
+        <p>
+          <strong>Avancement du paiement :</strong>
+        </p>
+        <div className={styles.progressBar}>
+          <div
+            className={styles.progress}
+            style={{ width: `${paymentPercentage}%` }}
+          ></div>
+        </div>
+        <p>{paymentPercentage.toFixed()}% payé</p>
+      </div>
     </div>
-  </div>
   );
 }

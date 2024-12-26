@@ -62,10 +62,8 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
-
-// console.log ("Dépenses du projet :", expenses);
-// console.log ("Bons de livraison du projet :", deliveryNotes);
-
+  // console.log ("Dépenses du projet :", expenses);
+  // console.log ("Bons de livraison du projet :", deliveryNotes);
 
   // Fonction pour télécharger un bon de livraison, on transforme le base64 en Blob puis on crée un lien pour le télécharger
   const handleDownloadDeliveryNote = async (deliveryNoteId) => {
@@ -108,8 +106,6 @@ export default function ProjectDetails() {
     }));
   };
 
- 
-
   // Préparation des données pour le graphique
   const difference =
     project.estimated_revenue - project.actual_expenses_cost || 0;
@@ -124,31 +120,20 @@ export default function ProjectDetails() {
     { name: "Différence (Revenu - Dépenses)", difference },
   ];
 
- // Calcul des totaux pour les dépenses TTC
-const totalExpensesTTC = expenses.reduce(
-  (acc, expense) => acc + expense.total_amount,
-  0
-);
-const totalLeftToPayTTC = expenses.reduce(
-  (acc, expense) => acc + expense.left_to_pay,
-  0
-);
+  // Calcul des totaux pour les dépenses TTC
+  const totalExpensesTTC = expenses.reduce(
+    (acc, expense) => acc + expense.total_amount,
+    0
+  );
+  const totalLeftToPayTTC = expenses.reduce(
+    (acc, expense) => acc + expense.left_to_pay,
+    0
+  );
 
-// Calcul du pourcentage restant à payer
-const percentageLeftToPay = totalExpensesTTC
-  ? (totalLeftToPayTTC / totalExpensesTTC) * 100
-  : 0;
-
-
-
-
-
-
-
-  
-
-
-
+  // Calcul du pourcentage restant à payer
+  const percentageLeftToPay = totalExpensesTTC
+    ? (totalLeftToPayTTC / totalExpensesTTC) * 100
+    : 0;
 
   if (loading) {
     return (
@@ -167,7 +152,7 @@ const percentageLeftToPay = totalExpensesTTC
 
       <div className={styles.header}>
         <div className={styles.section1}>
-          <p>
+          {/* <p>
             <strong>Id :</strong> {project.id}
           </p>
           <p>
@@ -175,7 +160,7 @@ const percentageLeftToPay = totalExpensesTTC
           </p>
           <p>
             <strong>Nom :</strong> {project.name}
-          </p>
+          </p> */}
           <p>
             <strong>Date de début estimé : </strong>
             {new Date(project.estimated_start).toLocaleDateString()}
@@ -201,11 +186,9 @@ const percentageLeftToPay = totalExpensesTTC
           <p>
             <strong>Adresse :</strong> {company.address_street}
           </p>
+
           <p>
-            <strong>Code postal :</strong> {company.zip_code}
-          </p>
-          <p>
-            <strong>Ville :</strong> {company.address_city} (
+            <strong>Ville :</strong> {company.address_city} {company.zip_code} (
             {company.address_country})
           </p>
           <p>
@@ -277,9 +260,7 @@ const percentageLeftToPay = totalExpensesTTC
                       Lien
                     </a>
                   </td>
-                  
                 </tr>
-              
 
                 {/* Détails déroulants */}
                 {expandedExpenses[expense.id] && (
@@ -313,53 +294,43 @@ const percentageLeftToPay = totalExpensesTTC
             <tr>
               <td colSpan="2">Total des dépenses</td>
               <td>
-                {expenses.reduce(
-                  (acc, expense) => acc + expense.pre_tax_amount,
-                  0
-                ).toFixed(2)}{" "}
+                {expenses
+                  .reduce((acc, expense) => acc + expense.pre_tax_amount, 0)
+                  .toFixed(2)}{" "}
                 €
               </td>
               <td>
-                {expenses.reduce(
-                  (acc, expense) => acc + expense.total_amount,
-                  0
-                ).toFixed(2)}{" "}
+                {expenses
+                  .reduce((acc, expense) => acc + expense.total_amount, 0)
+                  .toFixed(2)}{" "}
                 €
               </td>
               <td>
-                {expenses.reduce(
-                  (acc, expense) => acc + expense.left_to_pay,
-                  0
-                ).toFixed(2)}{" "}
+                {expenses
+                  .reduce((acc, expense) => acc + expense.left_to_pay, 0)
+                  .toFixed(2)}{" "}
                 €
               </td>
               {/* // jauge avec le reste des dépenses a payer */}
-           {/* Jauge */}
-          {/* Jauge */}
-          <td colSpan="4">
-              <div className={styles.gaugeContainer}>
-                <div
-                  className={styles.gaugeFill}
-                  style={{
-                    width: `${percentageLeftToPay}%`,
-                    backgroundColor: percentageLeftToPay === 0 ? 'green' : 'red', // Vert si tout est payé, rouge sinon
-                  }}
-                ></div>
-              </div>
-              <p>
-                Reste à payer :{" "}
-                {totalLeftToPayTTC.toFixed(2)} €
-              </p>
-            </td>
-
-
+              {/* Jauge */}
+              {/* Jauge */}
+              <td colSpan="4">
+                <div className={styles.gaugeContainer}>
+                  <div
+                    className={styles.gaugeFill}
+                    style={{
+                      width: `${percentageLeftToPay}%`,
+                      backgroundColor:
+                        percentageLeftToPay === 0 ? "green" : "red", // Vert si tout est payé, rouge sinon
+                    }}
+                  ></div>
+                </div>
+                <p>Reste à payer : {totalLeftToPayTTC.toFixed(2)} €</p>
+              </td>
             </tr>
           </tfoot>
-
         </table>
       </div>
-
-     
     </div>
   );
 }

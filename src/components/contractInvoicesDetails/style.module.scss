@@ -10,8 +10,6 @@
   color: black;
 }
 
-
-
 .contractInvoicesDetailsContainer {
   padding: 20px;
   background-color: #f9f9f9aa;
@@ -20,77 +18,102 @@
   padding-top: 2rem;
   margin: 0 auto;
   max-width: 1200px;
-  margin-bottom : 5rem;
+  margin-bottom: 5rem;
   
-    h2 {
-      font-size: 1.5rem;
-      margin-top: 30px;
-      margin-bottom: 15px;
-      color: #555;
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #555;
+  }
+
+  .contractDetails {
+    p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 8px 0;
+  
+      strong {
+        font-weight: bold;
+        color: #222;
+      }
     }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
   
-    .contractDetails {
-      p {
-        font-size: 1rem;
-        line-height: 1.5;
-        margin: 8px 0;
+    thead {
+      tr {
+        background-color: #f0f0f0;
   
-        strong {
+        th {
+          padding: 10px;
+          text-align: left;
           font-weight: bold;
-          color: #222;
+          color: #555;
+          border-bottom: 2px solid #ddd;
         }
       }
     }
   
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-  
-      thead {
-        tr {
-          background-color: #f0f0f0;
-  
-          th {
-            padding: 10px;
-            text-align: left;
-            font-weight: bold;
-            color: #555;
-            border-bottom: 2px solid #ddd;
-          }
+    tbody {
+      tr {
+        &:nth-child(even) {
+          background-color: #fafafa;
         }
-      }
   
-      tbody {
-        tr {
-          &:nth-child(even) {
-            background-color: #fafafa;
+        &:hover {
+          background-color: #f5f5f5;
+        }
+  
+        td {
+          padding: 10px;
+          border-bottom: 1px solid #ddd;
+          font-size: 0.9rem;
+          color: #333;
+  
+          a {
+            color: #007bff;
+            text-decoration: none;
+  
+            &:hover {
+              text-decoration: underline;
+            }
           }
   
-          &:hover {
-            background-color: #f5f5f5;
-          }
-  
-          td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            font-size: 0.9rem;
-            color: #333;
-  
-            a {
-              color: #007bff;
-              text-decoration: none;
-  
-              &:hover {
-                text-decoration: underline;
-              }
-            }
-  
-            strong {
-              color: #e74c3c; /* Mise en évidence pour les mentions importantes */
-            }
+          strong {
+            color: #e74c3c;
           }
         }
       }
     }
   }
+
+  .progressBarContainer {
+    margin-top: 20px;
+    text-align: center;
+
+    p {
+      font-weight: bold;
+    }
+
+    .progressBar {
+      width: 100%;
+      height: 20px;
+      background-color: #ddd;
+      border-radius: 10px;
+      margin-top: 10px;
+      margin-bottom : 1rem;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Vert */
+      border-radius: 10px;
+     
+    }
+  }
+}
