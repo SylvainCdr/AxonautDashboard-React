@@ -18,7 +18,6 @@
   margin: 0 auto;
   max-width: 1200px;
   margin-bottom: 5rem;
-
   .header {
     display: flex;
     justify-content: space-between;
@@ -70,6 +69,7 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s;
       margin-bottom: 10px;
+      cursor: pointer;
  
 
       &:hover {

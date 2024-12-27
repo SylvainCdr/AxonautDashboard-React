@@ -8,11 +8,9 @@ import DeliveryNotesDetails from "../../components/deliveryNotesDetails/delivery
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 
-
 export default function QuotationAndProjectDetails() {
   const { quotationId } = useParams();
   const [quotation, setQuotation] = useState(null);
- 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,7 +19,6 @@ export default function QuotationAndProjectDetails() {
       try {
         setLoading(true);
         const quotationData = await fetchQuotationById(quotationId);
-        
         setQuotation(quotationData);
       } catch (err) {
         console.error(err);
@@ -30,7 +27,6 @@ export default function QuotationAndProjectDetails() {
         setLoading(false);
       }
     };
-
     loadQuotationData();
   }, [quotationId]);
 
@@ -47,27 +43,31 @@ export default function QuotationAndProjectDetails() {
 
   return (
     <div className={styles.quotationAndProjectContainer}>
+      {/* <div className={styles.sidebar}>
+        <h3>Menu</h3>
+        <ul>
+          <li><a href="#quotation">Devis</a></li>
+          <li><a href="#project">Projet</a></li>
+          <li><a href="#contract-invoices">Factures</a></li>
+          <li><a href="#delivery-notes">Bons de livraison</a></li>
+        </ul>
+      </div> */}
 
-
-      <div className={styles.test}>
-
-      
-
-      </div>
-      <div className={styles.section}>
+      <div className={styles.section} id="quotation">
         <QuotationDetails quotation={quotation} />
       </div>
-    
-      <div className={styles.section}>
-      <ProjectDetails projectId={quotation.project_id} />
-      </div>
-      <div className={styles.section}>
-        <ContractInvoicesDetails contractId={quotation.contract_id} />
-        </div>
-      <div className={styles.section}>
-        <DeliveryNotesDetails projectId={quotation.project_id} />
-        </div>
 
+      <div className={styles.section} id="project">
+        <ProjectDetails projectId={quotation.project_id} />
+      </div>
+
+      <div className={styles.section} id="contract-invoices">
+        <ContractInvoicesDetails contractId={quotation.contract_id} />
+      </div>
+
+      <div className={styles.section} id="delivery-notes">
+        <DeliveryNotesDetails projectId={quotation.project_id} />
+      </div>
     </div>
   );
 }

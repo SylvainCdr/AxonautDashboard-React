@@ -13,14 +13,35 @@
 
 .deliveryNotesDetailsContainer {
 
-  padding: 20px;
+ 
   background-color: #f9f9f9aa;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding-top: 2rem;
   margin: 0 auto;
-  max-width: 1200px;
+ width: 100%;
 
+
+ button {
+  display: inline-block;
+  padding: 10px 15%;
+  font-size: 0.9rem;
+  color: #fff;
+  background-color: #109f00;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+  margin-bottom: 10px;
+  cursor: pointer;
+
+
+  &:hover {
+    background-color: #008b43;
+
+  }}
 
   table {
     width: 100%;
