@@ -38,6 +38,9 @@ export default function QuotationDetails() {
     loadQuotationData();
   }, [quotationId]);
 
+
+  
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -70,6 +73,9 @@ export default function QuotationDetails() {
             <strong>Titre :</strong> {quotation.title}
           </p>
           <p>
+            <strong>Nom de l'entreprise :</strong> {quotation.company_name}
+          </p>
+          <p>
             <strong>Date :</strong>{" "}
             {new Date(quotation.date).toLocaleDateString()}
           </p>
@@ -81,6 +87,14 @@ export default function QuotationDetails() {
             <strong>Date de dernière mise à jour :</strong>{" "}
             {new Date(quotation.last_update_date).toLocaleDateString()}
           </p> */}
+      
+     
+      
+
+          <p>
+            <strong>Commercial :</strong>{" "}
+            {company.business_manager?.name || "Inconnu"}
+          </p>
           <p>
             <strong>Statut :</strong>{" "}
             <span style={{ color: statusColor(quotation.status) }}>
@@ -90,21 +104,13 @@ export default function QuotationDetails() {
           <p>
             <strong>Commentaire(s):</strong> {quotation.comments}
           </p>
-          <p>
-            <strong>Nom de l'entreprise :</strong> {quotation.company_name}
-          </p>
 
-          <p>
-            <strong>Commercial :</strong>{" "}
-            {company.business_manager?.name || "Inconnu"}
-          </p>
-
-          <p>
+          {/* <p>
             <strong>Id projet :</strong>{" "}
             <button onClick={() => handleClickProject(quotation.project_id)}>
               {quotation.project_id}
             </button>
-          </p>
+          </p> */}
           {/* <p>
             <strong>Id opportunité :</strong> {quotation.opportunity_id}
           </p>
@@ -117,16 +123,16 @@ export default function QuotationDetails() {
             <strong>Id entreprise :</strong> {quotation.company_id}
           </p> */}
 
-          <p>
+          <h3>
             <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
-          </p>
-          <p>
+          </h3>
+          <h3>
             <strong>Marge total :</strong>  {quotation.margin.toFixed(2)} €
-          </p>
-          <p>
+          </h3>
+          <h3>
             {" "}
             <strong>Marge (%) </strong>
-          </p>
+          </h3>
           <GaugeChart
             id="margin-gauge"
             nrOfLevels={5}
@@ -139,12 +145,12 @@ export default function QuotationDetails() {
       </div>
 
       <div className={styles.quotationLines}>
-        <h2>Détails du devis</h2>
+        {/* <h2>Détails du devis</h2> */}
         <button
           onClick={() => setShowDetails(!showDetails)} // Toggle visibility on click
           className={styles.toggleButton}
         > <i class="fa-solid fa-bars"></i> 
-          {showDetails ?  "  Cacher les détails" : "  Voir les détails"}
+          {showDetails ?  "  Cacher les détails du devis" : "  Voir les détails du devis"}
         </button>
 
         {/* Conditionally render the table based on `showDetails` */}
@@ -219,3 +225,23 @@ export default function QuotationDetails() {
     </div>
   );
 }
+
+
+
+
+
+  // // Calcul de la marge réelle
+  // const margeReelle = (project.actual_revenue - project.actual_expenses_cost) / project.actual_revenue;
+
+
+  //           {/* Jauge représentant la marge réelle */}
+  //           <GaugeChart
+  //           id="margin-gauge"
+  //           nrOfLevels={5}
+  //           percent={margeReelle}
+  //           arcsLength={[0.15, 0.10, 0.30, 0.45 ]} // Définir les longueurs des arcs
+  //           colors={['#EA4228', '#F5CD19',  '#5BE12C', '#109f30' ]} // Couleurs des arcs
+  //           textColor="#000"
+  //           needleColor="#4520ff"
+  //           arcPadding={0.02}
+  //         />

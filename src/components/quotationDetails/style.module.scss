@@ -43,6 +43,13 @@
         strong {
           color: #0073e6;
         }
+
+      }
+      h3 {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 500;
       }
     }
   }
@@ -52,7 +59,7 @@
 
     .toggleButton {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 10px 15%;
       font-size: 0.9rem;
       color: #fff;
       background-color: #109f00;
@@ -63,6 +70,7 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s;
       margin-bottom: 10px;
+ 
 
       &:hover {
         background-color: #008b43;

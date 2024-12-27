@@ -42,6 +42,13 @@
         color: #343a40;
       }
     }
+
+    h3 {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
   }
 
   .graphContainer {
@@ -98,7 +105,7 @@
           th {
             padding: 10px;
             text-align: left;
-            color: #007bff;
+            color: white;
             font-weight: bold;
             border-bottom: 2px solid #0056b3;
           }
@@ -148,7 +155,6 @@
         width: 100%;
         margin-top: 10px;
         background-color: #f9f9f9;
-        
 
         th,
         td {
@@ -158,84 +164,7 @@
 
         th {
           background-color: #f2f2f2;
-        }
-      }
-    }
-
-    .gaugeContainer {
-      margin: 0.5rem 0rem;
-      width: 100%;
-      height: 20px;
-      background-color: #b5b5b5; /* Couleur de fond gris */
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .gaugeFill {
-      height: 100%;
-      transition: width 0.3s ease-in-out;
-    }
-
-    .gaugeContainer p {
-      margin-top: 5px;
-      text-align: center;
-    }
-  }
-
-  .deliveryNotesContainer {
-    margin: 20px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 100%;
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-
-      th,
-      td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
-
-      th {
-        background-color: #007bff;
-        color: #fff;
-      }
-
-      tbody tr:hover {
-        background-color: #f1f1f1;
-      }
-
-      button {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #0056b3;
-        }
-      }
-    }
-
-    .productsList {
-      list-style: none;
-      margin: 10px 0;
-      padding: 0;
-
-      li {
-        margin-bottom: 5px;
-        font-size: 14px;
-        color: #555;
-
-        strong {
-          color: #333;
+          color: #007bff;
         }
       }
     }

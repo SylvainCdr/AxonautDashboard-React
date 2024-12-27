@@ -57,12 +57,13 @@ export default function QuotationAndProjectDetails() {
       <div className={styles.section}>
         <QuotationDetails quotation={quotation} />
       </div>
-      <div className={styles.section}>
-        <ContractInvoicesDetails contractId={quotation.contract_id} />
-        </div>
+    
       <div className={styles.section}>
       <ProjectDetails projectId={quotation.project_id} />
       </div>
+      <div className={styles.section}>
+        <ContractInvoicesDetails contractId={quotation.contract_id} />
+        </div>
       <div className={styles.section}>
         <DeliveryNotesDetails projectId={quotation.project_id} />
         </div>

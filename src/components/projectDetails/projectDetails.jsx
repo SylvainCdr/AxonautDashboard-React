@@ -17,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import GaugeChart from "react-gauge-chart";
 
 export default function ProjectDetails() {
   const { projectId } = useParams();
@@ -61,6 +62,12 @@ export default function ProjectDetails() {
 
     loadProjectData();
   }, [projectId]);
+
+  
+  // Calcul de la marge réelle
+  const margeReelle = (project.actual_revenue - project.actual_expenses_cost) / project.actual_revenue;
+
+
 
   // console.log ("Dépenses du projet :", expenses);
   // console.log ("Bons de livraison du projet :", deliveryNotes);
@@ -177,8 +184,6 @@ export default function ProjectDetails() {
             <strong>Date de fin réelle : </strong>{" "}
             {new Date(project.actual_end).toLocaleDateString()}
           </p>
-        </div>
-        <div className={styles.section2}>
           <p>
             <strong>Entreprise :</strong>{" "}
             {company.name || "Entreprise inconnue"}
@@ -195,6 +200,36 @@ export default function ProjectDetails() {
             <strong>Commercial en charge :</strong>{" "}
             {company.business_manager?.name || "Inconnu"}
           </p>
+        </div>
+        <div className={styles.section2}>
+
+          
+        <h3>
+            <strong>Montant total HT:</strong> {project.actual_revenue.toFixed(2)} €
+          </h3>
+          <h3>
+            <strong>Total des dépenses  :</strong>  {project.actual_expenses_cost.toFixed(2)} €
+          </h3>
+          <h3>
+            <strong>Marge nette  :</strong>  {(project.actual_revenue - project.actual_expenses_cost).toFixed(2)} €
+          </h3>
+
+          <h3>
+            {" "}
+            <strong>Marge (%) </strong>
+          </h3>
+          
+            {/* Jauge représentant la marge réelle */}
+            <GaugeChart
+            id="margin-gauge"
+            nrOfLevels={5}
+            percent={margeReelle}
+            arcsLength={[0.15, 0.10, 0.30, 0.45 ]} // Définir les longueurs des arcs
+            colors={['#EA4228', '#F5CD19',  '#5BE12C', '#109f30' ]} // Couleurs des arcs
+            textColor="#000"
+            needleColor="#4520ff"
+            arcPadding={0.02}
+          />
         </div>
       </div>
 
