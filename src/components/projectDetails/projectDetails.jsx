@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
 import { fetchCompanyById } from "../../services/api/companies";
 import { fetchExpensesByProject } from "../../services/api/expenses";
+import { fetchSupplierContractsByProjectTitle } from "../../services/api/contracts";
 import styles from "./style.module.scss";
 import { GridLoader } from "react-spinners";
 import {
@@ -26,6 +27,8 @@ export default function ProjectDetails() {
   const [expandedExpenses, setExpandedExpenses] = useState({});
   const [loadExpenses, setLoadExpenses] = useState(false); // Nouvelle état pour charger les dépenses
   const [loadingExpenses, setLoadingExpenses] = useState(false); // État de chargement des dépenses
+  const [loadingContracts, setLoadingContracts] = useState(false); // Nouvel état pour les Supplier Contracts
+  const [supplierContracts, setSupplierContracts] = useState([]); // Nouvel état pour les Supplier Contracts
   
   const toggleExpense = (expenseId) => {
     setExpandedExpenses((prev) => ({
@@ -54,6 +57,7 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
+
   useEffect(() => {
     if (loadExpenses) {
       setLoadingExpenses(true); // Commencer le chargement des dépenses
@@ -76,6 +80,35 @@ export default function ProjectDetails() {
       loadExpensesData();
     }
   }, [loadExpenses, projectId, project.estimated_start, project.estimated_end]);
+
+
+  useEffect(() => {
+    const loadSupplierContracts = async () => {
+      if (!project.name) {
+        console.error("Le nom du projet est indéfini.");
+        return;
+      }
+  
+      console.log("Nom du projet utilisé pour la recherche :", project.name);
+  
+      try {
+        setLoadingContracts(true); // Début du chargement
+        const supplierContractsData = await fetchSupplierContractsByProjectTitle(
+          project.name
+        );
+        setSupplierContracts(supplierContractsData);
+      } catch (err) {
+        console.error(err);
+        setError("Erreur lors du chargement des contrats fournisseurs.");
+      } finally {
+        setLoadingContracts(false); // Fin du chargement
+      }
+    };
+  
+    loadSupplierContracts();
+  }, [project.name]);
+  
+console.log ("supplierContracts :", supplierContracts);
 
   // Calcul de la marge réelle
   const margeReelle = (project.actual_revenue - project.actual_expenses_cost) / project.actual_revenue;
@@ -153,8 +186,8 @@ export default function ProjectDetails() {
             
             <Bar dataKey="estimatedRevenue" fill="#3467ff" />
             <Bar dataKey="actualRevenue" fill="#00950c" />
-            <Bar dataKey="actualExpenses" fill="#e10069"  />
-            <Bar dataKey="difference" fill="#FFD700"  />
+            <Bar dataKey="actualExpenses" fill="#e10069" />
+            <Bar dataKey="difference" fill="#FFD700" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -234,6 +267,14 @@ export default function ProjectDetails() {
           </>
         )}
       </div>
+
+
+
+
+
+
+
+
     </div>
   );
 }

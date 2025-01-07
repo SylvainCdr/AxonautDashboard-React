@@ -35,6 +35,8 @@ export default function ContractInvoicesDetails() {
     loadQuotationData();
   }, [quotationId]);
 
+  // console.log("contract", contract);
+
   // Calculer le montant total payé
   const totalPaidAmount = invoices.reduce((acc, invoice) => {
     if (invoice.paid_date) {
