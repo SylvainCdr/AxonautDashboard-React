@@ -29,7 +29,7 @@ export default function ProjectDetails() {
   const [loadingExpenses, setLoadingExpenses] = useState(false); // État de chargement des dépenses
   const [loadingContracts, setLoadingContracts] = useState(false); // Nouvel état pour les Supplier Contracts
   const [supplierContracts, setSupplierContracts] = useState([]); // Nouvel état pour les Supplier Contracts
-  
+
   const toggleExpense = (expenseId) => {
     setExpandedExpenses((prev) => ({
       ...prev,
@@ -57,7 +57,6 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
-
   useEffect(() => {
     if (loadExpenses) {
       setLoadingExpenses(true); // Commencer le chargement des dépenses
@@ -81,21 +80,19 @@ export default function ProjectDetails() {
     }
   }, [loadExpenses, projectId, project.estimated_start, project.estimated_end]);
 
-
   useEffect(() => {
     const loadSupplierContracts = async () => {
       if (!project.name) {
         console.error("Le nom du projet est indéfini.");
         return;
       }
-  
+
       console.log("Nom du projet utilisé pour la recherche :", project.name);
-  
+
       try {
         setLoadingContracts(true); // Début du chargement
-        const supplierContractsData = await fetchSupplierContractsByProjectTitle(
-          project.name
-        );
+        const supplierContractsData =
+          await fetchSupplierContractsByProjectTitle(project.name);
         setSupplierContracts(supplierContractsData);
       } catch (err) {
         console.error(err);
@@ -104,27 +101,39 @@ export default function ProjectDetails() {
         setLoadingContracts(false); // Fin du chargement
       }
     };
-  
+
     loadSupplierContracts();
   }, [project.name]);
-  
-console.log ("supplierContracts :", supplierContracts);
+
+  console.log("supplierContracts :", supplierContracts);
 
   // Calcul de la marge réelle
-  const margeReelle = (project.actual_revenue - project.actual_expenses_cost) / project.actual_revenue;
+  const margeReelle =
+    (project.actual_revenue - project.actual_expenses_cost) /
+    project.actual_revenue;
 
   // Préparation des données pour le graphique
-  const difference = project.estimated_revenue - project.actual_expenses_cost || 0;
+  const difference =
+    project.estimated_revenue - project.actual_expenses_cost || 0;
   const chartData = [
     { name: "Montant Devis HT", estimatedRevenue: project.estimated_revenue },
     { name: "Revenu Actuel", actualRevenue: project.actual_revenue },
-    { name: "Dépenses Actuelles", actualExpenses: project.actual_expenses_cost },
+    {
+      name: "Dépenses Actuelles",
+      actualExpenses: project.actual_expenses_cost,
+    },
     { name: "Marge Nette Actuelle", difference },
   ];
 
   // Calcul des totaux pour les dépenses TTC
-  const totalExpensesTTC = expenses.reduce((acc, expense) => acc + expense.total_amount, 0);
-  const totalLeftToPayTTC = expenses.reduce((acc, expense) => acc + expense.left_to_pay, 0);
+  const totalExpensesTTC = expenses.reduce(
+    (acc, expense) => acc + expense.total_amount,
+    0
+  );
+  const totalLeftToPayTTC = expenses.reduce(
+    (acc, expense) => acc + expense.left_to_pay,
+    0
+  );
 
   // Calcul du pourcentage restant à payer
   const percentageLeftToPay = totalExpensesTTC
@@ -148,26 +157,61 @@ console.log ("supplierContracts :", supplierContracts);
 
       <div className={styles.header}>
         <div className={styles.section1}>
-          <p><strong>Date de début estimé : </strong>{new Date(project.estimated_start).toLocaleDateString()}</p>
-          <p><strong>Date de fin estimé : </strong>{new Date(project.estimated_end).toLocaleDateString()}</p>
-          <p><strong>Date de début réelle : </strong>{new Date(project.actual_start).toLocaleDateString()}</p>
-          <p><strong>Date de fin réelle : </strong>{new Date(project.actual_end).toLocaleDateString()}</p>
-          <p><strong>Entreprise :</strong> {company.name || "Entreprise inconnue"}</p>
-          <p><strong>Adresse :</strong> {company.address_street}</p>
-          <p><strong>Ville :</strong> {company.address_city} {company.zip_code} ({company.address_country})</p>
-          <p><strong>Commercial en charge :</strong> {company.business_manager?.name || "Inconnu"}</p>
+          <p>
+            <strong>Date de début estimé : </strong>
+            {new Date(project.estimated_start).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Date de fin estimé : </strong>
+            {new Date(project.estimated_end).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Date de début réelle : </strong>
+            {new Date(project.actual_start).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Date de fin réelle : </strong>
+            {new Date(project.actual_end).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Entreprise :</strong>{" "}
+            {company.name || "Entreprise inconnue"}
+          </p>
+          <p>
+            <strong>Adresse :</strong> {company.address_street}
+          </p>
+          <p>
+            <strong>Ville :</strong> {company.address_city} {company.zip_code} (
+            {company.address_country})
+          </p>
+          <p>
+            <strong>Commercial en charge :</strong>{" "}
+            {company.business_manager?.name || "Inconnu"}
+          </p>
         </div>
         <div className={styles.section2}>
-          <h3><strong>Montant total HT:</strong> {project.actual_revenue.toFixed(2)} €</h3>
-          <h3><strong>Total des dépenses :</strong> {project.actual_expenses_cost.toFixed(2)} €</h3>
-          <h3><strong>Marge nette :</strong> {(project.actual_revenue - project.actual_expenses_cost).toFixed(2)} €</h3>
-          <h3><strong>Marge (%) </strong></h3>
+          <h3>
+            <strong>Montant total HT:</strong>{" "}
+            {project.actual_revenue.toFixed(2)} €
+          </h3>
+          <h3>
+            <strong>Total des dépenses :</strong>{" "}
+            {project.actual_expenses_cost.toFixed(2)} €
+          </h3>
+          <h3>
+            <strong>Marge nette :</strong>{" "}
+            {(project.actual_revenue - project.actual_expenses_cost).toFixed(2)}{" "}
+            €
+          </h3>
+          <h3>
+            <strong>Marge (%) </strong>
+          </h3>
           <GaugeChart
             id="margin-gauge"
             nrOfLevels={5}
             percent={margeReelle}
-            arcsLength={[0.15, 0.10, 0.30, 0.45]}
-            colors={['#EA4228', '#F5CD19', '#5BE12C', '#109f30']}
+            arcsLength={[0.15, 0.1, 0.3, 0.45]}
+            colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
             textColor="#000"
             needleColor="#4520ff"
             arcPadding={0.02}
@@ -179,11 +223,14 @@ console.log ("supplierContracts :", supplierContracts);
       <div className={styles.graphContainer}>
         <h2>Graphique des coûts et revenus</h2>
         <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 5 }} barSize={150} >
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
+            barSize={150}
+          >
             <XAxis dataKey="name" /> {/* Axe des abscisses */}
             <YAxis /> {/* Axe des ordonnées */}
-            <Tooltip />  {/* Afficher les valeurs au survol */}
-            
+            <Tooltip /> {/* Afficher les valeurs au survol */}
             <Bar dataKey="estimatedRevenue" fill="#3467ff" />
             <Bar dataKey="actualRevenue" fill="#00950c" />
             <Bar dataKey="actualExpenses" fill="#e10069" />
@@ -192,10 +239,13 @@ console.log ("supplierContracts :", supplierContracts);
         </ResponsiveContainer>
       </div>
 
-      {/* Section des dépenses */}
+      {/* Section des dépenses*/}
       <div className={styles.expensesContainer}>
         <h1>Dépenses</h1>
-        <button onClick={() => setLoadExpenses(true)}> <i class="fa-solid fa-bars"></i>  Voir les dépenses du projet</button>
+        <button onClick={() => setLoadExpenses(true)}>
+          {" "}
+          <i class="fa-solid fa-bars"></i> Voir les dépenses du projet
+        </button>
 
         {/* Afficher le loader pendant le chargement des dépenses */}
         {loadingExpenses ? (
@@ -225,7 +275,10 @@ console.log ("supplierContracts :", supplierContracts);
                   {expenses.map((expense) => (
                     <React.Fragment key={expense.id}>
                       <tr onClick={() => toggleExpense(expense.id)}>
-                        <td><span>+</span>{expense.title}</td>
+                        <td>
+                          <span>+</span>
+                          {expense.title}
+                        </td>
                         <td>{new Date(expense.date).toLocaleDateString()}</td>
                         <td>{expense.pre_tax_amount.toFixed(2)} €</td>
                         <td>{expense.total_amount.toFixed(2)} €</td>
@@ -233,7 +286,15 @@ console.log ("supplierContracts :", supplierContracts);
                         <td>{expense.accounting_code_name}</td>
                         <td>{expense.supplier_name}</td>
                         <td>{expense.project_id}</td>
-                        <td><a href={expense.public_path} target="_blank" rel="noopener noreferrer">Lien</a></td>
+                        <td>
+                          <a
+                            href={expense.public_path}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Lien
+                          </a>
+                        </td>
                       </tr>
                       {expandedExpenses[expense.id] && (
                         <tr>
@@ -251,7 +312,9 @@ console.log ("supplierContracts :", supplierContracts);
                                   <tr key={index}>
                                     <td>{line.title}</td>
                                     <td>{line.quantity}</td>
-                                    <td>{line.total_pre_tax_amount.toFixed(2)} €</td>
+                                    <td>
+                                      {line.total_pre_tax_amount.toFixed(2)} €
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -268,13 +331,135 @@ console.log ("supplierContracts :", supplierContracts);
         )}
       </div>
 
+      {/* supplierContracts : 
+Array [ {…}, {…} ]
+​
+0: Object { id: 511828, title: "Pix3996 VIDEO SURVEILLANCE (MAIRIE DE PARIS): SITE DE BERCY", start_date: "2025-01-02T00:00:00+01:00", … }
+​​
+comments: '<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">Nom de la soci&eacute;t&eacute; : Spie Facilities</div>\n<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">Adresse de la soci&eacute;t&eacute; : 6 rue Fructidor, TSA 10027, 93484 SAINT-OUEN-SUR-SEINE CEDEX</div>\n<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">Nom du contact : Sebastien LAMY</div>\n<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">Adresse mail : sebastien.lamy@spie.com</div>\n<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">N&deg; de t&eacute;l&eacute;phone : 0609186981</div>\n<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">N&deg; de TVA : FR53538700022</div>\n<div class="ewa-rteLine" style="font-family: Verdana; font-size: 13.3333px; text-align: center; white-space-collapse: preserve;">SLC : M01-C05-223-01-6C405B</div>'
+​​
+end_date: null
+​​
+expenses: Array []
+​​​
+length: 0
+​​​
+<prototype>: Array []
+​​
+frequency_in_months: 0
+​​
+id: 511828
+​​
+pre_tax_amount: 3075.6000000000004
+​​
+start_date: "2025-01-02T00:00:00+01:00"
+​​
+supplier: Object { id: 457064, name: "ADI Global", prefered_tax_rate: 20, … }
+​​
+title: "Pix3996 VIDEO SURVEILLANCE (MAIRIE DE PARIS): SITE DE BERCY"
+​​
+total_amount: 3690.7200000000003
+​​
+<prototype>: Object { … }
+​
+1: Object { id: 442204, title: "Pix3996 VIDEO SURVEILLANCE (MAIRIE DE PARIS): SITE DE BERCY", start_date: "2024-10-14T00:00:00+02:00", … }
+​​
+comments: "Devis N&deg;:00296045"
+​​
+end_date: null
+​​
+expenses: Array [ {…} ]
+​​​
+0: Object { id: 9589062, title: "WV-U2540LA / Caméra Dôme Fixe - WV-U2540LA", date: "2024-10-29T00:00:00+01:00", … }
+​​​
+length: 1
+​​​
+<prototype>: Array []
+​​
+frequency_in_months: 0
+​​
+id: 442204
+​​
+pre_tax_amount: 2934
+​​
+start_date: "2024-10-14T00:00:00+02:00"
+​​
+supplier: Object { id: 895438, name: "I-PRO", prefered_tax_rate: 20, … }
+​​​
+categories: Array []
+​​​
+company_id: 9217711
+​​​
+custom_fields: null
+​​​
+id: 895438
+​​​
+name: "I-PRO"
+​​​
+prefered_tax_rate: 20
+​​​
+thirdparty_code: null
+​​​
+<prototype>: Object { … }
+​​
+title: "Pix3996 VIDEO SURVEILLANCE (MAIRIE DE PARIS): SITE DE BERCY"
+​​
+total_amount: 2934
+​​
+<prototype>: Object { … }
+​
+length: 2 */}
 
+      {/* Section des contrats fournisseurs */}
 
-
-
-
-
-
+      <div className={styles.supplierContractsContainer}>
+        <h1>Contrats fournisseurs</h1>
+        {/* Afficher le loader pendant le chargement des contrats fournisseurs */}
+        {loadingContracts ? (
+          <div className={styles.loaderContainer}>
+            <BarLoader color="#4520ff" loading={loadingContracts} width={200} />
+            <p>Chargement des contrats fournisseurs...</p>
+          </div>
+        ) : (
+          <>
+            {/* Afficher le tableau seulement après que les contrats fournisseurs sont chargés */}
+            {supplierContracts.length > 0 && (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Titre</th>
+                    <th>Date de début</th>
+                    <th>Date de fin</th>
+                    <th>Montant HT</th>
+                    <th>Montant TTC</th>
+                    <th>Fournisseur</th>
+                    {/* <th>Commentaires</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {supplierContracts.map((contract) => (
+                    <tr key={contract.id}>
+                      <td>{contract.title}</td>
+                      <td>
+                        {new Date(contract.start_date).toLocaleDateString()}
+                      </td>
+                      <td>
+                        {contract.end_date
+                          ? new Date(contract.end_date).toLocaleDateString()
+                          : "Non défini"}
+                      </td>
+                      <td>{contract.pre_tax_amount.toFixed(2)} €</td>
+                      <td>{contract.total_amount.toFixed(2)} €</td>
+                      <td>{contract.supplier.name}</td>
+                      {/* <td dangerouslySetInnerHTML={{ __html: contract.comments }} /> */}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

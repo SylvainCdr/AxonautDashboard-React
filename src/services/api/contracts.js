@@ -19,7 +19,7 @@ export const fetchSupplierContractsByProjectTitle = async (projectTitle) => {
   if (!projectTitle) {
     throw new Error("Le titre du projet est requis.");
   }
-  console.log ("fetchSupplierContractsByProjectTitle", projectTitle);
+  console.log("fetchSupplierContractsByProjectTitle", projectTitle);
 
   try {
     const encodedTitle = encodeURIComponent(projectTitle.trim());
@@ -32,7 +32,6 @@ export const fetchSupplierContractsByProjectTitle = async (projectTitle) => {
         },
       }
     );
-    
 
     if (!response.ok) {
       const errorDetails = await response.text();
@@ -41,10 +40,10 @@ export const fetchSupplierContractsByProjectTitle = async (projectTitle) => {
 
     return response.json();
   } catch (error) {
-    console.error("Erreur lors de la récupération des Supplier Contracts :", error.message);
+    console.error(
+      "Erreur lors de la récupération des Supplier Contracts :",
+      error.message
+    );
     throw error;
   }
 };
-
-
-
