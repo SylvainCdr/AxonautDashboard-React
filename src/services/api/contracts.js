@@ -15,16 +15,19 @@ export const fetchContractById = async (contractId) => {
   return response.json();
 };
 
-export const fetchSupplierContractsByProjectTitle = async (projectTitle) => {
+export const fetchSupplierContractsByProjectTitle = async (projectTitle, estimatedStart) => {
   if (!projectTitle) {
     throw new Error("Le titre du projet est requis.");
   }
-  console.log("fetchSupplierContractsByProjectTitle", projectTitle);
+  console.log("fetchSupplierContractsByProjectTitle", projectTitle, estimatedStart);
 
   try {
     const encodedTitle = encodeURIComponent(projectTitle.trim());
+    const queryParams = estimatedStart
+      ? `?estimatedStart=${encodeURIComponent(estimatedStart)}`
+      : "";
     const response = await fetch(
-      `http://localhost:3001/supplier-contracts/${encodedTitle}`,
+      `http://localhost:3001/supplier-contracts/${encodedTitle}${queryParams}`,
       {
         method: "GET",
         headers: {

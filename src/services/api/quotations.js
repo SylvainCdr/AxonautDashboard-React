@@ -1,4 +1,4 @@
-export const fetchQuotations = async (page = 1) => {
+export const fetchQuotations = async (page = 2) => {
   try {
     const response = await fetch(
       `http://localhost:3001/quotations?page=${page}`,

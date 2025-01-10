@@ -84,17 +84,20 @@ export default function ProjectDetails() {
 
   useEffect(() => {
     const loadSupplierContracts = async () => {
-      if (!project.name) {
-        console.error("Le nom du projet est indéfini.");
+      if (!project.name || !project.estimated_start) {
+        console.error("Le nom du projet ou la date de début estimée est indéfini.");
         return;
       }
-
+  
       console.log("Nom du projet utilisé pour la recherche :", project.name);
-
+      console.log("Date de début estimée :", project.estimated_start);
+  
       try {
         setLoadingContracts(true); // Début du chargement
-        const supplierContractsData =
-          await fetchSupplierContractsByProjectTitle(project.name);
+        const supplierContractsData = await fetchSupplierContractsByProjectTitle(
+          project.name,
+          project.estimated_start
+        );
         setSupplierContracts(supplierContractsData);
       } catch (err) {
         console.error(err);
@@ -103,9 +106,10 @@ export default function ProjectDetails() {
         setLoadingContracts(false); // Fin du chargement
       }
     };
-
+  
     loadSupplierContracts();
-  }, [project.name]);
+  }, [project.name, project.estimated_start]);
+  
 
   console.log("supplierContracts :", supplierContracts);
 
