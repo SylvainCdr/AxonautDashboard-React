@@ -57,6 +57,8 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
+  console.log ("project", project);
+
   useEffect(() => {
     if (loadExpenses) {
       setLoadingExpenses(true); // Commencer le chargement des dépenses
