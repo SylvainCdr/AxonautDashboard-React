@@ -14,21 +14,20 @@ export default function Quotations() {
   const navigate = useNavigate();
 
   const handleClickProject = (quotationId, projectId) => {
-    // On passe à la fois quotationId et projectId dans le chemin de l'URL
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
 
   useEffect(() => {
     const loadQuotationsData = async () => {
       try {
-        setLoading(true); // Mettre le loading à true avant de commencer l'appel
+        setLoading(true);
         const data = await fetchQuotations(page);
-        const limitedData = data.slice(0, 500); // On limite à 50 éléments
+        const limitedData = data.slice(0, 500); // On limite à 500 éléments
         setQuotations(limitedData);
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false); // Mettre le loading à false une fois les données chargées
+        setLoading(false);
       }
     };
     loadQuotationsData();
@@ -55,6 +54,11 @@ export default function Quotations() {
     return "black";
   };
 
+  const hasPixProductCode = (quotation) =>
+    quotation.quotation_lines?.some((line) =>
+      line.product_code?.startsWith("Pix_")
+    );
+
   return (
     <div className={styles.quotationsContainer}>
       <h1>Gestion des Devis & Projets</h1>
@@ -79,32 +83,35 @@ export default function Quotations() {
         </thead>
         <tbody>
           {quotations.map((quotation) => (
-            <tr key={quotation.id}>
+            <tr
+              key={quotation.id}
+              style={{
+                backgroundColor: hasPixProductCode(quotation)
+                  ? "#f0e68c" // Jaune clair pour les devis contenant "Pix_"
+                  : "white", // Blanc pour les autres
+              }}
+            >
               <td>{quotation.id}</td>
               <td>{quotation.number}</td>
               <td>{quotation.company_name || "Inconnue"}</td>
               <td>{quotation.user_id}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
               <td>
-                {" "}
                 <span style={{ color: statusColor(quotation.status) }}>
                   {quotation.status}
                 </span>
               </td>
-
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
               <td>{quotation.total_amount.toFixed(2)} €</td>
               <td>{quotation.margin.toFixed(2)} €</td>
               <td>
-                {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                  2
-                )}{" "}
+                {(
+                  (quotation.margin / quotation.pre_tax_amount) *
+                  100
+                ).toFixed(2)}{" "}
                 %
               </td>
               <td className={styles.actionCell}>
-                {/* <button onClick={() => handleClickProject(quotation.id)}>
-                  Voir
-                </button> */}
                 <button
                   onClick={() =>
                     handleClickProject(quotation.id, quotation.project_id)

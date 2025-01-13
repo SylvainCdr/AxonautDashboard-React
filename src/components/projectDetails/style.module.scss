@@ -4,7 +4,7 @@
   gap: 3rem;
   justify-content: center; /* Centrage horizontal */
   align-items: center; /* Centrage vertical */
-  min-height: 60vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+  min-height: 40vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
   text-align: center;
   color: black;
 }
@@ -88,7 +88,7 @@
     color: #dc3545;
   }
 
-  .expensesContainer {
+  .expenses, .supplierContracts {
     padding: 20px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;

@@ -1,4 +1,4 @@
-import { BarLoader } from "react-spinners";
+import { BarLoader, GridLoader } from "react-spinners";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
@@ -6,7 +6,6 @@ import { fetchCompanyById } from "../../services/api/companies";
 import { fetchExpensesByProject } from "../../services/api/expenses";
 import { fetchSupplierContractsByProjectTitle } from "../../services/api/contracts";
 import styles from "./style.module.scss";
-import { GridLoader } from "react-spinners";
 import {
   BarChart,
   Bar,
@@ -14,6 +13,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import GaugeChart from "react-gauge-chart";
 
@@ -25,7 +25,6 @@ export default function ProjectDetails() {
   const [error, setError] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [expandedExpenses, setExpandedExpenses] = useState({});
-  const [loadExpenses, setLoadExpenses] = useState(false); // Nouvelle état pour charger les dépenses
   const [loadingExpenses, setLoadingExpenses] = useState(false); // État de chargement des dépenses
   const [loadingContracts, setLoadingContracts] = useState(false); // Nouvel état pour les Supplier Contracts
   const [supplierContracts, setSupplierContracts] = useState([]); // Nouvel état pour les Supplier Contracts
@@ -57,102 +56,53 @@ export default function ProjectDetails() {
     loadProjectData();
   }, [projectId]);
 
-  console.log ("project", project);
+  console.log("project", project);
 
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     if (!project.name || !project.estimated_start) {
-  //       console.error("Le nom du projet ou la date de début estimée est indéfini.");
-  //       return;
-  //     }
-  
-  //     console.log("Nom du projet utilisé pour la recherche :", project.name);
-  //     console.log("Date de début estimée :", project.estimated_start);
-  
-  //     try {
-  //       setLoadingContracts(true); // Début du chargement
-  
-  //       // Charger les contrats fournisseurs
-  //       const supplierContractsData = await fetchSupplierContractsByProjectTitle(
-  //         project.name,
-  //         project.estimated_start
-  //       );
-  
-  //       // Charger les dépenses
-  //       const expensesData = await fetchExpensesByProject(
-  //         project.estimated_start,
-  //         project.estimated_end,
-  //         projectId
-  //       );
-  
-  //       console.log("Dépenses chargées :", expensesData);
-  
-  //       // Filtrer les contrats fournisseurs : 
-  //       // Ne conserver que ceux dont le tableau `expenses` est vide
-  //       const filteredSupplierContracts = supplierContractsData.filter((contract) => {
-  //         // Vérifiez si ce contrat est déjà présent dans les dépenses
-  //         const relatedExpenses = expensesData.filter(
-  //           (expense) => expense.supplierContractId === contract.id
-  //         );
-  //         // Garder les contrats avec un tableau `expenses` vide
-  //         return relatedExpenses.length === 0;
-  //       });
-  
-  //       console.log("Contrats sans dépenses associées :", filteredSupplierContracts);
-  
-  //       // Mettre à jour les états
-  //       setSupplierContracts(filteredSupplierContracts);
-  //       setExpenses(expensesData);
-  //     } catch (err) {
-  //       console.error(err);
-  //       setError("Erreur lors du chargement des données.");
-  //     } finally {
-  //       setLoadingContracts(false); // Fin du chargement
-  //     }
-  //   };
-  
-  //   loadData();
-  // }, [project.name, project.estimated_start, project.estimated_end, projectId]);
-  
   useEffect(() => {
     const loadData = async () => {
       if (!project.name || !project.estimated_start) {
-        console.error("Le nom du projet ou la date de début estimée est indéfini.");
+        console.error(
+          "Le nom du projet ou la date de début estimée est indéfini."
+        );
         return;
       }
-  
+
       console.log("Nom du projet utilisé pour la recherche :", project.name);
       console.log("Date de début estimée :", project.estimated_start);
-  
+
       try {
         setLoadingContracts(true); // Début du chargement
-  
+        setLoadingExpenses(true); // Début du chargement
+
         // Charger les contrats fournisseurs
-        const supplierContractsData = await fetchSupplierContractsByProjectTitle(
-          project.name,
-          project.estimated_start
-        );
-  
+        const supplierContractsData =
+          await fetchSupplierContractsByProjectTitle(
+            project.name,
+            project.estimated_start
+          );
+
         // Charger les dépenses
         const expensesData = await fetchExpensesByProject(
           project.estimated_start,
           project.estimated_end,
           projectId
         );
-  
+
         console.log("Dépenses chargées :", expensesData);
-  
+
         // Extraire tous les IDs des dépenses
         const expenseIds = expensesData.map((expense) => expense.id);
-  
+
         // Ajouter les IDs des dépenses comme une propriété supplémentaire
-        const updatedSupplierContracts = supplierContractsData.map((contract) => ({
-          ...contract,
-          hasExpense: contract.expenses.some((expense) =>
-            expenseIds.includes(expense.id)
-          ),
-        }));
-  
+        const updatedSupplierContracts = supplierContractsData.map(
+          (contract) => ({
+            ...contract,
+            hasExpense: contract.expenses.some((expense) =>
+              expenseIds.includes(expense.id)
+            ),
+          })
+        );
+
         // Mettre à jour les états
         setSupplierContracts(updatedSupplierContracts);
         setExpenses(expensesData);
@@ -161,12 +111,12 @@ export default function ProjectDetails() {
         setError("Erreur lors du chargement des données.");
       } finally {
         setLoadingContracts(false); // Fin du chargement
+        setLoadingExpenses(false); // Fin du chargement
       }
     };
-  
+
     loadData();
   }, [project.name, project.estimated_start, project.estimated_end, projectId]);
-  
 
   console.log("supplierContracts :", supplierContracts);
 
@@ -177,13 +127,19 @@ export default function ProjectDetails() {
 
   // Préparation des données pour le graphique
   const difference =
-    project.estimated_revenue - project.actual_expenses_cost || 0;
+  project.actual_revenue - project.actual_expenses_cost || 0;
+
+  const supplierContractAmount = supplierContracts
+    .filter((contract) => !contract.hasExpense)
+    .reduce((acc, contract) => acc + contract.pre_tax_amount, 0);
+
   const chartData = [
     { name: "Commande", estimatedRevenue: project.estimated_revenue },
     { name: "Recette", actualRevenue: project.actual_revenue },
     {
-      name: "Dépenses actuelles",
-      actualExpenses: project.actual_expenses_cost ,
+      name: "Dépenses/Commandes",
+      actualExpenses: project.actual_expenses_cost, // Dépenses réelles
+      supplierContracts: supplierContractAmount, // Commandes à venir
     },
     { name: "Marge Nette Actuelle", difference },
   ];
@@ -291,119 +247,119 @@ export default function ProjectDetails() {
             margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
             barSize={150}
           >
-            <XAxis dataKey="name" /> {/* Axe des abscisses */}
-            <YAxis /> {/* Axe des ordonnées */}
-            <Tooltip /> {/* Afficher les valeurs au survol */}
-            <Bar dataKey="estimatedRevenue" fill="#3467ff" />
-            <Bar dataKey="actualRevenue" fill="#00950c" />
-            <Bar dataKey="actualExpenses" fill="#e10069" />
-            <Bar dataKey="difference" fill="#FFD700" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="estimatedRevenue" fill="#3467ff" name="Commande" />
+            <Bar dataKey="actualRevenue" fill="#00950c" name="Recette" />
+            <Bar
+              dataKey="actualExpenses"
+              stackId="expenses"
+              fill="#e10069"
+              name="Dépenses payées"
+            />
+            <Bar
+              dataKey="supplierContracts"
+              stackId="expenses"
+              fill="#ffa500"
+              name="Dépenses à venir"
+            />
+            <Bar dataKey="difference" fill="#FFD700" name="Marge Nette" />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Section des dépenses*/}
-      <div className={styles.expensesContainer}>
-        <h1>Dépenses</h1>
-        {/* <button onClick={() => setLoadExpenses(true)}>
-          {" "}
-          <i class="fa-solid fa-bars"></i> Voir les dépenses du projet
-        </button> */}
-
-        {/* Afficher le loader pendant le chargement des dépenses */}
-        {loadingExpenses ? (
-          <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingExpenses} width={200} />
-            <p>Chargement des dépenses...</p>
-          </div>
-        ) : (
-          <>
-            {/* Afficher le tableau seulement après que les dépenses sont chargées */}
-            {expenses.length > 0 && (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Titre</th>
-                    <th>Date</th>
-                    <th>Montant HT</th>
-                    <th>Montant TTC</th>
-                    <th>Reste à payer TTC</th>
-                    <th>Nom comptable</th>
-                    <th>Fournisseur</th>
-                    <th>Projet</th>
-                    <th>Détails</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {expenses.map((expense) => (
-                    <React.Fragment key={expense.id}>
-                      <tr onClick={() => toggleExpense(expense.id)}>
-                        <td>
-                          <span>+</span>
-                          {expense.title}
-                        </td>
-                        <td>{new Date(expense.date).toLocaleDateString()}</td>
-                        <td>{expense.pre_tax_amount.toFixed(2)} €</td>
-                        <td>{expense.total_amount.toFixed(2)} €</td>
-                        <td>{expense.left_to_pay.toFixed(2)} €</td>
-                        <td>{expense.accounting_code_name}</td>
-                        <td>{expense.supplier_name}</td>
-                        <td>{expense.project_id}</td>
-                        <td>
-                          <a
-                            href={expense.public_path}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Lien
-                          </a>
-                        </td>
+{/* Section des dépenses */}
+<div className={styles.expenses}>
+  <h1>Dépenses</h1>
+  {loadingExpenses ? ( // Affichage du loader pour les dépenses
+    <div className={styles.loaderContainer}>
+      <BarLoader color="#4520ff" loading={loadingExpenses} width={200} />
+      <p>Chargement des dépenses...</p>
+    </div>
+  ) : expenses.length > 0 ? (
+    <table>
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Date</th>
+          <th>Montant HT</th>
+          <th>Montant TTC</th>
+          <th>Reste à payer TTC</th>
+          <th>Nom comptable</th>
+          <th>Fournisseur</th>
+          <th>Projet</th>
+          <th>Détails</th>
+        </tr>
+      </thead>
+      <tbody>
+        {expenses.map((expense) => (
+          <React.Fragment key={expense.id}>
+            <tr onClick={() => toggleExpense(expense.id)}>
+              <td>
+                <span>+</span>
+                {expense.title}
+              </td>
+              <td>{new Date(expense.date).toLocaleDateString()}</td>
+              <td>{expense.pre_tax_amount.toFixed(2)} €</td>
+              <td>{expense.total_amount.toFixed(2)} €</td>
+              <td>{expense.left_to_pay.toFixed(2)} €</td>
+              <td>{expense.accounting_code_name}</td>
+              <td>{expense.supplier_name}</td>
+              <td>{expense.project_id}</td>
+              <td>
+                <a
+                  href={expense.public_path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Lien
+                </a>
+              </td>
+            </tr>
+            {expandedExpenses[expense.id] && (
+              <tr>
+                <td colSpan="9">
+                  <table className={styles.expenseDetails}>
+                    <thead>
+                      <tr>
+                        <th>Article</th>
+                        <th>Quantité</th>
+                        <th>Montant HT</th>
                       </tr>
-                      {expandedExpenses[expense.id] && (
-                        <tr>
-                          <td colSpan="9">
-                            <table className={styles.expenseDetails}>
-                              <thead>
-                                <tr>
-                                  <th>Article</th>
-                                  <th>Quantité</th>
-                                  <th>Montant HT</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {expense.expense_lines.map((line, index) => (
-                                  <tr key={index}>
-                                    <td>{line.title}</td>
-                                    <td>{line.quantity}</td>
-                                    <td>
-                                      {line.total_pre_tax_amount.toFixed(2)} €
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                    </thead>
+                    <tbody>
+                      {expense.expense_lines.map((line, index) => (
+                        <tr key={index}>
+                          <td>{line.title}</td>
+                          <td>{line.quantity}</td>
+                          <td>
+                            {line.total_pre_tax_amount.toFixed(2)} €
                           </td>
                         </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </tbody>
-              </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
             )}
-          </>
-        )}
-      </div>
+          </React.Fragment>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p>Aucune dépense trouvée.</p>
+  )}
+</div>
 
-    
-
-      {/* Section des contrats fournisseurs */}
-
-      <div className={styles.expensesContainer}>
+{/* Section des contrats fournisseurs */}
+<div className={styles.supplierContracts}>
   <h1>Commandes fournisseurs</h1>
-  {loadingContracts ? (
+  {loadingContracts ? ( // Affichage du loader pour les contrats fournisseurs
     <div className={styles.loaderContainer}>
       <BarLoader color="#4520ff" loading={loadingContracts} width={200} />
-      <p>Chargement des contrats fournisseurs...</p>
+      <p>Chargement des commandes fournisseurs...</p>
     </div>
   ) : supplierContracts.length > 0 ? (
     <table>
@@ -411,10 +367,10 @@ export default function ProjectDetails() {
         <tr>
           <th>Titre</th>
           <th>Date de début</th>
-          <th>Date de fin</th>
           <th>Montant HT</th>
           <th>Montant TTC</th>
           <th>Fournisseur</th>
+          <th>Commentaire</th>
           <th>expense ID</th>
         </tr>
       </thead>
@@ -427,17 +383,20 @@ export default function ProjectDetails() {
             }}
           >
             <td>{contract.title}</td>
-            <td>
-              {new Date(contract.start_date).toLocaleDateString()}
-            </td>
-            <td>
-              {contract.end_date
-                ? new Date(contract.end_date).toLocaleDateString()
-                : "Non défini"}
-            </td>
+            <td>{new Date(contract.start_date).toLocaleDateString()}</td>
             <td>{contract.pre_tax_amount.toFixed(2)} €</td>
             <td>{contract.total_amount.toFixed(2)} €</td>
             <td>{contract.supplier.name}</td>
+            <td>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: contract.comments
+                    ? contract.comments.slice(0, 90) +
+                      (contract.comments.length > 90 ? "..." : "")
+                    : "Aucun commentaire",
+                }}
+              ></div>
+            </td>
             <td>
               {contract.expenses.map((expense) => (
                 <span key={expense.id}>{expense.id}, </span>
@@ -451,8 +410,6 @@ export default function ProjectDetails() {
     <p>Aucun contrat fournisseur sans dépenses disponible.</p>
   )}
 </div>
-
-
 
     </div>
   );
