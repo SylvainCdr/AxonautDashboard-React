@@ -77,9 +77,16 @@ export default function ContractInvoicesDetails() {
         <p>
           <strong>Nom :</strong> {contract.name}
         </p>
-        <p>
+
+        
+       {/* comment : <div style="text-align: center;">Commande IPRO : PIX4376 + PIX4459 + PIX3646</div> */}
+        {/* // le commentaire est soit une valeur soit du code html donc on utilise dangerouslySetInnerHTML */}
+        <p> <strong>Commentaire :</strong> <div dangerouslySetInnerHTML={{__html: contract.comments}}></div> </p>
+        {/* <p>
           <strong>Commentaire :</strong> {contract.comments}
-        </p>
+        </p> */}
+
+
         <p>
           <strong>Montant total HT du devis :</strong>{" "}
           {contract.quotation.pre_tax_amount.toFixed(2)} €

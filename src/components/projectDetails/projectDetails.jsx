@@ -179,10 +179,10 @@ export default function ProjectDetails() {
   const difference =
     project.estimated_revenue - project.actual_expenses_cost || 0;
   const chartData = [
-    { name: "Montant Devis HT", estimatedRevenue: project.estimated_revenue },
-    { name: "Revenu Actuel", actualRevenue: project.actual_revenue },
+    { name: "Commande", estimatedRevenue: project.estimated_revenue },
+    { name: "Recette", actualRevenue: project.actual_revenue },
     {
-      name: "Dépenses Actuelles",
+      name: "Dépenses actuelles",
       actualExpenses: project.actual_expenses_cost ,
     },
     { name: "Marge Nette Actuelle", difference },
