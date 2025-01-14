@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchCompanyById } from "../../services/api/companies";
 import { GridLoader } from "react-spinners";
@@ -14,11 +14,7 @@ export default function QuotationDetails() {
   const [error, setError] = useState(null);
   const [showDetails, setShowDetails] = useState(false); // State to toggle visibility
 
-  const navigate = useNavigate();
 
-  const handleClickProject = (projectId) => {
-    navigate(`/projects/${quotation.project_id}`);
-  };
 
   useEffect(() => {
     const loadQuotationData = async () => {
@@ -58,6 +54,15 @@ export default function QuotationDetails() {
     if (status === "refused") return "red";
     return "black";
   };
+
+ // on compte le total en euros des lines contentant "Pix_" dans le product_code
+ const totalPixProductCode = quotation.quotation_lines
+  .filter((line) => line.product_code.startsWith("Pix_"))
+  .reduce((acc, line) => acc + line.unit_job_costing, 0);
+
+
+ 
+    
 
   return (
     <div className={styles.quotationContainer}>
@@ -200,6 +205,11 @@ export default function QuotationDetails() {
           <p>
             <strong>Marge % :</strong>{" "}
             {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(2)} %
+          </p>
+
+          <p>
+            <strong>Cout total des prestations :</strong>{" "}
+            {totalPixProductCode} €
           </p>
         </div>
       </div>

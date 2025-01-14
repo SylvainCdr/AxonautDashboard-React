@@ -35,7 +35,7 @@ function Homepage() {
     >
       {/* Animation spéciale pour l'image */}
       <motion.img
-        src="assets/pix-techapp3.png"
+        src="assets/logo-clear.png"
         alt=""
         initial={{ scale: 0 }}
         animate={{ rotate: 360, scale: 1 }}
@@ -51,13 +51,13 @@ function Homepage() {
           <Link to="/companies">Entreprises</Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/projects">Projets</Link>
+          <Link to="/quotations">Projets</Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/quotations">Devis</Link>
+          <Link to="/expense-report">Note de frais</Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/employees">Employés</Link>
+          <Link to="/">*</Link>
         </motion.div>
       </motion.div>
     </motion.div>

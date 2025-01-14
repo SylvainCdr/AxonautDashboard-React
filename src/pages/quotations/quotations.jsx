@@ -59,6 +59,11 @@ export default function Quotations() {
       line.product_code?.startsWith("Pix_")
     );
 
+
+
+
+
+
   return (
     <div className={styles.quotationsContainer}>
       <h1>Gestion des Devis & Projets</h1>

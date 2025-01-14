@@ -1,0 +1,162 @@
+// <div className={styles.expenseReportContainer}>
+// <h1>Créer une Note de Frais</h1>
+// {successMessage && <p className={styles.success}>{successMessage}</p>}
+// {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+
+// <form onSubmit={handleSubmit} className={styles.expenseForm}>
+//   <label>
+//     ID du Fournisseur:
+//     <input
+//       type="text"
+//       name="supplier_id"
+//       value={formData.supplier_id}
+//       onChange={handleChange}
+//       required
+//     />
+//   </label>
+//   <label>
+//     Code Tiers:
+//     <input
+//       type="text"
+//       name="supplier_thirdparty_code"
+//       value={formData.supplier_thirdparty_code}
+//       onChange={handleChange}
+//     />
+//   </label>
+//   <label>
+//     Titre:
+//     <input
+//       type="text"
+//       name="title"
+//       value={formData.title}
+//       onChange={handleChange}
+//       required
+//     />
+//   </label>
+//   <label>
+//     ID du Projet:
+//     <input
+//       type="text"
+//       name="project_id"
+//       value={formData.project_id}
+//       onChange={handleChange}
+//       required
+//     />
+//   </label>
+//   <label>
+//     Date:
+//     <input
+//       type="date"
+//       name="date"
+//       value={formData.date}
+//       onChange={handleChange}
+//       required
+//     />
+//   </label>
+//   <label>
+//     Montant HT:
+//     <input
+//       type="number"
+//       step="0.01"
+//       name="pre_tax_amount"
+//       value={formData.pre_tax_amount}
+//       onChange={handleChange}
+//       required
+//     />
+//   </label>
+//   <label>
+//     Taux de Taxe:
+//     <input
+//       type="number"
+//       step="0.01"
+//       name="tax_rate"
+//       value={formData.tax_rate}
+//       onChange={handleChange}
+//     />
+//   </label>
+//   <label>
+//     Code Comptable:
+//     <input
+//       type="text"
+//       name="accounting_code"
+//       value={formData.accounting_code}
+//       onChange={handleChange}
+//     />
+//   </label>
+//   <label>
+//     Montant de Taxe:
+//     <input
+//       type="number"
+//       step="0.01"
+//       name="tax_amount"
+//       value={formData.tax_amount}
+//       onChange={handleChange}
+//     />
+//   </label>
+
+//   <button type="submit" disabled={loading}>
+//     {loading ? "En cours..." : "Créer la Note de Frais"}
+//   </button>
+// </form>
+// </div>
+// );
+// }
+
+.expenseReportContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 5rem;
+  min-height: 90vh;
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .success {
+    color: green;
+  }
+
+  .error {
+    color: red;
+  }
+
+  .expenseForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+    background-color: #ffffffc3;
+    padding: 1rem;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+
+      input {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 500px;
+      }
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  }
+}

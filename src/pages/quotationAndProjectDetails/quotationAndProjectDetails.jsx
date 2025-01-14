@@ -41,6 +41,10 @@ export default function QuotationAndProjectDetails() {
 
   if (error) return <p className={styles.error}>{error}</p>;
 
+
+
+
+
   return (
     <div className={styles.quotationAndProjectContainer}>
       {/* <div className={styles.sidebar}>

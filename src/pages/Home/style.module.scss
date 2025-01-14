@@ -28,8 +28,9 @@
     grid-template-columns: repeat(2, 1fr);
     justify-content: center;
     gap: 30px;
-    background-color: rgba(255, 255, 255, 0.103);
+    
     padding: 20px;
+    background-color: var(--col1);
     border-radius: 3rem;
     -webkit-border-radius: 3rem;
     -moz-border-radius: 3rem;
@@ -40,27 +41,30 @@
       text-decoration: none;
       width: 10rem;
       height: 10rem;
-      color: white;
+      color: rgb(74, 74, 74);
+      background-color: white;
       font-size: 1.2rem;
       font-family: "barlow-condensed", sans-serif;
+      font-weight: 700;
       text-transform: uppercase;
       justify-content: center;
       align-items: center;
       display: flex;
       text-align: center;
-      background-color: var(--col1);
+     
       padding: 20px;
       line-height: 2rem;
       transition: all 0.3s ease;
-      border-radius: 50%;
-      -webkit-border-radius: 50%;
-      -moz-border-radius: 50%;
-      -ms-border-radius: 50%;
-      -o-border-radius: 50%;
-    }
+      border-radius: 3rem;
+      -webkit-border-radius: 3rem;
+      -moz-border-radius: 3rem;
+      -ms-border-radius: 3rem;
+      -o-border-radius: 3rem;
+}
 
     a:hover {
-      background-color: var(--col1);
+      background-color: #53cbff;
+      color : white;
       scale: 1.1;
     }
   }

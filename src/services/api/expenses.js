@@ -27,3 +27,25 @@ export const fetchExpensesByProject = async (startDate, endDate, projectId) => {
     throw error;
   }
 };
+
+export const postExpenseReport = async (expense) => {
+  try {
+    const url = "http://localhost:3001/create-expense-report";
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(expense),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur lors de la création de la dépense : ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Dépense créée :", data);
+    return data.expense;
+  } catch (error) {
+    console.error("Erreur dans postExpense :", error.message);
+    throw error;
+  }
+}
