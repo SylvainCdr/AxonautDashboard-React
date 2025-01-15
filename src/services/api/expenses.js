@@ -5,6 +5,8 @@ export const fetchExpensesByProject = async (startDate, endDate, projectId) => {
       throw new Error("Les paramètres 'startDate', 'endDate', et 'projectId' sont requis.");
     }
 
+
+
     const url = `http://localhost:3001/expensesByProject?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(
       endDate
     )}&projectId=${encodeURIComponent(projectId)}`;
@@ -28,6 +30,7 @@ export const fetchExpensesByProject = async (startDate, endDate, projectId) => {
   }
 };
 
+
 export const postExpenseReport = async (expense) => {
   try {
     const url = "http://localhost:3001/create-expense-report";
@@ -38,14 +41,15 @@ export const postExpenseReport = async (expense) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur lors de la création de la dépense : ${response.statusText}`);
+      const errorResponse = await response.json();
+      console.error("Erreur API côté backend :", errorResponse);
+      throw new Error(`Erreur API : ${errorResponse.message || response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log("Dépense créée :", data);
-    return data.expense;
+    return await response.json();
   } catch (error) {
-    console.error("Erreur dans postExpense :", error.message);
+    console.error("Erreur dans postExpenseReport :", error.message);
     throw error;
   }
-}
+};
+

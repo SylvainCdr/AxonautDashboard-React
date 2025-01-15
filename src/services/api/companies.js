@@ -58,7 +58,6 @@ export const fetchCompanies = async (page = 1) => {
     return response.json();
   };
 
-  // router.get("/companies/:companyId/invoices", getInvoicesByCompanyId);
   export const fetchInvoicesByCompanyId = async (companyId) => {
     const response = await fetch(`http://localhost:3001/companies/${companyId}/invoices`, {
       method: "GET",
@@ -73,6 +72,22 @@ export const fetchCompanies = async (page = 1) => {
     }
     return response.json();
   };
+
+  // router.get("/suppliers", getAllSuppliers);
+  export const fetchSuppliers = async () => {
+    const response = await fetch(`http://localhost:3001/suppliers`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }); // Assurez-vous que l'API backend fonctionne correctement
+    if (!response.ok) {
+      throw new Error(
+        "Erreur lors de la récupération des données de l'entreprise"
+      );
+    }
+    return response.json();
+  }
 
   
 
