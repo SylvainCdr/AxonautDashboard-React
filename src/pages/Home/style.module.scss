@@ -11,8 +11,13 @@
   img {
     width: 100%;
     max-width: 28rem;
-    margin-top: 3%;
-    padding-bottom: 5%;
+  }
+
+  .cross {
+    font-size: 3rem;
+    margin-top: 1.5rem;
+    font-weight: 1000;
+    font-family:'Courier New', Courier, monospace
   }
 
   h1 {
@@ -28,6 +33,7 @@
     grid-template-columns: repeat(2, 1fr);
     justify-content: center;
     gap: 30px;
+    margin-top : 4rem;
     
     padding: 20px;
     background-color: var(--col1);

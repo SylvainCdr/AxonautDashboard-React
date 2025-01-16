@@ -45,6 +45,19 @@ function Homepage() {
           damping: 20,
         }}
       />
+      <p className={styles.cross}>X</p>
+      {/* Animation spéciale pour l'image */}
+      <motion.img
+        src="assets/axo.png"
+        alt=""
+        initial={{ scale: 0 }}
+        animate={{ rotate: 360, scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 260,
+          damping: 20,
+        }}
+      />
 
       <motion.div className={styles.categories} variants={container}>
         <motion.div variants={item}>
