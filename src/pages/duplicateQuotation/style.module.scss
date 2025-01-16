@@ -1,0 +1,137 @@
+.loaderContainer {
+    display: flex;
+    flex-direction: column; 
+    gap : 3rem;
+    justify-content: center; /* Centrage horizontal */
+    align-items: center; /* Centrage vertical */
+    min-height: 100vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+    text-align: center;
+    color : black;
+  
+  }
+
+//   <div className={styles.duplicateQuotationContainer}>
+//   <h1>Détails du devis dupliqué - {quotation.number}</h1>
+
+//   <div className={styles.header}>
+//     <p>
+//       <strong>Numéro :</strong> {quotation.number}
+//     </p>
+//     <p>
+//       <strong>Titre :</strong> {quotation.title}
+//     </p>
+
+//     <p>
+//       <strong>Date :</strong> {new Date(quotation.date).toLocaleDateString()}
+//     </p>
+//     <p>
+//       <strong>Montant total HT :</strong> {quotation.pre_tax_amount} €
+//     </p>
+//     <p>
+//       <strong>Montant total TTC :</strong> {quotation.total_amount} €
+//     </p>
+//     <p>
+//       <strong>Marge totale :</strong> {quotation.margin.toFixed(2)} €
+//     </p>
+//   </div>
+
+//   <div className={styles.lines}>
+//     <h2>Lignes du devis :</h2>
+//     {quotation.quotation_lines && quotation.quotation_lines.length > 0 ? (
+//       <table>
+//         <thead>
+//           <tr>
+//             <th >Référence</th>
+//             <th>Désignation</th>
+//             <th>Quantité initiale</th>
+
+//             <th style={{ color: 'blue' }}>Quantité finale</th>
+//             <th>Prix vendu</th>
+//             <th style={{ color: 'blue' }}>Cout de revient </th>
+//             <th>Total prix vendu</th>
+//             <th style={{ color: 'blue' }}>Total cout de revient initial</th>
+//             <th>Marge</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {quotation.quotation_lines.map((line, index) => (
+//             <tr key={index}>
+//               <td>{line.product_code}</td>
+//               <td>{line.product_name}</td>
+//               <td>{line.quantity}</td>
+//               <td style={{ color: 'blue' }}> qté finale </td>
+//               <td>{line.price} €</td>
+//               <td style={{ color: 'blue' }}> cout revient</td>
+//               <td>{line.pre_tax_amount} €</td>
+//                 <td style={{ color: 'blue' }}> Total cout revient init</td>
+//               <td>{line.margin.toFixed(2)} €</td>
+//             </tr>
+//           ))}
+//         </tbody>
+//       </table>
+//     ) : (
+//       <p>Aucune ligne de devis disponible.</p>
+//     )}
+//   </div>
+// </div>
+// );
+// }
+
+
+.duplicateQuotationContainer {
+    min-height: 100vh;
+    padding-top : 6rem;
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 2rem;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+
+    .lines {
+      table {
+        max-width: 1200px;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        color : black;
+    
+        th, td {
+          padding: 10px;
+          text-align: left;
+          border: 1px solid #ddd;
+          background-color: #f4f4f4;
+        }
+    
+        th {
+          background-color: #f4f4f4;
+          font-weight: bold;
+        }
+    
+      
+        tr:hover {
+          background-color: #bababa;
+        }
+    
+        td {
+          font-size: 0.95rem;
+        }
+    
+        button {
+          padding: 5px 15px;
+        }
+      }
+    }
+
+    
+}

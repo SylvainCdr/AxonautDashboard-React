@@ -5,6 +5,9 @@ import { fetchCompanyById } from "../../services/api/companies";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import GaugeChart from "react-gauge-chart";
+import { db } from "../../firebase/firebase";
+import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function QuotationDetails() {
   const { quotationId } = useParams();
@@ -12,8 +15,50 @@ export default function QuotationDetails() {
   const [company, setCompany] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showDetails, setShowDetails] = useState(false); // State to toggle visibility
+  const [isDuplicate, setIsDuplicate] = useState(false); // Vérification de duplication
+  const [showDetails, setShowDetails] = useState(false); // Toggle des détails
+  const [duplicateQuotationId, setDuplicateQuotationId] = useState(null);
 
+
+  // Ajoutez `useNavigate` :
+const navigate = useNavigate();
+
+  // Vérifie si le devis est déjà dupliqué dans la collection
+  const checkDuplicateQuotation = async () => {
+    try {
+      const duplicateQuotationQuery = query(
+        collection(db, "DuplicateQuotation"),
+        where("quotation_id", "==", quotationId)
+      );
+
+      const querySnapshot = await getDocs(duplicateQuotationQuery);
+
+      if (!querySnapshot.empty) {
+        setIsDuplicate(true); // Marque comme dupliqué si trouvé
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification du devis dupliqué :", error);
+    }
+  };
+
+// Après duplication, redirigez :
+const duplicateQuotation = async () => {
+  try {
+    const docRef = await addDoc(collection(db, "DuplicateQuotation"), {
+      ...quotation,
+      quotation_id: quotationId,
+    });
+    console.log("Document dupliqué avec succès avec l'ID :", docRef.id);
+    setIsDuplicate(true);
+    setDuplicateQuotationId(docRef.id); // Mettez à jour l'état avec l'ID
+
+
+    // Redirection vers la page du devis dupliqué
+    // navigate(`/duplicate-quotation/${docRef.id}`);
+  } catch (e) {
+    console.error("Erreur lors de la duplication du document :", e);
+  }
+};
 
 
   useEffect(() => {
@@ -25,17 +70,15 @@ export default function QuotationDetails() {
 
         setQuotation(data);
         setCompany(companyData);
+        await checkDuplicateQuotation(); // Vérifie la duplication
       } catch (err) {
-        setError("Impossible de charger les données du projet.");
+        setError("Impossible de charger les données du devis.");
       } finally {
         setLoading(false);
       }
     };
     loadQuotationData();
   }, [quotationId]);
-
-
-  
 
   if (loading) {
     return (
@@ -55,14 +98,9 @@ export default function QuotationDetails() {
     return "black";
   };
 
- // on compte le total en euros des lines contentant "Pix_" dans le product_code
- const totalPixProductCode = quotation.quotation_lines
-  .filter((line) => line.product_code.startsWith("Pix_"))
-  .reduce((acc, line) => acc + line.unit_job_costing, 0);
-
-
- 
-    
+  const totalPixProductCode = quotation.quotation_lines
+    .filter((line) => line.product_code.startsWith("Pix_"))
+    .reduce((acc, line) => acc + line.unit_job_costing, 0);
 
   return (
     <div className={styles.quotationContainer}>
@@ -84,17 +122,6 @@ export default function QuotationDetails() {
             <strong>Date :</strong>{" "}
             {new Date(quotation.date).toLocaleDateString()}
           </p>
-          {/* <p>
-            <strong>Date d'expiration :</strong>{" "}
-            {new Date(quotation.expiry_date).toLocaleDateString()}
-          </p> */}
-          {/* <p>
-            <strong>Date de dernière mise à jour :</strong>{" "}
-            {new Date(quotation.last_update_date).toLocaleDateString()}
-          </p> */}
-      
-     
-      
 
           <p>
             <strong>Commercial :</strong>{" "}
@@ -109,30 +136,13 @@ export default function QuotationDetails() {
           <p>
             <strong>Commentaire(s):</strong> {quotation.comments}
           </p>
-
-          {/* <p>
-            <strong>Id projet :</strong>{" "}
-            <button onClick={() => handleClickProject(quotation.project_id)}>
-              {quotation.project_id}
-            </button>
-          </p> */}
-          {/* <p>
-            <strong>Id opportunité :</strong> {quotation.opportunity_id}
-          </p>
-          <p>
-            <strong>Id contrat :</strong> {quotation.contract_id}
-          </p> */}
         </div>
         <div className={styles.section2}>
-          {/* <p>
-            <strong>Id entreprise :</strong> {quotation.company_id}
-          </p> */}
-
           <h3>
             <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
           </h3>
           <h3>
-            <strong>Marge total :</strong>  {quotation.margin.toFixed(2)} €
+            <strong>Marge total :</strong> {quotation.margin.toFixed(2)} €
           </h3>
           <h3>
             {" "}
@@ -150,15 +160,16 @@ export default function QuotationDetails() {
       </div>
 
       <div className={styles.quotationLines}>
-        {/* <h2>Détails du devis</h2> */}
         <button
           onClick={() => setShowDetails(!showDetails)} // Toggle visibility on click
           className={styles.toggleButton}
-        > <i class="fa-solid fa-bars"></i> 
-          {showDetails ?  "  Cacher les détails du devis" : "  Voir les détails du devis"}
+        >
+          <i className="fa-solid fa-bars"></i>
+          {showDetails
+            ? "  Cacher les détails du devis"
+            : "  Voir les détails du devis"}
         </button>
 
-        {/* Conditionally render the table based on `showDetails` */}
         {showDetails && (
           <table>
             <thead>
@@ -208,8 +219,8 @@ export default function QuotationDetails() {
           </p>
 
           <p>
-            <strong>Cout total des prestations :</strong>{" "}
-            {totalPixProductCode} €
+            <strong>Cout total des prestations :</strong> {totalPixProductCode}{" "}
+            €
           </p>
         </div>
       </div>
@@ -231,27 +242,18 @@ export default function QuotationDetails() {
         >
           Voir le devis dans le portail client
         </a>
+        {!isDuplicate ? (
+  <button onClick={duplicateQuotation} className={styles.button}>
+    Dupliquer le devis
+  </button>
+) : (
+  <a href={`/duplicate-quotation/${duplicateQuotationId}`} className={styles.button}>
+    Voir le devis dupliqué
+
+  </a>
+)}
+
       </div>
     </div>
   );
 }
-
-
-
-
-
-  // // Calcul de la marge réelle
-  // const margeReelle = (project.actual_revenue - project.actual_expenses_cost) / project.actual_revenue;
-
-
-  //           {/* Jauge représentant la marge réelle */}
-  //           <GaugeChart
-  //           id="margin-gauge"
-  //           nrOfLevels={5}
-  //           percent={margeReelle}
-  //           arcsLength={[0.15, 0.10, 0.30, 0.45 ]} // Définir les longueurs des arcs
-  //           colors={['#EA4228', '#F5CD19',  '#5BE12C', '#109f30' ]} // Couleurs des arcs
-  //           textColor="#000"
-  //           needleColor="#4520ff"
-  //           arcPadding={0.02}
-  //         />

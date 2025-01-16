@@ -58,6 +58,66 @@ export default function ProjectDetails() {
 
   console.log("project", project);
 
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     if (!project.name || !project.estimated_start) {
+  //       console.error(
+  //         "Le nom du projet ou la date de début estimée est indéfini."
+  //       );
+  //       return;
+  //     }
+
+  //     console.log("Nom du projet utilisé pour la recherche :", project.name);
+  //     console.log("Date de début estimée :", project.estimated_start);
+
+  //     try {
+  //       setLoadingContracts(true); // Début du chargement
+  //       setLoadingExpenses(true); // Début du chargement
+
+  //       // Charger les contrats fournisseurs
+  //       const supplierContractsData =
+  //         await fetchSupplierContractsByProjectTitle(
+  //           project.name,
+  //           project.estimated_start
+  //         );
+
+  //       // Charger les dépenses
+  //       const expensesData = await fetchExpensesByProject(
+  //         project.estimated_start,
+  //         project.estimated_end,
+  //         projectId
+  //       );
+
+  //       console.log("Dépenses chargées :", expensesData);
+
+  //       // Extraire tous les IDs des dépenses
+  //       const expenseIds = expensesData.map((expense) => expense.id);
+
+  //       // Ajouter les IDs des dépenses comme une propriété supplémentaire
+  //       const updatedSupplierContracts = supplierContractsData.map(
+  //         (contract) => ({
+  //           ...contract,
+  //           hasExpense: contract.expenses.some((expense) =>
+  //             expenseIds.includes(expense.id)
+  //           ),
+  //         })
+  //       );
+
+  //       // Mettre à jour les états
+  //       setSupplierContracts(updatedSupplierContracts);
+  //       setExpenses(expensesData);
+  //     } catch (err) {
+  //       console.error(err);
+  //       setError("Erreur lors du chargement des données.");
+  //     } finally {
+  //       setLoadingContracts(false); // Fin du chargement
+  //       setLoadingExpenses(false); // Fin du chargement
+  //     }
+  //   };
+
+  //   loadData();
+  // }, [project.name, project.estimated_start, project.estimated_end, projectId]);
+
   useEffect(() => {
     const loadData = async () => {
       if (!project.name || !project.estimated_start) {
@@ -66,45 +126,36 @@ export default function ProjectDetails() {
         );
         return;
       }
-
+  
       console.log("Nom du projet utilisé pour la recherche :", project.name);
       console.log("Date de début estimée :", project.estimated_start);
-
+  
       try {
         setLoadingContracts(true); // Début du chargement
         setLoadingExpenses(true); // Début du chargement
-
+  
         // Charger les contrats fournisseurs
-        const supplierContractsData =
-          await fetchSupplierContractsByProjectTitle(
-            project.name,
-            project.estimated_start
-          );
-
+        try {
+          const supplierContractsData =
+            await fetchSupplierContractsByProjectTitle(
+              project.name,
+              project.estimated_start
+            );
+  
+          setSupplierContracts(supplierContractsData);
+        } catch (err) {
+          console.warn("Aucun contrat fournisseur trouvé :", err.message);
+          setSupplierContracts([]); // Aucun contrat trouvé
+        }
+  
         // Charger les dépenses
         const expensesData = await fetchExpensesByProject(
           project.estimated_start,
           project.estimated_end,
           projectId
         );
-
+  
         console.log("Dépenses chargées :", expensesData);
-
-        // Extraire tous les IDs des dépenses
-        const expenseIds = expensesData.map((expense) => expense.id);
-
-        // Ajouter les IDs des dépenses comme une propriété supplémentaire
-        const updatedSupplierContracts = supplierContractsData.map(
-          (contract) => ({
-            ...contract,
-            hasExpense: contract.expenses.some((expense) =>
-              expenseIds.includes(expense.id)
-            ),
-          })
-        );
-
-        // Mettre à jour les états
-        setSupplierContracts(updatedSupplierContracts);
         setExpenses(expensesData);
       } catch (err) {
         console.error(err);
@@ -114,10 +165,10 @@ export default function ProjectDetails() {
         setLoadingExpenses(false); // Fin du chargement
       }
     };
-
+  
     loadData();
   }, [project.name, project.estimated_start, project.estimated_end, projectId]);
-
+  
   console.log("supplierContracts :", supplierContracts);
 
   // Calcul de la marge réelle
@@ -407,7 +458,7 @@ export default function ProjectDetails() {
       </tbody>
     </table>
   ) : (
-    <p>Aucun contrat fournisseur sans dépenses disponible.</p>
+    <p>Aucune commande fournisseur trouvée.</p>
   )}
 </div>
 
