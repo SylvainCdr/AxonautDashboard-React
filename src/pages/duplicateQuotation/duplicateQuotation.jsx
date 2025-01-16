@@ -53,8 +53,11 @@ export default function DuplicateQuotation() {
 
   return (
     <div className={styles.duplicateQuotationContainer}>
-      <h1>Détails du devis dupliqué - {quotation.number}</h1>
-
+      <h1>
+        <i className="fa-solid fa-file-alt" style={{ color: "#4520ff", marginRight: "10px" }}></i>
+        Détails du devis dupliqué - {quotation.number}
+      </h1>
+  
       <div className={styles.header}>
         <p>
           <strong>Numéro :</strong> {quotation.number}
@@ -62,7 +65,6 @@ export default function DuplicateQuotation() {
         <p>
           <strong>Titre :</strong> {quotation.title}
         </p>
-
         <p>
           <strong>Date :</strong> {new Date(quotation.date).toLocaleDateString()}
         </p>
@@ -76,26 +78,28 @@ export default function DuplicateQuotation() {
           <strong>Marge totale :</strong> {quotation.margin.toFixed(2)} €
         </p>
       </div>
-
+  
       <div className={styles.lines}>
-        <h2>Lignes du devis :</h2>
+        <h2>
+          <i className="fa-solid fa-list" style={{ color: "#4520ff", marginRight: "10px" }}></i>
+          Lignes du devis
+        </h2>
         {quotation.quotation_lines && quotation.quotation_lines.length > 0 ? (
           <table>
             <thead>
               <tr>
-                <th >Référence</th>
+                <th>Référence</th>
                 <th>Désignation</th>
                 <th>Quantité initiale</th>
-    
-                <th style={{ color: 'blue' }}>Quantité finale</th>
+                <th>Quantité finale</th>
                 <th>Prix vendu</th>
-                <th >Cout de revient </th>
+                <th>Cout de revient</th>
                 <th>Total prix vendu</th>
-                <th >Total cout de revient initial</th>
+                <th>Total cout de revient initial</th>
                 <th>Marge co %</th>
-                <th style={{ color: 'blue' }}>Cout réel</th>
-                <th style={{ color: 'blue' }}>Total réel</th>
-                <th style={{ color: 'blue' }}>Total marge réelle %</th>
+                <th>Cout réel</th>
+                <th>Total réel</th>
+                <th>Total marge réelle %</th>
               </tr>
             </thead>
             <tbody>
@@ -104,15 +108,22 @@ export default function DuplicateQuotation() {
                   <td>{line.product_code}</td>
                   <td>{line.product_name}</td>
                   <td>{line.quantity}</td>
-                  <td style={{ color: 'blue' }}> qté finale </td>
+                  <td style={{ color: "blue" }}>qté finale</td>
                   <td>{line.price} €</td>
-                  <td > {line.unit_job_costing}</td>
+                  <td>{line.unit_job_costing} €</td>
                   <td>{(line.quantity * line.price).toFixed(2)} €</td>
-                    <td > {(line.quantity * line.unit_job_costing).toFixed(2) }</td>
-                  <td> {( (line.quantity * line.price - line.quantity * line.unit_job_costing) / (line.quantity * line.price) * 100).toFixed(1) } %</td>
-                  <td style={{ color: 'blue' }}> cout réel</td>
-                  <td style={{ color: 'blue' }}> total réel</td>
-                  <td style={{ color: 'blue' }}> total marge réel </td>
+                  <td>{(line.quantity * line.unit_job_costing).toFixed(2)} €</td>
+                  <td>
+                    {(
+                      ((line.quantity * line.price - line.quantity * line.unit_job_costing) /
+                        (line.quantity * line.price)) *
+                      100
+                    ).toFixed(1)}{" "}
+                    %
+                  </td>
+                  <td style={{ color: "blue" }}>cout réel</td>
+                  <td style={{ color: "blue" }}>total réel</td>
+                  <td style={{ color: "blue" }}>total marge réel</td>
                 </tr>
               ))}
             </tbody>
@@ -123,4 +134,6 @@ export default function DuplicateQuotation() {
       </div>
     </div>
   );
+
 }
+  
