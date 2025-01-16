@@ -28,7 +28,7 @@
         }
       };
 
-    //   router.get("/downloadDeliveryNote", async (req, res) => {
+
 
         export const downloadDeliveryNote = async (deliveryNoteId) => {
             try {
