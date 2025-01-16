@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./style.module.scss";
 import { useParams } from "react-router-dom";
 import { db } from "../../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { GridLoader } from "react-spinners";
 
 export default function DuplicateQuotation() {
@@ -11,17 +11,16 @@ export default function DuplicateQuotation() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
-
+  // Charge les données du devis
   useEffect(() => {
     const fetchDuplicateQuotation = async () => {
       try {
         setLoading(true);
-        const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId); // Vérifiez bien le nom de la collection
+        const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
         const snapshot = await getDoc(docRef);
 
         if (snapshot.exists()) {
-          setQuotation(snapshot.data()); // Charge les données du devis
+          setQuotation(snapshot.data());
         } else {
           setError("Aucun devis dupliqué trouvé pour cet ID.");
         }
@@ -36,7 +35,47 @@ export default function DuplicateQuotation() {
     fetchDuplicateQuotation();
   }, [duplicateQuotationId]);
 
-  console.log(quotation);
+  // Met à jour les champs modifiables
+  const handleChange = (index, field, value) => {
+    const updatedLines = [...quotation.quotation_lines];
+    updatedLines[index][field] = value;
+    setQuotation((prev) => ({
+      ...prev,
+      quotation_lines: updatedLines,
+    }));
+  };
+
+  // Insère une nouvelle ligne vide après un indice spécifique
+  const addLineAfter = (index) => {
+    const newLine = {
+      product_code: "",
+      product_name: "",
+      quantity: 0,
+      final_quantity: 0,
+      price: 0,
+      unit_job_costing: 0,
+      actual_cost: 0,
+    };
+
+    const updatedLines = [...quotation.quotation_lines];
+    updatedLines.splice(index + 1, 0, newLine); // Ajoute la nouvelle ligne après l'indice
+    setQuotation((prev) => ({
+      ...prev,
+      quotation_lines: updatedLines,
+    }));
+  };
+
+  // Sauvegarde les modifications dans Firestore
+  const saveChanges = async () => {
+    try {
+      const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
+      await updateDoc(docRef, quotation);
+      alert("Devis mis à jour avec succès !");
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour :", err);
+      alert("Erreur lors de la mise à jour du devis.");
+    }
+  };
 
   if (loading) {
     return (
@@ -57,7 +96,7 @@ export default function DuplicateQuotation() {
         <i className="fa-solid fa-file-alt" style={{ color: "#4520ff", marginRight: "10px" }}></i>
         Détails du devis dupliqué - {quotation.number}
       </h1>
-  
+
       <div className={styles.header}>
         <p>
           <strong>Numéro :</strong> {quotation.number}
@@ -78,7 +117,7 @@ export default function DuplicateQuotation() {
           <strong>Marge totale :</strong> {quotation.margin.toFixed(2)} €
         </p>
       </div>
-  
+
       <div className={styles.lines}>
         <h2>
           <i className="fa-solid fa-list" style={{ color: "#4520ff", marginRight: "10px" }}></i>
@@ -100,6 +139,7 @@ export default function DuplicateQuotation() {
                 <th>Cout réel</th>
                 <th>Total réel</th>
                 <th>Total marge réelle %</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -108,7 +148,15 @@ export default function DuplicateQuotation() {
                   <td>{line.product_code}</td>
                   <td>{line.product_name}</td>
                   <td>{line.quantity}</td>
-                  <td style={{ color: "blue" }}>qté finale</td>
+                  <td>
+                    <input
+                      type="number"
+                      value={line.final_quantity || ""}
+                      onChange={(e) =>
+                        handleChange(index, "final_quantity", parseFloat(e.target.value) || 0)
+                      }
+                    />
+                  </td>
                   <td>{line.price} €</td>
                   <td>{line.unit_job_costing} €</td>
                   <td>{(line.quantity * line.price).toFixed(2)} €</td>
@@ -121,9 +169,30 @@ export default function DuplicateQuotation() {
                     ).toFixed(1)}{" "}
                     %
                   </td>
-                  <td style={{ color: "blue" }}>cout réel</td>
-                  <td style={{ color: "blue" }}>total réel</td>
-                  <td style={{ color: "blue" }}>total marge réel</td>
+                  <td>
+                    <input
+                      type="number"
+                      value={line.actual_cost || ""}
+                      onChange={(e) =>
+                        handleChange(index, "actual_cost", parseFloat(e.target.value) || 0)
+                      }
+                    />
+                  </td>
+                  <td>{(line.final_quantity * line.actual_cost || 0).toFixed(2)} €</td>
+                  <td>
+                    {(
+                      ((line.final_quantity * line.price -
+                        line.final_quantity * line.actual_cost) /
+                        (line.final_quantity * line.price)) *
+                      100
+                    ).toFixed(1)}{" "}
+                    %
+                  </td>
+                  <td>
+                    <button onClick={() => addLineAfter(index)} className={styles.addButton}>
+                      Ajouter une ligne
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -132,8 +201,9 @@ export default function DuplicateQuotation() {
           <p>Aucune ligne de devis disponible.</p>
         )}
       </div>
+      <button onClick={saveChanges} className={styles.saveButton}>
+        Enregistrer les modifications
+      </button>
     </div>
   );
-
 }
-  
