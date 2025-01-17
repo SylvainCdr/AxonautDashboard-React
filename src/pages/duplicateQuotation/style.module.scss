@@ -56,6 +56,15 @@
     text-align: center;
     text-transform: uppercase;
   }
+  
+        .chapterRow {
+          background-color: #fff1a9;
+          font-weight: bold;
+          
+         
+  
+        }
+        
 
   table {
     width: 100%;
@@ -76,22 +85,24 @@
     }
 
     tbody {
+      
+      
       tr {
         transition: background-color 0.3s ease;
-
+        
         &:nth-child(even) {
           background-color: #f9f9f9;
         }
-
+        
         &:hover {
           background-color: #e9f5ff;
         }
-
+        
         td {
           padding: 1rem;
           font-size: 1rem;
           text-align: center;
-
+          
           &.indicator {
             font-size: 1.2rem;
           }
@@ -126,6 +137,8 @@
     }
 
     tfoot {
+
+
       tr {
         background-color: #f1f1f1;
         font-weight: bold;

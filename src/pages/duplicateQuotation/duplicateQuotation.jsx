@@ -177,90 +177,156 @@ export default function DuplicateQuotation() {
               </tr>
             </thead>
             <tbody>
-  {quotation.quotation_lines.map((line, index) => {
-    const discountPercentage = line.pre_tax_amount > 0
-      ? ((line.pre_tax_amount - line.quantity * line.price) / line.pre_tax_amount) * 100
-      : 0;
-
-    const commercialMargin = line.pre_tax_amount > 0
-      ? ((line.pre_tax_amount - line.quantity * line.unit_job_costing) / line.pre_tax_amount) * 100
-      : 0;
-
-    const realMargin = line.pre_tax_amount > 0
-      ? ((line.pre_tax_amount - totalLineAmountReal(line)) / line.pre_tax_amount) * 100
-      : 0;
-
-    return (
-      <tr key={index}>
-        <td>
-          <input
-            type="text"
-            value={line.product_code || ""}
-            onChange={(e) => handleChange(index, "product_code", e.target.value)}
-          />
-        </td>
-        <td>
-          <input
-            type="text"
-            value={line.product_name || ""}
-            onChange={(e) => handleChange(index, "product_name", e.target.value)}
-          />
-        </td>
-        <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
-        <td>
-          <input
-            type="number"
-            value={line.final_quantity || ""}
-            onChange={(e) => handleChange(index, "final_quantity", parseFloat(e.target.value) || 0)}
-          />
-        </td>
-        <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
-        <td>{!isNaN(discountPercentage) ? discountPercentage.toFixed(1) : "0.0"} %</td>
-        <td>{line.pre_tax_amount > 0 ? `${line.pre_tax_amount.toFixed(2)} €` : "-"}</td>
-        <td>{line.unit_job_costing > 0 ? `${line.unit_job_costing.toFixed(2)} €` : "-"}</td>
-        <td>
-          {line.quantity > 0
-            ? (line.quantity * line.unit_job_costing).toFixed(2)
-            : "-"}{" "}
-
-          €
-        </td>
-
-        <td>{!isNaN(commercialMargin) ? commercialMargin.toFixed(1) : "0.0"} %</td>
-        <td>
-          <input
-            type="number"
-            value={line.actual_cost || ""}
-            onChange={(e) => handleChange(index, "actual_cost", parseFloat(e.target.value) || 0)}
-          />
-        </td>
-        <td>{totalLineAmountReal(line) > 0 ? `${totalLineAmountReal(line).toFixed(2)} €` : "-"}</td>
-        <td
-          className={
-            realMargin > 50
-              ? styles.orange
-              : realMargin > 30
-              ? styles.green
-              : realMargin >= 15
-              ? styles.orange
-              : realMargin < 0
-              ? styles.red
-              : styles.red
-          }
-        >
-          {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %{" "}
-          <span>
-            {realMargin > 50 && <span>🔥</span>}
-            {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
-            {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
-            {realMargin < 0 && <span>☠️</span>}
-            {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
-          </span>
+  {Object.entries(
+    quotation.quotation_lines.reduce((groups, line) => {
+      const chapter = line.chapter || "Autres";
+      if (!groups[chapter]) {
+        groups[chapter] = [];
+      }
+      groups[chapter].push(line);
+      return groups;
+    }, {})
+  ).map(([chapter, lines], chapterIndex) => (
+    <React.Fragment key={chapterIndex}>
+      {/* Ligne du chapitre */}
+      <tr className={styles.chapterRow}>
+        <td colSpan="13" className={styles.chapterHeader}>
+          <strong>{chapter}</strong>
         </td>
       </tr>
-    );
-  })}
+      {/* Lignes des éléments dans le chapitre */}
+      {lines.map((line, index) => {
+        const discountPercentage =
+          line.pre_tax_amount > 0
+            ? ((line.pre_tax_amount - line.quantity * line.price) /
+                line.pre_tax_amount) *
+              100
+            : 0;
+
+        const commercialMargin =
+          line.pre_tax_amount > 0
+            ? ((line.pre_tax_amount - line.quantity * line.unit_job_costing) /
+                line.pre_tax_amount) *
+              100
+            : 0;
+
+        const realMargin =
+          line.pre_tax_amount > 0
+            ? ((line.pre_tax_amount - totalLineAmountReal(line)) /
+                line.pre_tax_amount) *
+              100
+            : 0;
+
+        return (
+          <tr key={index}>
+            <td>
+              <input
+                type="text"
+                value={line.product_code || ""}
+                onChange={(e) =>
+                  handleChange(index, "product_code", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                value={line.product_name || ""}
+                onChange={(e) =>
+                  handleChange(index, "product_name", e.target.value)
+                }
+              />
+            </td>
+            <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
+            <td>
+              <input
+                type="number"
+                value={line.final_quantity || ""}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "final_quantity",
+                    parseFloat(e.target.value) || 0
+                  )
+                }
+              />
+            </td>
+            <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
+            <td>
+              {!isNaN(discountPercentage)
+                ? discountPercentage.toFixed(1)
+                : "0.0"}{" "}
+              %
+            </td>
+            <td>
+              {line.pre_tax_amount > 0
+                ? `${line.pre_tax_amount.toFixed(2)} €`
+                : "-"}
+            </td>
+            <td>
+              {line.unit_job_costing > 0
+                ? `${line.unit_job_costing.toFixed(2)} €`
+                : "-"}
+            </td>
+            <td>
+              {line.quantity > 0
+                ? (line.quantity * line.unit_job_costing).toFixed(2)
+                : "-"}{" "}
+              €
+            </td>
+            <td>
+              {!isNaN(commercialMargin)
+                ? commercialMargin.toFixed(1)
+                : "0.0"}{" "}
+              %
+            </td>
+            <td>
+              <input
+                type="number"
+                value={line.actual_cost || ""}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "actual_cost",
+                    parseFloat(e.target.value) || 0
+                  )
+                }
+              />
+            </td>
+            <td>
+              {totalLineAmountReal(line) > 0
+                ? `${totalLineAmountReal(line).toFixed(2)} €`
+                : "-"}
+            </td>
+            <td
+              className={
+                realMargin > 50
+                  ? styles.orange
+                  : realMargin > 30
+                  ? styles.green
+                  : realMargin >= 15
+                  ? styles.orange
+                  : realMargin < 0
+                  ? styles.red
+                  : styles.red
+              }
+            >
+              {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %{" "}
+              <span>
+                {realMargin > 50 && <span>🔥</span>}
+                {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
+                {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
+                {realMargin < 0 && <span>☠️</span>}
+                {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
+              </span>
+            </td>
+          </tr>
+        );
+      })}
+    </React.Fragment>
+  ))}
 </tbody>
+
 
             {/* //bouton pour ajouter une ligne */}
             <button onClick={addNewLine} className={styles.addButton}>
