@@ -126,34 +126,26 @@ export default function DuplicateQuotation() {
         <p>
           <strong>Montant Commande HT :</strong> {quotation.pre_tax_amount} €
         </p>
-        <p>
-          <strong>Montant Commande TTC :</strong> {quotation.total_amount} €
-        </p>
-
 
         <p>
           <strong>Remise globale:</strong>
           {quotation.global_discount_amount} €
         </p>
-
         <p>
-          <strong>Remise globale TTC:</strong>
-          {quotation.global_discount_amount_with_tax} €
+          <strong>Remise globale %:</strong>
+          {((quotation.global_discount_amount / quotation.pre_tax_amount) * 100).toFixed(1)} %
         </p>
+
+
 
         <p>
           <strong>Marge Commande:</strong>
           {quotation.margin.toFixed(2)} €{" "}
         </p>
 
-  
         <p>
           <strong>Marge Commande %:</strong>
-          {(
-            (quotation.margin / quotation.total_amount) *
-            100
-          ).toFixed(2)}{" "}
-          %
+          {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
         </p>
       </div>
 
@@ -185,187 +177,167 @@ export default function DuplicateQuotation() {
               </tr>
             </thead>
             <tbody>
-              {quotation.quotation_lines.map((line, index) => {
-                const realMargin =
-                  ((line.pre_tax_amount - totalLineAmountReal(line)) /
-                  line.pre_tax_amount) *
-                  100;
+  {quotation.quotation_lines.map((line, index) => {
+    const discountPercentage = line.pre_tax_amount > 0
+      ? ((line.pre_tax_amount - line.quantity * line.price) / line.pre_tax_amount) * 100
+      : 0;
 
-                return (
-                  <tr key={index}>
-                    <td>
-                      <input
-                        type="text"
-                        value={line.product_code || ""}
-                        onChange={(e) =>
-                          handleChange(index, "product_code", e.target.value)
-                        }
-                      />
-                    </td>
+    const commercialMargin = line.pre_tax_amount > 0
+      ? ((line.pre_tax_amount - line.quantity * line.unit_job_costing) / line.pre_tax_amount) * 100
+      : 0;
 
-                    <td>
-                      <input
-                        type="text"
-                        value={line.product_name || ""}
-                        onChange={(e) =>
-                          handleChange(index, "product_name", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>{line.quantity}</td>
-                    <td>
-                      <input
-                        type="number"
-                        value={line.final_quantity || ""}
-                        onChange={(e) =>
-                          handleChange(
-                            index,
-                            "final_quantity",
-                            parseFloat(e.target.value) || 0
-                          )
-                        }
-                      />
-                    </td>
-                    <td>{line.price} €</td>
-                    <td> 
-                      {(
-                        ((line.pre_tax_amount - line.quantity * line.price) / line.pre_tax_amount) * 100
-                      ).toFixed(2)}{" "}
-                      %
+    const realMargin = line.pre_tax_amount > 0
+      ? ((line.pre_tax_amount - totalLineAmountReal(line)) / line.pre_tax_amount) * 100
+      : 0;
 
+    return (
+      <tr key={index}>
+        <td>
+          <input
+            type="text"
+            value={line.product_code || ""}
+            onChange={(e) => handleChange(index, "product_code", e.target.value)}
+          />
+        </td>
+        <td>
+          <input
+            type="text"
+            value={line.product_name || ""}
+            onChange={(e) => handleChange(index, "product_name", e.target.value)}
+          />
+        </td>
+        <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
+        <td>
+          <input
+            type="number"
+            value={line.final_quantity || ""}
+            onChange={(e) => handleChange(index, "final_quantity", parseFloat(e.target.value) || 0)}
+          />
+        </td>
+        <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
+        <td>{!isNaN(discountPercentage) ? discountPercentage.toFixed(1) : "0.0"} %</td>
+        <td>{line.pre_tax_amount > 0 ? `${line.pre_tax_amount.toFixed(2)} €` : "-"}</td>
+        <td>{line.unit_job_costing > 0 ? `${line.unit_job_costing.toFixed(2)} €` : "-"}</td>
+        <td>
+          {line.quantity > 0
+            ? (line.quantity * line.unit_job_costing).toFixed(2)
+            : "-"}{" "}
 
+          €
+        </td>
 
-                      </td>
-                    <td>
-                      {line.pre_tax_amount} €
-                    </td>
-                    <td>{line.unit_job_costing} €</td>
-                
-                    <td>
-                      {(line.quantity * line.unit_job_costing).toFixed(2)} €
-                    </td>
-                    <td>
-                      {(
-                        ((line.pre_tax_amount - line.quantity * line.unit_job_costing) /
-                        line.pre_tax_amount) *
-                        100
-                      ).toFixed(1)}{" "}
-                      %
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        value={line.actual_cost || ""}
-                        onChange={(e) =>
-                          handleChange(
-                            index,
-                            "actual_cost",
-                            parseFloat(e.target.value) || 0
-                          )
-                        }
-                      />
-                    </td>
-                    <td>{totalLineAmountReal(line).toFixed(2)} €</td>
-                    <td
-                      className={
-                        realMargin > 50
-                          ? styles.orange
-                          : realMargin > 30
-                          ? styles.green
-                          : realMargin >= 15
-                          ? styles.orange
-                          : realMargin < 0
-                          ? styles.red
-                          : styles.red
-                      }
-                    >
-                      {realMargin.toFixed(1)} %{" "}
-                      <span>
-                        {realMargin > 50 && <span>🔥</span>}
-                        {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
-                        {realMargin >= 15 && realMargin <= 30 && (
-                          <span>⚠️</span>
-                        )}
-                        {realMargin < 0 && <span>☠️</span>}
-                        {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
+        <td>{!isNaN(commercialMargin) ? commercialMargin.toFixed(1) : "0.0"} %</td>
+        <td>
+          <input
+            type="number"
+            value={line.actual_cost || ""}
+            onChange={(e) => handleChange(index, "actual_cost", parseFloat(e.target.value) || 0)}
+          />
+        </td>
+        <td>{totalLineAmountReal(line) > 0 ? `${totalLineAmountReal(line).toFixed(2)} €` : "-"}</td>
+        <td
+          className={
+            realMargin > 50
+              ? styles.orange
+              : realMargin > 30
+              ? styles.green
+              : realMargin >= 15
+              ? styles.orange
+              : realMargin < 0
+              ? styles.red
+              : styles.red
+          }
+        >
+          {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %{" "}
+          <span>
+            {realMargin > 50 && <span>🔥</span>}
+            {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
+            {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
+            {realMargin < 0 && <span>☠️</span>}
+            {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
+          </span>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
+
             {/* //bouton pour ajouter une ligne */}
             <button onClick={addNewLine} className={styles.addButton}>
               <i class="fa-solid fa-plus"></i>
             </button>
-            <tfoot>
-              <tr>
-                <td colSpan="6">Total</td>
-                <td>
-                  {quotation.quotation_lines
-                    .reduce((acc, line) => acc + line.pre_tax_amount, 0)
-                    .toFixed(2)}{" "}
-                  €
-                </td>
-                <td>
-                  {quotation.quotation_lines
-                    .reduce(
-                      (acc, line) =>
-                        acc + line.quantity * line.unit_job_costing,
-                      0
-                    )
-                    .toFixed(2)}{" "}
-                  €
-                </td>
-                <td>
-                  {(  
-                    quotation.quotation_lines.reduce(
-                      (acc, line) =>
-                        acc +
-                        ((line.quantity * line.price -
-                          line.quantity * line.unit_job_costing) /
-                          (line.quantity * line.price)) *
-                          100,
-                      0
-                    ) / quotation.quotation_lines.length
-                  ).toFixed(0)}{" "}
-                  %
-                </td>
-                <td></td>
-                <td>
-                  {quotation.quotation_lines
-                    .reduce(
-                      (acc, line) =>
-                        acc + line.final_quantity * line.actual_cost,
-                      0
-                    )
-                    .toFixed(2)}{" "}
-                  €
-                </td>
-                {/* // marge reelle du rpojet en %  line.final_quantity * line.actual_cost, sur total commande*/}
-                <td>
-                  {(
-                    (quotation.quotation_lines.reduce(
-                      (acc, line) =>
-                        acc +
-                        line.pre_tax_amount -
-                        line.final_quantity * line.actual_cost,
-                      0
-                    ) /
-                      quotation.pre_tax_amount) *
-                    100
-                  ).toFixed(0)}{" "}
-                  %
-                </td>
+         <tfoot>
+  <tr>
+    <td colSpan="7">Total</td>
+    <td>
+      {/* Total prix vendu */}
+      {quotation.quotation_lines
+        .reduce((acc, line) => acc + (line.pre_tax_amount || 0), 0)
+        .toFixed(2)}{" "}
+      €
+    </td>
+    <td>
+      {/* Total coût de revient initial */}
+      {quotation.quotation_lines
+        .reduce(
+          (acc, line) =>
+            acc + (line.quantity || 0) * (line.unit_job_costing || 0),
+          0
+        )
+        .toFixed(2)}{" "}
+      €
+    </td>
+    <td>
+      {/* Total marge commerciale en %*/}
+      {quotation.pre_tax_amount > 0
+        ? (
+            (quotation.quotation_lines.reduce(
+              (acc, line) =>
+                acc +
+                (line.pre_tax_amount || 0) -
+                (line.quantity || 0) * (line.unit_job_costing || 0),
+              0
+            ) /
+              quotation.pre_tax_amount) *
+            100
+          ).toFixed(1)
+        : "0"}{" "}
+      %
+    </td>
+      
 
+    <td></td>
+    <td>
+      {/* Total coût réel */}
+      {quotation.quotation_lines
+        .reduce(
+          (acc, line) =>
+            acc + (line.final_quantity || 0) * (line.actual_cost || 0),
+          0
+        )
+        .toFixed(2)}{" "}
+      €
+    </td>
+    <td>
+      {/* Marge réelle totale */}
+      {quotation.pre_tax_amount > 0
+        ? (
+            (quotation.quotation_lines.reduce(
+              (acc, line) =>
+                acc +
+                (line.pre_tax_amount || 0) -
+                (line.final_quantity || 0) * (line.actual_cost || 0),
+              0
+            ) /
+              quotation.pre_tax_amount) *
+            100
+          ).toFixed(0)
+        : "0"}{" "}
+      %
+    </td>
+  </tr>
+</tfoot>
 
-
-               
-                 
-              </tr>
-
-<p></p>
-            </tfoot>
           </table>
         ) : (
           <p>Aucune ligne de devis disponible.</p>
