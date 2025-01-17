@@ -6,10 +6,13 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { GridLoader } from "react-spinners";
 
 export default function DuplicateQuotation() {
-  const { duplicateQuotationId } = useParams(); // Récupère l'ID du devis depuis l'URL
+  const { duplicateQuotationId } = useParams();
   const [quotation, setQuotation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const totalLineAmountSold = (line) => line.quantity * line.price;
+  const totalLineAmountReal = (line) => line.final_quantity * line.actual_cost;
 
   // Charge les données du devis
   useEffect(() => {
@@ -25,7 +28,10 @@ export default function DuplicateQuotation() {
           setError("Aucun devis dupliqué trouvé pour cet ID.");
         }
       } catch (err) {
-        console.error("Erreur lors de la récupération du devis dupliqué :", err);
+        console.error(
+          "Erreur lors de la récupération du devis dupliqué :",
+          err
+        );
         setError("Impossible de charger les données du devis.");
       } finally {
         setLoading(false);
@@ -45,8 +51,8 @@ export default function DuplicateQuotation() {
     }));
   };
 
-  // Insère une nouvelle ligne vide après un indice spécifique
-  const addLineAfter = (index) => {
+  // Ajoute une nouvelle ligne en bas du tableau
+  const addNewLine = () => {
     const newLine = {
       product_code: "",
       product_name: "",
@@ -57,11 +63,9 @@ export default function DuplicateQuotation() {
       actual_cost: 0,
     };
 
-    const updatedLines = [...quotation.quotation_lines];
-    updatedLines.splice(index + 1, 0, newLine); // Ajoute la nouvelle ligne après l'indice
     setQuotation((prev) => ({
       ...prev,
-      quotation_lines: updatedLines,
+      quotation_lines: [...prev.quotation_lines, newLine],
     }));
   };
 
@@ -75,6 +79,14 @@ export default function DuplicateQuotation() {
       console.error("Erreur lors de la mise à jour :", err);
       alert("Erreur lors de la mise à jour du devis.");
     }
+  };
+
+  const getMarginIndicator = (margin) => {
+    if (margin > 50) return <span style={{ color: "orange" }}>🔥</span>;
+    if (margin > 30) return <span style={{ color: "green" }}>⬆️</span>;
+    if (margin >= 15) return <span style={{ color: "#ffa500" }}>⚠️</span>;
+    if (margin < 0) return <span style={{ color: "red" }}>☠️</span>;
+    return <span style={{ color: "red" }}>⬇️</span>;
   };
 
   if (loading) {
@@ -93,7 +105,10 @@ export default function DuplicateQuotation() {
   return (
     <div className={styles.duplicateQuotationContainer}>
       <h1>
-        <i className="fa-solid fa-file-alt" style={{ color: "#4520ff", marginRight: "10px" }}></i>
+        <i
+          className="fa-solid fa-file-alt"
+          style={{ color: "#4520ff", marginRight: "10px" }}
+        ></i>
         Détails du devis dupliqué - {quotation.number}
       </h1>
 
@@ -105,7 +120,8 @@ export default function DuplicateQuotation() {
           <strong>Titre :</strong> {quotation.title}
         </p>
         <p>
-          <strong>Date :</strong> {new Date(quotation.date).toLocaleDateString()}
+          <strong>Date :</strong>{" "}
+          {new Date(quotation.date).toLocaleDateString()}
         </p>
         <p>
           <strong>Montant total HT :</strong> {quotation.pre_tax_amount} €
@@ -114,13 +130,16 @@ export default function DuplicateQuotation() {
           <strong>Montant total TTC :</strong> {quotation.total_amount} €
         </p>
         <p>
-          <strong>Marge totale :</strong> {quotation.margin.toFixed(2)} €
+          <strong>Marge totale :</strong> {quotation.margin.toFixed(0)} €
         </p>
       </div>
 
       <div className={styles.lines}>
         <h2>
-          <i className="fa-solid fa-list" style={{ color: "#4520ff", marginRight: "10px" }}></i>
+          <i
+            className="fa-solid fa-list"
+            style={{ color: "#4520ff", marginRight: "10px" }}
+          ></i>
           Lignes du devis
         </h2>
         {quotation.quotation_lines && quotation.quotation_lines.length > 0 ? (
@@ -139,63 +158,174 @@ export default function DuplicateQuotation() {
                 <th>Cout réel</th>
                 <th>Total réel</th>
                 <th>Total marge réelle %</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {quotation.quotation_lines.map((line, index) => (
-                <tr key={index}>
-                  <td>{line.product_code}</td>
-                  <td>{line.product_name}</td>
-                  <td>{line.quantity}</td>
-                  <td>
-                    <input
-                      type="number"
-                      value={line.final_quantity || ""}
-                      onChange={(e) =>
-                        handleChange(index, "final_quantity", parseFloat(e.target.value) || 0)
-                      }
-                    />
-                  </td>
-                  <td>{line.price} €</td>
-                  <td>{line.unit_job_costing} €</td>
-                  <td>{(line.quantity * line.price).toFixed(2)} €</td>
-                  <td>{(line.quantity * line.unit_job_costing).toFixed(2)} €</td>
-                  <td>
-                    {(
-                      ((line.quantity * line.price - line.quantity * line.unit_job_costing) /
-                        (line.quantity * line.price)) *
-                      100
-                    ).toFixed(1)}{" "}
-                    %
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={line.actual_cost || ""}
-                      onChange={(e) =>
-                        handleChange(index, "actual_cost", parseFloat(e.target.value) || 0)
-                      }
-                    />
-                  </td>
-                  <td>{(line.final_quantity * line.actual_cost || 0).toFixed(2)} €</td>
-                  <td>
-                    {(
-                      ((line.final_quantity * line.price -
-                        line.final_quantity * line.actual_cost) /
-                        (line.final_quantity * line.price)) *
-                      100
-                    ).toFixed(1)}{" "}
-                    %
-                  </td>
-                  <td>
-                    <button onClick={() => addLineAfter(index)} className={styles.addButton}>
-                      Ajouter une ligne
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {quotation.quotation_lines.map((line, index) => {
+                const realMargin =
+                  ((totalLineAmountSold(line) - totalLineAmountReal(line)) /
+                    totalLineAmountSold(line)) *
+                  100;
+
+                return (
+                  <tr key={index}>
+                    <td>
+                      <input type="text"
+                        value={line.product_code || ""}
+                        onChange={(e) =>
+                          handleChange(index, "product_code", e.target.value)
+                        }
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        type="text"
+                        value={line.product_name || ""}
+                        onChange={(e) =>
+                          handleChange(index, "product_name", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td>{line.quantity}</td>
+                    <td>
+                      <input
+                        type="number"
+                        value={line.final_quantity || ""}
+                        onChange={(e) =>
+                          handleChange(
+                            index,
+                            "final_quantity",
+                            parseFloat(e.target.value) || 0
+                          )
+                        }
+                      />
+                    </td>
+                    <td>{line.price} €</td>
+                    <td>{line.unit_job_costing} €</td>
+                    <td> {totalLineAmountSold(line).toFixed(2)} €</td>
+                    <td>
+                      {(line.quantity * line.unit_job_costing).toFixed(2)} €
+                    </td>
+                    <td>
+                      {(
+                        ((line.quantity * line.price -
+                          line.quantity * line.unit_job_costing) /
+                          (line.quantity * line.price)) *
+                        100
+                      ).toFixed(0)}{" "}
+                      %
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={line.actual_cost || ""}
+                        onChange={(e) =>
+                          handleChange(
+                            index,
+                            "actual_cost",
+                            parseFloat(e.target.value) || 0
+                          )
+                        }
+                      />
+                    </td>
+                    <td>{totalLineAmountReal(line).toFixed(2)} €</td>
+                    <td
+  className={
+    realMargin > 50
+      ? styles.orange
+      : realMargin > 30
+      ? styles.green
+      : realMargin >= 15
+      ? styles.orange
+      : realMargin < 0
+      ? styles.red
+      : styles.red
+  }
+>
+  {realMargin.toFixed(0)} %{" "}
+  <span>
+    {realMargin > 50 && <span>🔥</span>}
+    {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
+    {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
+    {realMargin < 0 && <span>☠️</span>}
+    {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
+  </span>
+</td>
+
+
+
+                  </tr>
+                );
+              })}
             </tbody>
+            {/* //bouton pour ajouter une ligne */}
+            <button onClick={addNewLine} className={styles.addButton}>
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <tfoot>
+              <tr>
+                <td colSpan="6">Total</td>
+                <td>
+                  {quotation.quotation_lines
+                    .reduce((acc, line) => acc + totalLineAmountSold(line), 0)
+                    .toFixed(2)}{" "}
+                  €
+                </td>
+                <td>
+                  {quotation.quotation_lines
+                    .reduce(
+                      (acc, line) =>
+                        acc + line.quantity * line.unit_job_costing,
+                      0
+                    )
+                    .toFixed(2)}{" "}
+                  €
+                </td>
+                <td>
+                  {(
+                    (quotation.quotation_lines.reduce(
+                      (acc, line) =>
+                        acc +
+                        (totalLineAmountSold(line) - totalLineAmountReal(line)),
+                      0
+                    ) /
+                      quotation.quotation_lines.reduce(
+                        (acc, line) => acc + totalLineAmountSold(line),
+                        0
+                      )) *
+                    100
+                  ).toFixed(0)}{" "}
+                  %
+                </td>
+                <td></td>
+                <td>
+                  {quotation.quotation_lines
+                    .reduce(
+                      (acc, line) =>
+                        acc + line.final_quantity * line.actual_cost,
+                      0
+                    )
+                    .toFixed(2)}{" "}
+                  €
+                </td>
+                {/* // moyenne de la derniere colone marge reelle en % */}
+                <td>
+                  {(
+                    quotation.quotation_lines.reduce(
+                      (acc, line) =>
+                        acc +
+                        ((totalLineAmountSold(line) -
+                          totalLineAmountReal(line)) /
+                          totalLineAmountSold(line)) *
+                          100,
+                      0
+                    ) / quotation.quotation_lines.length
+                  ).toFixed(0)}{" "}
+                  %
+                </td>
+              </tr>
+            </tfoot>
           </table>
         ) : (
           <p>Aucune ligne de devis disponible.</p>

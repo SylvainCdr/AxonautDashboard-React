@@ -23,25 +23,27 @@ export default function QuotationDetails() {
   // Ajoutez `useNavigate` :
 const navigate = useNavigate();
 
-  // Vérifie si le devis est déjà dupliqué dans la collection
-  const checkDuplicateQuotation = async () => {
-    try {
-      const duplicateQuotationQuery = query(
-        collection(db, "DuplicateQuotation"),
-        where("quotation_id", "==", quotationId)
-      );
+ // Vérifie si le devis est déjà dupliqué
+ const checkDuplicateQuotation = async () => {
+  try {
+    const duplicateQuotationQuery = query(
+      collection(db, "DuplicateQuotation"),
+      where("quotation_id", "==", quotationId)
+    );
 
-      const querySnapshot = await getDocs(duplicateQuotationQuery);
+    const querySnapshot = await getDocs(duplicateQuotationQuery);
 
-      if (!querySnapshot.empty) {
-        setIsDuplicate(true); // Marque comme dupliqué si trouvé
-      }
-    } catch (error) {
-      console.error("Erreur lors de la vérification du devis dupliqué :", error);
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      setIsDuplicate(true);
+      setDuplicateQuotationId(doc.id);
     }
-  };
+  } catch (error) {
+    console.error("Erreur lors de la vérification du devis dupliqué :", error);
+  }
+};
 
-// Après duplication, redirigez :
+// Duplique le devis
 const duplicateQuotation = async () => {
   try {
     const docRef = await addDoc(collection(db, "DuplicateQuotation"), {
@@ -50,15 +52,17 @@ const duplicateQuotation = async () => {
     });
     console.log("Document dupliqué avec succès avec l'ID :", docRef.id);
     setIsDuplicate(true);
-    setDuplicateQuotationId(docRef.id); // Mettez à jour l'état avec l'ID
+    setDuplicateQuotationId(docRef.id);
 
-
-    // Redirection vers la page du devis dupliqué
-    // navigate(`/duplicate-quotation/${docRef.id}`);
+    // Naviguer automatiquement après duplication
+    navigate(`/duplicate-quotation/${docRef.id}`);
   } catch (e) {
     console.error("Erreur lors de la duplication du document :", e);
   }
 };
+
+console.log(quotation);
+console.log(duplicateQuotation)
 
 
   useEffect(() => {
@@ -243,16 +247,17 @@ const duplicateQuotation = async () => {
           Voir le devis dans le portail client
         </a>
         {!isDuplicate ? (
-  <button onClick={duplicateQuotation} className={styles.button}>
-    Dupliquer le devis
-  </button>
-) : (
-  <a href={`/duplicate-quotation/${duplicateQuotationId}`} className={styles.button}>
-    Voir le devis dupliqué
-
-  </a>
-)}
-
+          <button onClick={duplicateQuotation} className={styles.button}>
+            Dupliquer le devis
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate(`/duplicate-quotation/${duplicateQuotationId}`)}
+            className={styles.button}
+          >
+            Voir le devis dupliqué
+          </button>
+        )}
       </div>
     </div>
   );
