@@ -11,7 +11,7 @@ export default function DuplicateQuotation() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const totalLineAmountSold = (line) => line.quantity * line.price;
+  // const totalLineAmountSold = (line) => line.quantity * line.price;
   const totalLineAmountReal = (line) => line.final_quantity * line.actual_cost;
 
   // Charge les données du devis
@@ -124,13 +124,36 @@ export default function DuplicateQuotation() {
           {new Date(quotation.date).toLocaleDateString()}
         </p>
         <p>
-          <strong>Montant total HT :</strong> {quotation.pre_tax_amount} €
+          <strong>Montant Commande HT :</strong> {quotation.pre_tax_amount} €
         </p>
         <p>
-          <strong>Montant total TTC :</strong> {quotation.total_amount} €
+          <strong>Montant Commande TTC :</strong> {quotation.total_amount} €
         </p>
+
+
         <p>
-          <strong>Marge totale :</strong> {quotation.margin.toFixed(0)} €
+          <strong>Remise globale:</strong>
+          {quotation.global_discount_amount} €
+        </p>
+
+        <p>
+          <strong>Remise globale TTC:</strong>
+          {quotation.global_discount_amount_with_tax} €
+        </p>
+
+        <p>
+          <strong>Marge Commande:</strong>
+          {quotation.margin.toFixed(2)} €{" "}
+        </p>
+
+  
+        <p>
+          <strong>Marge Commande %:</strong>
+          {(
+            (quotation.margin / quotation.total_amount) *
+            100
+          ).toFixed(2)}{" "}
+          %
         </p>
       </div>
 
@@ -151,8 +174,9 @@ export default function DuplicateQuotation() {
                 <th>Quantité initiale</th>
                 <th>Quantité finale</th>
                 <th>Prix vendu</th>
-                <th>Cout de revient</th>
+                <th>Remise </th>
                 <th>Total prix vendu</th>
+                <th>Cout de revient</th>
                 <th>Total cout de revient initial</th>
                 <th>Marge co %</th>
                 <th>Cout réel</th>
@@ -163,14 +187,15 @@ export default function DuplicateQuotation() {
             <tbody>
               {quotation.quotation_lines.map((line, index) => {
                 const realMargin =
-                  ((totalLineAmountSold(line) - totalLineAmountReal(line)) /
-                    totalLineAmountSold(line)) *
+                  ((line.pre_tax_amount - totalLineAmountReal(line)) /
+                  line.pre_tax_amount) *
                   100;
 
                 return (
                   <tr key={index}>
                     <td>
-                      <input type="text"
+                      <input
+                        type="text"
                         value={line.product_code || ""}
                         onChange={(e) =>
                           handleChange(index, "product_code", e.target.value)
@@ -202,18 +227,29 @@ export default function DuplicateQuotation() {
                       />
                     </td>
                     <td>{line.price} €</td>
+                    <td> 
+                      {(
+                        ((line.pre_tax_amount - line.quantity * line.price) / line.pre_tax_amount) * 100
+                      ).toFixed(2)}{" "}
+                      %
+
+
+
+                      </td>
+                    <td>
+                      {line.pre_tax_amount} €
+                    </td>
                     <td>{line.unit_job_costing} €</td>
-                    <td> {totalLineAmountSold(line).toFixed(2)} €</td>
+                
                     <td>
                       {(line.quantity * line.unit_job_costing).toFixed(2)} €
                     </td>
                     <td>
                       {(
-                        ((line.quantity * line.price -
-                          line.quantity * line.unit_job_costing) /
-                          (line.quantity * line.price)) *
+                        ((line.pre_tax_amount - line.quantity * line.unit_job_costing) /
+                        line.pre_tax_amount) *
                         100
-                      ).toFixed(0)}{" "}
+                      ).toFixed(1)}{" "}
                       %
                     </td>
                     <td>
@@ -231,30 +267,29 @@ export default function DuplicateQuotation() {
                     </td>
                     <td>{totalLineAmountReal(line).toFixed(2)} €</td>
                     <td
-  className={
-    realMargin > 50
-      ? styles.orange
-      : realMargin > 30
-      ? styles.green
-      : realMargin >= 15
-      ? styles.orange
-      : realMargin < 0
-      ? styles.red
-      : styles.red
-  }
->
-  {realMargin.toFixed(0)} %{" "}
-  <span>
-    {realMargin > 50 && <span>🔥</span>}
-    {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
-    {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
-    {realMargin < 0 && <span>☠️</span>}
-    {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
-  </span>
-</td>
-
-
-
+                      className={
+                        realMargin > 50
+                          ? styles.orange
+                          : realMargin > 30
+                          ? styles.green
+                          : realMargin >= 15
+                          ? styles.orange
+                          : realMargin < 0
+                          ? styles.red
+                          : styles.red
+                      }
+                    >
+                      {realMargin.toFixed(1)} %{" "}
+                      <span>
+                        {realMargin > 50 && <span>🔥</span>}
+                        {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
+                        {realMargin >= 15 && realMargin <= 30 && (
+                          <span>⚠️</span>
+                        )}
+                        {realMargin < 0 && <span>☠️</span>}
+                        {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
+                      </span>
+                    </td>
                   </tr>
                 );
               })}
@@ -268,7 +303,7 @@ export default function DuplicateQuotation() {
                 <td colSpan="6">Total</td>
                 <td>
                   {quotation.quotation_lines
-                    .reduce((acc, line) => acc + totalLineAmountSold(line), 0)
+                    .reduce((acc, line) => acc + line.pre_tax_amount, 0)
                     .toFixed(2)}{" "}
                   €
                 </td>
@@ -283,18 +318,16 @@ export default function DuplicateQuotation() {
                   €
                 </td>
                 <td>
-                  {(
-                    (quotation.quotation_lines.reduce(
+                  {(  
+                    quotation.quotation_lines.reduce(
                       (acc, line) =>
                         acc +
-                        (totalLineAmountSold(line) - totalLineAmountReal(line)),
+                        ((line.quantity * line.price -
+                          line.quantity * line.unit_job_costing) /
+                          (line.quantity * line.price)) *
+                          100,
                       0
-                    ) /
-                      quotation.quotation_lines.reduce(
-                        (acc, line) => acc + totalLineAmountSold(line),
-                        0
-                      )) *
-                    100
+                    ) / quotation.quotation_lines.length
                   ).toFixed(0)}{" "}
                   %
                 </td>
@@ -309,22 +342,29 @@ export default function DuplicateQuotation() {
                     .toFixed(2)}{" "}
                   €
                 </td>
-                {/* // moyenne de la derniere colone marge reelle en % */}
+                {/* // marge reelle du rpojet en %  line.final_quantity * line.actual_cost, sur total commande*/}
                 <td>
                   {(
-                    quotation.quotation_lines.reduce(
+                    (quotation.quotation_lines.reduce(
                       (acc, line) =>
                         acc +
-                        ((totalLineAmountSold(line) -
-                          totalLineAmountReal(line)) /
-                          totalLineAmountSold(line)) *
-                          100,
+                        line.pre_tax_amount -
+                        line.final_quantity * line.actual_cost,
                       0
-                    ) / quotation.quotation_lines.length
+                    ) /
+                      quotation.pre_tax_amount) *
+                    100
                   ).toFixed(0)}{" "}
                   %
                 </td>
+
+
+
+               
+                 
               </tr>
+
+<p></p>
             </tfoot>
           </table>
         ) : (
