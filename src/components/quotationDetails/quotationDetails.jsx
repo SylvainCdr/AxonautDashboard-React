@@ -84,6 +84,8 @@ console.log(duplicateQuotation)
     loadQuotationData();
   }, [quotationId]);
 
+  console.log(quotation);
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>

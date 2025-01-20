@@ -3,7 +3,10 @@ import { fetchQuotations } from "../../services/api/quotations";
 import React, { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 import SearchQuotations from "../../components/searchQuotations/searchQuotations";
+
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
@@ -17,13 +20,49 @@ export default function Quotations() {
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
 
+  const handleToggleClosed = async (quotationId, currentState) => {
+    try {
+      // Mise à jour en base
+      const quotationRef = doc(db, "isClosedQuotations", quotationId.toString());
+      await setDoc(quotationRef, { isClosed: !currentState });
+
+      // Mise à jour en local
+      setQuotations((prev) =>
+        prev.map((quotation) =>
+          quotation.id === quotationId
+            ? { ...quotation, isClosed: !currentState }
+            : quotation
+        )
+      );
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour :", err);
+      alert("Erreur lors de la mise à jour de la quotation.");
+    }
+  };
+
+  const fetchClosedStatus = async (quotationId) => {
+    const docRef = doc(db, "isClosedQuotations", quotationId.toString());
+    const snapshot = await getDoc(docRef);
+    return snapshot.exists() ? snapshot.data().isClosed : false;
+  };
+
+  const loadClosedStatuses = async (quotationsList) => {
+    const updatedQuotations = await Promise.all(
+      quotationsList.map(async (quotation) => {
+        const isClosed = await fetchClosedStatus(quotation.id);
+        return { ...quotation, isClosed };
+      })
+    );
+    setQuotations(updatedQuotations);
+  };
+
   useEffect(() => {
     const loadQuotationsData = async () => {
       try {
         setLoading(true);
         const data = await fetchQuotations(page);
         const limitedData = data.slice(0, 500); // On limite à 500 éléments
-        setQuotations(limitedData);
+        await loadClosedStatuses(limitedData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -32,6 +71,8 @@ export default function Quotations() {
     };
     loadQuotationsData();
   }, [page]);
+
+  console.log("quotations", quotations);
 
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
@@ -59,11 +100,6 @@ export default function Quotations() {
       line.product_code?.startsWith("Pix_")
     );
 
-
-
-
-
-
   return (
     <div className={styles.quotationsContainer}>
       <h1>Gestion des Devis & Projets</h1>
@@ -75,7 +111,7 @@ export default function Quotations() {
           <tr>
             <th>ID</th>
             <th>Numéro</th>
-            <th>Entreprise</th>
+            <th>Titre</th>
             <th>Commercial(e)</th>
             <th>Date</th>
             <th>Statut</th>
@@ -83,6 +119,7 @@ export default function Quotations() {
             <th>Montant TTC</th>
             <th>Marge (€)</th>
             <th>Marge (%)</th>
+            <th>Clôturé</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -92,13 +129,13 @@ export default function Quotations() {
               key={quotation.id}
               style={{
                 backgroundColor: hasPixProductCode(quotation)
-                  ? "#f0e68c" // Jaune clair pour les devis contenant "Pix_"
+                  ? "#f8f2bc" // Jaune clair pour les devis contenant "Pix_"
                   : "white", // Blanc pour les autres
               }}
             >
               <td>{quotation.id}</td>
               <td>{quotation.number}</td>
-              <td>{quotation.company_name || "Inconnue"}</td>
+              <td>{quotation.title || "Inconnue"}</td>
               <td>{quotation.user_id}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
               <td>
@@ -115,6 +152,16 @@ export default function Quotations() {
                   100
                 ).toFixed(2)}{" "}
                 %
+              </td>
+              <td>
+                <input
+                  type="checkbox"
+                  className={styles.formCheckInput}
+                  checked={quotation.isClosed || false}
+                  onChange={() =>
+                    handleToggleClosed(quotation.id, quotation.isClosed)
+                  }
+                />
               </td>
               <td className={styles.actionCell}>
                 <button
