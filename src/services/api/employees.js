@@ -41,7 +41,6 @@ export const fetchEmployees = async (page = 1) => {
     return response.json();
   };
 
-  // router.get ("/workforces", getAllWorkforces);
   export const fetchWorkforces = async (page = 1) => {
     try {
       const response = await fetch(
@@ -68,5 +67,21 @@ export const fetchEmployees = async (page = 1) => {
       throw error;
     }
   }
+
+  export const fetchAxonautUsers = async () =>
+  {
+    const response = await fetch(`http://localhost:3001/axonaut-users`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des données du projet");
+    }
+    return response.json();
+  }
+
 
   

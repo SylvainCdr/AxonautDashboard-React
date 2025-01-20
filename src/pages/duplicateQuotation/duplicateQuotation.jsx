@@ -91,6 +91,20 @@ export default function DuplicateQuotation() {
     }
   };
 
+  // ajoute le champs etude terminée boolean dans la base de données
+  const finalizeApproStudy = async () => {
+    try {
+      const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
+      await updateDoc(docRef, { ...quotation, appro_study_finished: true })
+      alert("Etude finalisée avec succès !");
+    } catch (err) {
+      console.error("Erreur lors de la finalisation de l'étude :", err);
+      alert("Erreur lors de la finalisation de l'étude.");
+    }
+  };
+
+
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -550,6 +564,13 @@ export default function DuplicateQuotation() {
       <button onClick={saveChanges} className={styles.saveButton}>
         Enregistrer les modifications
       </button>
+
+      {/* // bouton pour notifier que l etude est finalisée */}
+      <button onClick={finalizeApproStudy} className={styles.saveButton}>
+        Finaliser l'étude
+      </button>
+      
+
     </div>
   );
 }

@@ -142,6 +142,8 @@ console.log(duplicateQuotation)
           <p>
             <strong>Commentaire(s):</strong> {quotation.comments}
           </p>
+
+          <p><strong> Remise :</strong> {quotation.global_discount_amount} €</p>
         </div>
         <div className={styles.section2}>
           <h3>
@@ -199,9 +201,9 @@ console.log(duplicateQuotation)
                   <td>{line.price} €</td>
                   <td>{line.pre_tax_amount} €</td>
                   <td>{line.unit_job_costing} €</td>
-                  <td>{line.margin} €</td>
+                  <td>{(line.margin.toFixed(1))} %</td>
                   <td>
-                    {((line.margin / line.pre_tax_amount) * 100).toFixed(2)} %
+                    {((line.margin / line.pre_tax_amount) * 100).toFixed(1)} %
                   </td>
                 </tr>
               ))}
@@ -213,9 +215,11 @@ console.log(duplicateQuotation)
           <p>
             <strong>Montant total HT :</strong> {quotation.pre_tax_amount} €
           </p>
+         
           <p>
-            <strong>Montant total TTC :</strong> {quotation.total_amount} €
+            <strong>Remise HT :</strong>  {quotation.global_discount_amount} €
           </p>
+      
           <p>
             <strong>Marge totale :</strong> {quotation.margin.toFixed(2)} €
           </p>

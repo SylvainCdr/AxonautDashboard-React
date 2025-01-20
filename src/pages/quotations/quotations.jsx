@@ -1,5 +1,6 @@
 import styles from "./style.module.scss";
 import { fetchQuotations } from "../../services/api/quotations";
+import { fetchAxonautUsers } from "../../services/api/employees";
 import React, { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
@@ -7,26 +8,26 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import SearchQuotations from "../../components/searchQuotations/searchQuotations";
 
-
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
+  const [axonautUsers, setAxonautUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
+  // Fonction pour naviguer vers les détails du projet
   const handleClickProject = (quotationId, projectId) => {
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
 
+  // Mise à jour de l'état "Clôturé"
   const handleToggleClosed = async (quotationId, currentState) => {
     try {
-      // Mise à jour en base
       const quotationRef = doc(db, "isClosedQuotations", quotationId.toString());
       await setDoc(quotationRef, { isClosed: !currentState });
 
-      // Mise à jour en local
       setQuotations((prev) =>
         prev.map((quotation) =>
           quotation.id === quotationId
@@ -40,12 +41,14 @@ export default function Quotations() {
     }
   };
 
+  // Vérification de l'état "Clôturé" en base de données
   const fetchClosedStatus = async (quotationId) => {
     const docRef = doc(db, "isClosedQuotations", quotationId.toString());
     const snapshot = await getDoc(docRef);
     return snapshot.exists() ? snapshot.data().isClosed : false;
   };
 
+  // Chargement des états "Clôturé" pour chaque devis
   const loadClosedStatuses = async (quotationsList) => {
     const updatedQuotations = await Promise.all(
       quotationsList.map(async (quotation) => {
@@ -56,6 +59,7 @@ export default function Quotations() {
     setQuotations(updatedQuotations);
   };
 
+  // Chargement des données des devis
   useEffect(() => {
     const loadQuotationsData = async () => {
       try {
@@ -72,8 +76,39 @@ export default function Quotations() {
     loadQuotationsData();
   }, [page]);
 
-  console.log("quotations", quotations);
+  console.log (quotations)
 
+  // Optimisation de la fonction pour récupérer le nom de l'utilisateur en charge
+  const getQuotationUser = (quotation) => {
+    const axonautUser = axonautUsers.find(
+      (user) => parseInt(user.id) === parseInt(quotation.user_id)
+    );
+    return axonautUser
+      ? `${axonautUser.firstname} ${axonautUser.lastname}`
+      : "Inconnu";
+  };
+  
+
+// Chargement des données des employés
+useEffect(() => {
+  const loadAxonautUsersData = async () => {
+    try {
+      const data = await fetchAxonautUsers();
+      setAxonautUsers(data);
+
+      // Ajout des logs pour vérifier les données
+      console.log("AxonautUsers chargés :", data);
+    } catch (err) {
+      console.error(
+        "Erreur lors de la récupération des données des employés :",
+        err
+      );
+    }
+  };
+  loadAxonautUsersData();
+}, []);
+
+  // Navigation entre les pages
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
@@ -129,14 +164,14 @@ export default function Quotations() {
               key={quotation.id}
               style={{
                 backgroundColor: hasPixProductCode(quotation)
-                  ? "#f8f2bc" // Jaune clair pour les devis contenant "Pix_"
+                  ? "#fff3cd" // Jaune clair pour les devis contenant "Pix_"
                   : "white", // Blanc pour les autres
               }}
             >
               <td>{quotation.id}</td>
               <td>{quotation.number}</td>
               <td>{quotation.title || "Inconnue"}</td>
-              <td>{quotation.user_id}</td>
+              <td>{getQuotationUser(quotation)}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
               <td>
                 <span style={{ color: statusColor(quotation.status) }}>
