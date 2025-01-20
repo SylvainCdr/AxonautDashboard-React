@@ -4,7 +4,17 @@ import { useParams } from "react-router-dom";
 import { db } from "../../firebase/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { GridLoader } from "react-spinners";
-import { p } from "framer-motion/client";
+import {
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
+import GaugeChart from "react-gauge-chart";
+
 
 export default function DuplicateQuotation() {
   const { duplicateQuotationId } = useParams();
@@ -99,6 +109,61 @@ export default function DuplicateQuotation() {
     return <p className={styles.error}>{error}</p>;
   }
 
+
+  // preparation des données pour la jauge avec les marges, on reprend les marges des t footer 
+  const data = [
+    { value: ((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1) },
+    { value: quotation.pre_tax_amount > 0
+      ? (
+          (quotation.quotation_lines.reduce(
+            (acc, line) =>
+              acc +
+              (line.pre_tax_amount || 0) -
+              (line.final_quantity || 0) * (line.actual_cost || 0),
+            0
+          ) /
+            quotation.pre_tax_amount) *
+          100
+        ).toFixed(0)
+      : "0" },
+  ];
+
+      
+ 
+
+
+  // Préparation des données pour le graphique
+  const chartData = [
+    {
+      name: "Total",
+      "Prix vendu": quotation.quotation_lines.reduce(
+        (acc, line) => acc + (line.pre_tax_amount || 0),
+        0
+      ),
+      "Coût de revient initial": quotation.quotation_lines.reduce(
+        (acc, line) =>
+          acc + (line.quantity || 0) * (line.unit_job_costing || 0),
+        0
+      ),
+      "Coût réel": quotation.quotation_lines.reduce(
+        (acc, line) =>
+          acc + (line.final_quantity || 0) * (line.actual_cost || 0),
+        0
+      ),
+      "Marge réelle": quotation.pre_tax_amount
+        ? quotation.quotation_lines.reduce(
+            (acc, line) =>
+              acc +
+              (line.pre_tax_amount || 0) -
+              (line.final_quantity || 0) * (line.actual_cost || 0),
+            0
+          )
+        : 0,
+    },
+  ];
+
+  // fin config graphique
+
   return (
     <div className={styles.duplicateQuotationContainer}>
       <h1>
@@ -145,6 +210,53 @@ export default function DuplicateQuotation() {
           {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
         </p>
       </div>
+      
+      <div className={styles.chartContainer}>
+          
+
+// Jauge avec les marges
+          <div className={styles.gaugeChart}>
+            {data.map((entry, index) => ( 
+              <GaugeChart
+                key={index}
+                id="gauge-chart2"
+                nrOfLevels={15}
+                colors={["#FF5F6D", "#0ef124"]}
+                arcWidth={0.3}
+                percent={entry.value / 100}
+                textColor="#000"
+              />
+            ))}
+          </div>
+
+
+
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
+            >
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Prix vendu" fill="#0088FE" />
+              <Bar dataKey="Coût de revient initial" fill="#FF8042" />
+              <Bar dataKey="Coût réel" fill="#00C49F" />
+              <Bar dataKey="Marge réelle" fill="#FFBB28" />
+            </BarChart>
+          </ResponsiveContainer>
+
+           {/* Vérification des champs renseignés */}
+  {quotation.quotation_lines.some(
+    (line) => !line.final_quantity || !line.actual_cost
+  ) && (
+    <p className={styles.warningMessage}>
+      ⚠️ Attention : Certaines lignes ne contiennent pas de "Quantité finale" ou de "Coût réel". Les données du graphique pourraient ne pas être représentatives.
+    </p>
+  )}
+        </div>
+      
 
       <div className={styles.lines}>
         <h2>

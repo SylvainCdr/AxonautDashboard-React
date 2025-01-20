@@ -53,26 +53,14 @@
     }
     .noDataMessage {
       color: #ff4d4f; /* Rouge doux pour signaler une alerte */
+      // color: #0ef124; 
       font-size: 1.1rem;
       text-align: center;
       margin-top: 30px;
     }
-  }
 
-  .graphContainer {
- 
 
-    h2 {
-      font-size: 1.8rem;
-      color: #343a40;
-      margin-bottom: 1.5rem;
-    }
 
-    svg {
-      overflow: visible;
-    }
-
-    
   }
 
   .loader,
