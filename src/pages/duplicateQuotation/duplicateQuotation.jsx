@@ -15,7 +15,6 @@ import {
 } from "recharts";
 import GaugeChart from "react-gauge-chart";
 
-
 export default function DuplicateQuotation() {
   const { duplicateQuotationId } = useParams();
   const [quotation, setQuotation] = useState(null);
@@ -61,7 +60,6 @@ export default function DuplicateQuotation() {
       quotation_lines: updatedLines,
     }));
   };
-  
 
   // Ajoute une nouvelle ligne en bas du tableau
   const addNewLine = () => {
@@ -93,9 +91,6 @@ export default function DuplicateQuotation() {
     }
   };
 
-
-
-
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -109,55 +104,67 @@ export default function DuplicateQuotation() {
     return <p className={styles.error}>{error}</p>;
   }
 
-
-  // preparation des données pour la jauge avec les marges, on reprend les marges des t footer 
+  // preparation des données pour la jauge avec les marges, on reprend les marges des t footer
   const data = [
     { value: ((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1) },
-    { value: quotation.pre_tax_amount > 0
-      ? (
-          (quotation.quotation_lines.reduce(
-            (acc, line) =>
-              acc +
-              (line.pre_tax_amount || 0) -
-              (line.final_quantity || 0) * (line.actual_cost || 0),
-            0
-          ) /
-            quotation.pre_tax_amount) *
-          100
-        ).toFixed(0)
-      : "0" },
+    {
+      value:
+        quotation.pre_tax_amount > 0
+          ? (
+              (quotation.quotation_lines.reduce(
+                (acc, line) =>
+                  acc +
+                  (line.pre_tax_amount || 0) -
+                  (line.final_quantity || 0) * (line.actual_cost || 0),
+                0
+              ) /
+                quotation.pre_tax_amount) *
+              100
+            ).toFixed(0)
+          : "0",
+    },
   ];
-
-      
- 
-
 
   // Préparation des données pour le graphique
   const chartData = [
     {
       name: "Total",
-      "Prix vendu": quotation.quotation_lines.reduce(
-        (acc, line) => acc + (line.pre_tax_amount || 0),
-        0
-      ),
-      "Coût de revient initial": quotation.quotation_lines.reduce(
-        (acc, line) =>
-          acc + (line.quantity || 0) * (line.unit_job_costing || 0),
-        0
-      ),
-      "Coût réel": quotation.quotation_lines.reduce(
-        (acc, line) =>
-          acc + (line.final_quantity || 0) * (line.actual_cost || 0),
-        0
-      ),
+      "Prix vendu": quotation.quotation_lines
+        .reduce((acc, line) => acc + (line.pre_tax_amount || 0), 0)
+        .toFixed(2),
+      "Coût de revient initial": quotation.quotation_lines
+        .reduce(
+          (acc, line) =>
+            acc + (line.quantity || 0) * (line.unit_job_costing || 0),
+          0
+        )
+        .toFixed(2),
+      "Coût réel": quotation.quotation_lines
+        .reduce(
+          (acc, line) =>
+            acc + (line.final_quantity || 0) * (line.actual_cost || 0),
+          0
+        )
+        .toFixed(2),
+      "Marge prévi": quotation.quotation_lines
+        .reduce(
+          (acc, line) =>
+            acc +
+            (line.pre_tax_amount || 0) -
+            (line.quantity || 0) * (line.unit_job_costing || 0),
+          0
+        )
+        .toFixed(2),
       "Marge réelle": quotation.pre_tax_amount
-        ? quotation.quotation_lines.reduce(
-            (acc, line) =>
-              acc +
-              (line.pre_tax_amount || 0) -
-              (line.final_quantity || 0) * (line.actual_cost || 0),
-            0
-          )
+        ? quotation.quotation_lines
+            .reduce(
+              (acc, line) =>
+                acc +
+                (line.pre_tax_amount || 0) -
+                (line.final_quantity || 0) * (line.actual_cost || 0),
+              0
+            )
+            .toFixed(2)
         : 0,
     },
   ];
@@ -174,89 +181,95 @@ export default function DuplicateQuotation() {
         Détails du devis dupliqué - {quotation.number}
       </h1>
 
-      <div className={styles.header}>
-        <p>
-          <strong>Numéro :</strong> {quotation.number}
-        </p>
-        <p>
-          <strong>Titre :</strong> {quotation.title}
-        </p>
-        <p>
-          <strong>Date :</strong>{" "}
-          {new Date(quotation.date).toLocaleDateString()}
-        </p>
-        <p>
-          <strong>Montant Commande HT :</strong> {quotation.pre_tax_amount} €
-        </p>
+      <div className={styles.section1}>
+        <div className={styles.section1Left}>
+          <p>
+            <strong>Numéro :</strong> {quotation.number}
+          </p>
+          <p>
+            <strong>Titre :</strong> {quotation.title}
+          </p>
+          <p>
+            <strong>Date :</strong>{" "}
+            {new Date(quotation.date).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Montant Commande HT :</strong>{" "}
+            {quotation.pre_tax_amount.toFixed(2)} €
+          </p>
 
-        <p>
-          <strong>Remise globale:</strong>
-          {quotation.global_discount_amount} €
-        </p>
-        <p>
-          <strong>Remise globale %:</strong>
-          {((quotation.global_discount_amount / quotation.pre_tax_amount) * 100).toFixed(1)} %
-        </p>
+          <br />
+          <p>
+            <strong>Remise globale %:</strong>{" "}
+            {(
+              (quotation.global_discount_amount / quotation.pre_tax_amount) *
+              100
+            ).toFixed(1)}{" "}
+            %
+          </p>
+          <p>
+            <strong>Remise globale:</strong> {quotation.global_discount_amount}{" "}
+            €
+          </p>
+          <br />
 
-
-
-        <p>
-          <strong>Marge Commande:</strong>
-          {quotation.margin.toFixed(2)} €{" "}
-        </p>
-
-        <p>
-          <strong>Marge Commande %:</strong>
-          {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
-        </p>
-      </div>
-      
-      <div className={styles.chartContainer}>
-          
-
-// Jauge avec les marges
+          <p>
+            <strong>Marge Commande %:</strong>{" "}
+            {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
+          </p>
+          <p>
+            <strong>Marge Commande:</strong> {quotation.margin.toFixed(2)} €{" "}
+          </p>
+        </div>
+        <div className={styles.section1Right}>
+          {/* // Jauges avec les marges */}
           <div className={styles.gaugeChart}>
-            {data.map((entry, index) => ( 
-              <GaugeChart
-                key={index}
-                id="gauge-chart2"
-                nrOfLevels={15}
-                colors={["#FF5F6D", "#0ef124"]}
-                arcWidth={0.3}
-                percent={entry.value / 100}
-                textColor="#000"
-              />
+            {data.map((entry, index) => (
+              <div key={index} className={styles.gaugeContainer}>
+                <h4>{index === 0 ? "Marge commerciale" : "Marge réelle"}</h4>
+                <GaugeChart
+                  id={`gauge-chart-${index}`}
+                  nrOfLevels={15}
+                  colors={["#FF5F6D", "#0ef124"]}
+                  arcWidth={0.3}
+                  percent={entry.value / 100}
+                  textColor="#000"
+                />
+              </div>
             ))}
           </div>
-
-
-
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
-            >
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Prix vendu" fill="#0088FE" />
-              <Bar dataKey="Coût de revient initial" fill="#FF8042" />
-              <Bar dataKey="Coût réel" fill="#00C49F" />
-              <Bar dataKey="Marge réelle" fill="#FFBB28" />
-            </BarChart>
-          </ResponsiveContainer>
-
-           {/* Vérification des champs renseignés */}
-  {quotation.quotation_lines.some(
-    (line) => !line.final_quantity || !line.actual_cost
-  ) && (
-    <p className={styles.warningMessage}>
-      ⚠️ Attention : Certaines lignes ne contiennent pas de "Quantité finale" ou de "Coût réel". Les données du graphique pourraient ne pas être représentatives.
-    </p>
-  )}
         </div>
-      
+      </div>
+
+      <div className={styles.section2}>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
+          >
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Prix vendu" fill="#0088FE" />
+            <Bar dataKey="Coût de revient initial" fill="#FF8042" />
+            <Bar dataKey="Coût réel" fill="#00C49F" />
+            <Bar dataKey="Marge prévi" fill="#FFBB28" />
+            <Bar dataKey="Marge réelle" fill="#c783ff" />
+          </BarChart>
+        </ResponsiveContainer>
+
+        {/* Vérification des champs renseignés */}
+        {quotation.quotation_lines.some(
+          (line) => !line.final_quantity || !line.actual_cost
+        ) && (
+          <p className={styles.warningMessage}>
+            ⚠️ Attention : Certaines lignes ne contiennent pas de "Quantité
+            finale" ou de "Coût réel". Les données du graphique pourraient ne
+            pas être représentatives.
+          </p>
+        )}
+      </div>
 
       <div className={styles.lines}>
         <h2>
@@ -286,235 +299,249 @@ export default function DuplicateQuotation() {
               </tr>
             </thead>
             <tbody>
-  {Object.entries(
-    quotation.quotation_lines.reduce((groups, line, index) => {
-      const chapter = line.chapter || "Autres";
-      if (!groups[chapter]) {
-        groups[chapter] = [];
-      }
-      // Ajout de l'index d'origine
-      groups[chapter].push({ ...line, originalIndex: index });
-      return groups;
-    }, {})
-  ).map(([chapter, lines], chapterIndex) => (
-    <React.Fragment key={chapterIndex}>
-      {/* Ligne du chapitre */}
-      <tr className={styles.chapterRow}>
-        <td colSpan="13" className={styles.chapterHeader}>
-          <strong>{chapter}</strong>
-        </td>
-      </tr>
-      {/* Lignes des éléments dans le chapitre */}
-      {lines.map((line, index) => {
-        const discountPercentage =
-          line.pre_tax_amount > 0
-            ? ((line.pre_tax_amount - line.quantity * line.price) /
-                line.pre_tax_amount) *
-              100
-            : 0;
+              {Object.entries(
+                quotation.quotation_lines.reduce((groups, line, index) => {
+                  const chapter = line.chapter || "Autres";
+                  if (!groups[chapter]) {
+                    groups[chapter] = [];
+                  }
+                  // Ajout de l'index d'origine
+                  groups[chapter].push({ ...line, originalIndex: index });
+                  return groups;
+                }, {})
+              ).map(([chapter, lines], chapterIndex) => (
+                <React.Fragment key={chapterIndex}>
+                  {/* Ligne du chapitre */}
+                  <tr className={styles.chapterRow}>
+                    <td colSpan="13" className={styles.chapterHeader}>
+                      <strong>{chapter}</strong>
+                    </td>
+                  </tr>
+                  {/* Lignes des éléments dans le chapitre */}
+                  {lines.map((line, index) => {
+                    const discountPercentage =
+                      line.pre_tax_amount > 0
+                        ? ((line.pre_tax_amount - line.quantity * line.price) /
+                            line.pre_tax_amount) *
+                          100
+                        : 0;
 
-        const commercialMargin =
-          line.pre_tax_amount > 0
-            ? ((line.pre_tax_amount - line.quantity * line.unit_job_costing) /
-                line.pre_tax_amount) *
-              100
-            : 0;
+                    const commercialMargin =
+                      line.pre_tax_amount > 0
+                        ? ((line.pre_tax_amount -
+                            line.quantity * line.unit_job_costing) /
+                            line.pre_tax_amount) *
+                          100
+                        : 0;
 
-        const realMargin =
-          line.pre_tax_amount > 0
-            ? ((line.pre_tax_amount - totalLineAmountReal(line)) /
-                line.pre_tax_amount) *
-              100
-            : 0;
+                    const realMargin =
+                      line.pre_tax_amount > 0
+                        ? ((line.pre_tax_amount - totalLineAmountReal(line)) /
+                            line.pre_tax_amount) *
+                          100
+                        : 0;
 
-        return (
-          <tr key={index}>
-            <td>
-              <input
-                type="text"
-                value={line.product_code || ""}
-                onChange={(e) =>
-                  handleChange(line.originalIndex, "product_code", e.target.value)
-                }
-              />
-            </td>
-            <td>
-              <input
-                type="text"
-                value={line.product_name || ""}
-                onChange={(e) =>
-                  handleChange(line.originalIndex, "product_name", e.target.value)
-                }
-              />
-            </td>
-            <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
-            <td>
-              <input
-                type="number"
-                value={line.final_quantity || ""}
-                onChange={(e) =>
-                  handleChange(
-                    line.originalIndex,
-                    "final_quantity",
-                    parseFloat(e.target.value) || 0
-                  )
-                }
-              />
-            </td>
-            <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
-            <td>
-              {!isNaN(discountPercentage)
-                ? discountPercentage.toFixed(1)
-                : "0.0"}{" "}
-              %
-            </td>
-            <td>
-              {line.pre_tax_amount > 0
-                ? `${line.pre_tax_amount.toFixed(2)} €`
-                : "-"}
-            </td>
-            <td>
-              {line.unit_job_costing > 0
-                ? `${line.unit_job_costing.toFixed(2)} €`
-                : "-"}
-            </td>
-            <td>
-              {line.quantity > 0
-                ? (line.quantity * line.unit_job_costing).toFixed(2)
-                : "-"}{" "}
-              €
-            </td>
-            <td>
-              {!isNaN(commercialMargin)
-                ? commercialMargin.toFixed(1)
-                : "0.0"}{" "}
-              %
-            </td>
-            <td>
-              <input
-                type="number"
-                value={line.actual_cost || ""}
-                onChange={(e) =>
-                  handleChange(
-                    line.originalIndex,
-                    "actual_cost",
-                    parseFloat(e.target.value) || 0
-                  )
-                }
-              />
-            </td>
-            <td>
-              {totalLineAmountReal(line) > 0
-                ? `${totalLineAmountReal(line).toFixed(2)} €`
-                : "-"}
-            </td>
-            <td
-              className={
-                realMargin > 50
-                  ? styles.orange
-                  : realMargin > 30
-                  ? styles.green
-                  : realMargin >= 15
-                  ? styles.orange
-                  : realMargin < 0
-                  ? styles.red
-                  : styles.red
-              }
-            >
-              {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %{" "}
-              <span>
-                {realMargin > 50 && <span>🔥</span>}
-                {realMargin > 30 && realMargin <= 50 && <span>✅</span>}
-                {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
-                {realMargin < 0 && <span>☠️</span>}
-                {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
-              </span>
-            </td>
-          </tr>
-        );
-      })}
-    </React.Fragment>
-  ))}
-</tbody>
-
-
+                    return (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="text"
+                            value={line.product_code || ""}
+                            onChange={(e) =>
+                              handleChange(
+                                line.originalIndex,
+                                "product_code",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={line.product_name || ""}
+                            onChange={(e) =>
+                              handleChange(
+                                line.originalIndex,
+                                "product_name",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
+                        <td>
+                          <input
+                            type="number"
+                            value={line.final_quantity || ""}
+                            onChange={(e) =>
+                              handleChange(
+                                line.originalIndex,
+                                "final_quantity",
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                          />
+                        </td>
+                        <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
+                        <td>
+                          {!isNaN(discountPercentage)
+                            ? discountPercentage.toFixed(1)
+                            : "0.0"}{" "}
+                          %
+                        </td>
+                        <td>
+                          {line.pre_tax_amount > 0
+                            ? `${line.pre_tax_amount.toFixed(2)} €`
+                            : "-"}
+                        </td>
+                        <td>
+                          {line.unit_job_costing > 0
+                            ? `${line.unit_job_costing.toFixed(2)} €`
+                            : "-"}
+                        </td>
+                        <td>
+                          {line.quantity > 0
+                            ? (line.quantity * line.unit_job_costing).toFixed(2)
+                            : "-"}{" "}
+                          €
+                        </td>
+                        <td>
+                          {!isNaN(commercialMargin)
+                            ? commercialMargin.toFixed(1)
+                            : "0.0"}{" "}
+                          %
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={line.actual_cost || ""}
+                            onChange={(e) =>
+                              handleChange(
+                                line.originalIndex,
+                                "actual_cost",
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                          />
+                        </td>
+                        <td>
+                          {totalLineAmountReal(line) > 0
+                            ? `${totalLineAmountReal(line).toFixed(2)} €`
+                            : "-"}
+                        </td>
+                        <td
+                          className={
+                            realMargin > 50
+                              ? styles.orange
+                              : realMargin > 30
+                              ? styles.green
+                              : realMargin >= 15
+                              ? styles.orange
+                              : realMargin < 0
+                              ? styles.red
+                              : styles.red
+                          }
+                        >
+                          {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %{" "}
+                          <span>
+                            {realMargin > 50 && <span>🔥</span>}
+                            {realMargin > 30 && realMargin <= 50 && (
+                              <span>✅</span>
+                            )}
+                            {realMargin >= 15 && realMargin <= 30 && (
+                              <span>⚠️</span>
+                            )}
+                            {realMargin < 0 && <span>☠️</span>}
+                            {realMargin >= 0 && realMargin < 15 && (
+                              <span>⬇️</span>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </tbody>
 
             {/* //bouton pour ajouter une ligne */}
             <button onClick={addNewLine} className={styles.addButton}>
               <i class="fa-solid fa-plus"></i>
             </button>
-         <tfoot>
-  <tr>
-    <td colSpan="7">Total</td>
-    <td>
-      {/* Total prix vendu */}
-      {quotation.quotation_lines
-        .reduce((acc, line) => acc + (line.pre_tax_amount || 0), 0)
-        .toFixed(2)}{" "}
-      €
-    </td>
-    <td>
-      {/* Total coût de revient initial */}
-      {quotation.quotation_lines
-        .reduce(
-          (acc, line) =>
-            acc + (line.quantity || 0) * (line.unit_job_costing || 0),
-          0
-        )
-        .toFixed(2)}{" "}
-      €
-    </td>
-    <td>
-      {/* Total marge commerciale en %*/}
-      {quotation.pre_tax_amount > 0
-        ? (
-            (quotation.quotation_lines.reduce(
-              (acc, line) =>
-                acc +
-                (line.pre_tax_amount || 0) -
-                (line.quantity || 0) * (line.unit_job_costing || 0),
-              0
-            ) /
-              quotation.pre_tax_amount) *
-            100
-          ).toFixed(1)
-        : "0"}{" "}
-      %
-    </td>
-      
+            <tfoot>
+              <tr>
+                <td colSpan="7">Total</td>
+                <td>
+                  {/* Total prix vendu */}
+                  {quotation.quotation_lines
+                    .reduce((acc, line) => acc + (line.pre_tax_amount || 0), 0)
+                    .toFixed(2)}{" "}
+                  €
+                </td>
+                <td>
+                  {/* Total coût de revient initial */}
+                  {quotation.quotation_lines
+                    .reduce(
+                      (acc, line) =>
+                        acc +
+                        (line.quantity || 0) * (line.unit_job_costing || 0),
+                      0
+                    )
+                    .toFixed(2)}{" "}
+                  €
+                </td>
+                <td>
+                  {/* Total marge commerciale en %*/}
+                  {quotation.pre_tax_amount > 0
+                    ? (
+                        (quotation.quotation_lines.reduce(
+                          (acc, line) =>
+                            acc +
+                            (line.pre_tax_amount || 0) -
+                            (line.quantity || 0) * (line.unit_job_costing || 0),
+                          0
+                        ) /
+                          quotation.pre_tax_amount) *
+                        100
+                      ).toFixed(1)
+                    : "0"}{" "}
+                  %
+                </td>
 
-    <td></td>
-    <td>
-      {/* Total coût réel */}
-      {quotation.quotation_lines
-        .reduce(
-          (acc, line) =>
-            acc + (line.final_quantity || 0) * (line.actual_cost || 0),
-          0
-        )
-        .toFixed(2)}{" "}
-      €
-    </td>
-    <td>
-      {/* Marge réelle totale */}
-      {quotation.pre_tax_amount > 0
-        ? (
-            (quotation.quotation_lines.reduce(
-              (acc, line) =>
-                acc +
-                (line.pre_tax_amount || 0) -
-                (line.final_quantity || 0) * (line.actual_cost || 0),
-              0
-            ) /
-              quotation.pre_tax_amount) *
-            100
-          ).toFixed(0)
-        : "0"}{" "}
-      %
-    </td>
-  </tr>
-</tfoot>
-
+                <td></td>
+                <td>
+                  {/* Total coût réel */}
+                  {quotation.quotation_lines
+                    .reduce(
+                      (acc, line) =>
+                        acc +
+                        (line.final_quantity || 0) * (line.actual_cost || 0),
+                      0
+                    )
+                    .toFixed(2)}{" "}
+                  €
+                </td>
+                <td>
+                  {/* Marge réelle totale */}
+                  {quotation.pre_tax_amount > 0
+                    ? (
+                        (quotation.quotation_lines.reduce(
+                          (acc, line) =>
+                            acc +
+                            (line.pre_tax_amount || 0) -
+                            (line.final_quantity || 0) *
+                              (line.actual_cost || 0),
+                          0
+                        ) /
+                          quotation.pre_tax_amount) *
+                        100
+                      ).toFixed(0)
+                    : "0"}{" "}
+                  %
+                </td>
+              </tr>
+            </tfoot>
           </table>
         ) : (
           <p>Aucune ligne de devis disponible.</p>
