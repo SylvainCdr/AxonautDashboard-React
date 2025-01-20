@@ -229,7 +229,7 @@ export default function DuplicateQuotation() {
                 <h4>{index === 0 ? "Marge commerciale" : "Marge réelle"}</h4>
                 <GaugeChart
                   id={`gauge-chart-${index}`}
-                  nrOfLevels={15}
+                  nrOfLevels={6}
                   colors={["#FF5F6D", "#0ef124"]}
                   arcWidth={0.3}
                   percent={entry.value / 100}
@@ -242,7 +242,7 @@ export default function DuplicateQuotation() {
       </div>
 
       <div className={styles.section2}>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={350}>
           <BarChart
             data={chartData}
             margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
