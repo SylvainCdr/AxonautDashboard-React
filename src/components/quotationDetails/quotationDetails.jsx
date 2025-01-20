@@ -155,7 +155,7 @@ console.log(duplicateQuotation)
           <GaugeChart
             id="margin-gauge"
             nrOfLevels={5}
-            percent={quotation.margin / quotation.pre_tax_amount}
+            percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
             colors={["#f78800", "#109f00"]}
             textColor="#000"
             needleColor="#4520ff"

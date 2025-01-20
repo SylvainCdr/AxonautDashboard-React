@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { db } from "../../firebase/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { GridLoader } from "react-spinners";
+import { p } from "framer-motion/client";
 
 export default function DuplicateQuotation() {
   const { duplicateQuotationId } = useParams();
@@ -42,14 +43,15 @@ export default function DuplicateQuotation() {
   }, [duplicateQuotationId]);
 
   // Met à jour les champs modifiables
-  const handleChange = (index, field, value) => {
+  const handleChange = (originalIndex, field, value) => {
     const updatedLines = [...quotation.quotation_lines];
-    updatedLines[index][field] = value;
+    updatedLines[originalIndex][field] = value;
     setQuotation((prev) => ({
       ...prev,
       quotation_lines: updatedLines,
     }));
   };
+  
 
   // Ajoute une nouvelle ligne en bas du tableau
   const addNewLine = () => {
@@ -81,13 +83,8 @@ export default function DuplicateQuotation() {
     }
   };
 
-  const getMarginIndicator = (margin) => {
-    if (margin > 50) return <span style={{ color: "orange" }}>🔥</span>;
-    if (margin > 30) return <span style={{ color: "green" }}>⬆️</span>;
-    if (margin >= 15) return <span style={{ color: "#ffa500" }}>⚠️</span>;
-    if (margin < 0) return <span style={{ color: "red" }}>☠️</span>;
-    return <span style={{ color: "red" }}>⬇️</span>;
-  };
+
+
 
   if (loading) {
     return (
@@ -168,7 +165,7 @@ export default function DuplicateQuotation() {
                 <th>Prix vendu</th>
                 <th>Remise </th>
                 <th>Total prix vendu</th>
-                <th>Cout de revient</th>
+                <th>Cout de revient initial</th>
                 <th>Total cout de revient initial</th>
                 <th>Marge co %</th>
                 <th>Cout réel</th>
@@ -178,12 +175,13 @@ export default function DuplicateQuotation() {
             </thead>
             <tbody>
   {Object.entries(
-    quotation.quotation_lines.reduce((groups, line) => {
+    quotation.quotation_lines.reduce((groups, line, index) => {
       const chapter = line.chapter || "Autres";
       if (!groups[chapter]) {
         groups[chapter] = [];
       }
-      groups[chapter].push(line);
+      // Ajout de l'index d'origine
+      groups[chapter].push({ ...line, originalIndex: index });
       return groups;
     }, {})
   ).map(([chapter, lines], chapterIndex) => (
@@ -224,7 +222,7 @@ export default function DuplicateQuotation() {
                 type="text"
                 value={line.product_code || ""}
                 onChange={(e) =>
-                  handleChange(index, "product_code", e.target.value)
+                  handleChange(line.originalIndex, "product_code", e.target.value)
                 }
               />
             </td>
@@ -233,7 +231,7 @@ export default function DuplicateQuotation() {
                 type="text"
                 value={line.product_name || ""}
                 onChange={(e) =>
-                  handleChange(index, "product_name", e.target.value)
+                  handleChange(line.originalIndex, "product_name", e.target.value)
                 }
               />
             </td>
@@ -244,7 +242,7 @@ export default function DuplicateQuotation() {
                 value={line.final_quantity || ""}
                 onChange={(e) =>
                   handleChange(
-                    index,
+                    line.originalIndex,
                     "final_quantity",
                     parseFloat(e.target.value) || 0
                   )
@@ -286,7 +284,7 @@ export default function DuplicateQuotation() {
                 value={line.actual_cost || ""}
                 onChange={(e) =>
                   handleChange(
-                    index,
+                    line.originalIndex,
                     "actual_cost",
                     parseFloat(e.target.value) || 0
                   )
@@ -314,7 +312,7 @@ export default function DuplicateQuotation() {
               {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %{" "}
               <span>
                 {realMargin > 50 && <span>🔥</span>}
-                {realMargin > 30 && realMargin <= 50 && <span>⬆️</span>}
+                {realMargin > 30 && realMargin <= 50 && <span>✅</span>}
                 {realMargin >= 15 && realMargin <= 30 && <span>⚠️</span>}
                 {realMargin < 0 && <span>☠️</span>}
                 {realMargin >= 0 && realMargin < 15 && <span>⬇️</span>}
@@ -326,6 +324,7 @@ export default function DuplicateQuotation() {
     </React.Fragment>
   ))}
 </tbody>
+
 
 
             {/* //bouton pour ajouter une ligne */}

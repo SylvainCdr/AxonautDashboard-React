@@ -186,7 +186,7 @@ export default function ProjectDetails() {
 
   const chartData = [
     { name: "Commande", estimatedRevenue: project.estimated_revenue },
-    { name: "Recette", actualRevenue: project.actual_revenue },
+    { name: "Facturation", actualRevenue: project.actual_revenue },
     {
       name: "Dépenses/Commandes",
       actualExpenses: project.actual_expenses_cost, // Dépenses réelles
@@ -260,33 +260,48 @@ export default function ProjectDetails() {
           </p>
         </div>
         <div className={styles.section2}>
-          <h3>
-            <strong>Montant total HT:</strong>{" "}
-            {project.actual_revenue.toFixed(2)} €
-          </h3>
-          <h3>
-            <strong>Total des dépenses :</strong>{" "}
-            {project.actual_expenses_cost.toFixed(2)} €
-          </h3>
-          <h3>
-            <strong>Marge nette :</strong>{" "}
-            {(project.actual_revenue - project.actual_expenses_cost).toFixed(2)}{" "}
-            €
-          </h3>
-          <h3>
-            <strong>Marge (%) </strong>
-          </h3>
-          <GaugeChart
-            id="margin-gauge"
-            nrOfLevels={5}
-            percent={margeReelle}
-            arcsLength={[0.15, 0.1, 0.3, 0.45]}
-            colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
-            textColor="#000"
-            needleColor="#4520ff"
-            arcPadding={0.02}
-          />
-        </div>
+  <h3>
+    <strong>Montant total HT:</strong>{" "}
+    {project.actual_revenue
+      ? `${project.actual_revenue.toFixed(2)} €`
+      : "Données insuffisantes"}
+  </h3>
+  <h3>
+    <strong>Total des dépenses :</strong>{" "}
+    {project.actual_expenses_cost
+      ? `${project.actual_expenses_cost.toFixed(2)} €`
+      : "Données insuffisantes"}
+  </h3>
+  <h3>
+    <strong>Marge nette :</strong>{" "}
+    {project.actual_revenue && project.actual_expenses_cost
+      ? `${(project.actual_revenue - project.actual_expenses_cost).toFixed(2)} €`
+      : "Données insuffisantes"}
+  </h3>
+  <h3>
+    <strong>Marge (%) </strong>
+  </h3>
+  {project.actual_revenue && project.actual_expenses_cost ? (
+    <GaugeChart
+      id="margin-gauge"
+      nrOfLevels={5}
+      percent={
+        project.actual_revenue
+          ? (project.actual_revenue - project.actual_expenses_cost) /
+            project.actual_revenue
+          : 0
+      }
+      arcsLength={[0.15, 0.1, 0.3, 0.45]}
+      colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+      textColor="#000"
+      needleColor="#4520ff"
+      arcPadding={0.02}
+    />
+  ) : (
+    <p className={styles.noDataMessage}>Pas assez de données pour afficher la jauge.</p>
+  )}
+</div>
+
       </div>
 
       {/* Section Graphique */}
@@ -296,14 +311,14 @@ export default function ProjectDetails() {
           <BarChart
             data={chartData}
             margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
-            barSize={150}
+            barSize={140}
           >
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="estimatedRevenue" fill="#3467ff" name="Commande" />
-            <Bar dataKey="actualRevenue" fill="#00950c" name="Recette" />
+            <Bar dataKey="estimatedRevenue" fill="#3467ff" name="Commande HT" />
+            <Bar dataKey="actualRevenue" fill="#00950c" name="Facturé" />
             <Bar
               dataKey="actualExpenses"
               stackId="expenses"
