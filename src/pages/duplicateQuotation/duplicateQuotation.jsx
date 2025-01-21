@@ -92,11 +92,39 @@ export default function DuplicateQuotation() {
   };
 
   // ajoute le champs etude terminée boolean dans la base de données
+  // Fonction pour finaliser l'étude et persister les données du tfooter
   const finalizeApproStudy = async () => {
     try {
+      const realCostTotal = quotation.quotation_lines.reduce(
+        (acc, line) =>
+          acc + (line.final_quantity || 0) * (line.actual_cost || 0),
+        0
+      );
+
+      const realMarginValue = quotation.quotation_lines.reduce(
+        (acc, line) =>
+          acc +
+          (line.pre_tax_amount || 0) -
+          (line.final_quantity || 0) * (line.actual_cost || 0),
+        0
+      );
+
+      const realMarginPercent =
+        quotation.pre_tax_amount > 0
+          ? (realMarginValue / quotation.pre_tax_amount) * 100
+          : 0;
+
+      // Mise à jour dans Firebase
       const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
-      await updateDoc(docRef, { ...quotation, appro_study_finished: true });
-      alert("Etude finalisée avec succès !");
+      await updateDoc(docRef, {
+        ...quotation,
+        appro_study_finished: true,
+        real_margin_percent: parseFloat(realMarginPercent.toFixed(2)),
+        real_margin_value: parseFloat(realMarginValue.toFixed(2)),
+        real_cost_total: parseFloat(realCostTotal.toFixed(2)),
+      });
+
+      alert("Étude finalisée et données enregistrées avec succès !");
     } catch (err) {
       console.error("Erreur lors de la finalisation de l'étude :", err);
       alert("Erreur lors de la finalisation de l'étude.");
@@ -258,7 +286,7 @@ export default function DuplicateQuotation() {
           </div>
           {data[1].value === "100" && (
             <p className={styles.waitingMessage}>
-              ⚠️ En attente de l'étude d'appro 
+              ⚠️ En attente de l'étude d'appro
             </p>
           )}
         </div>
@@ -533,6 +561,8 @@ export default function DuplicateQuotation() {
                 </td>
 
                 <td></td>
+
+                {/* total des coûts */}
                 <td>
                   {quotation.quotation_lines
                     .reduce(

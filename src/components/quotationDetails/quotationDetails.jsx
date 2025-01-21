@@ -19,7 +19,6 @@ export default function QuotationDetails() {
   const [showDetails, setShowDetails] = useState(false); // Toggle des détails
   const [duplicateQuotationId, setDuplicateQuotationId] = useState(null);
 
-
   // Ajoutez `useNavigate` :
 const navigate = useNavigate();
 
@@ -43,6 +42,10 @@ const navigate = useNavigate();
   }
 };
 
+
+
+
+
 // Duplique le devis
 const duplicateQuotation = async () => {
   try {
@@ -63,8 +66,7 @@ const duplicateQuotation = async () => {
 
 console.log(quotation);
 
-// fonction pour verifier si le devis est dupliqué et comporte dans DuplicateQuotation de firebase appro_study_finished a true, si oui alors on retourne une jauge avec la marge réelle du porjet :
-// objet :
+// objet DuplicateQuotation :
 
 // appro_study_finished true
 // (booléen)
@@ -1179,6 +1181,12 @@ console.log(quotation);
 // user_id 147097 
 
 
+// fonction pour verifier si le devis est dupliqué et comporte dans DuplicateQuotation de firebase appro_study_finished a true, si oui alors on retourne une jauge avec la marge réelle du porjet :
+
+
+
+ 
+
 
 
 
@@ -1363,14 +1371,14 @@ console.log(quotation);
         >
           Voir le devis dans Axonaut
         </a>
-        <a
+        {/* <a
           href={quotation.customer_portal_url}
           target="_blank"
           rel="noreferrer"
           className={styles.button}
         >
           Voir le devis dans le portail client
-        </a>
+        </a> */}
         {!isDuplicate ? (
           <button onClick={duplicateQuotation} className={styles.button}>
             Dupliquer le devis
