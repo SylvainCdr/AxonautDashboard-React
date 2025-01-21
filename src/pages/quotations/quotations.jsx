@@ -160,8 +160,8 @@ useEffect(() => {
             {/* <th>Statut</th> */}
             <th>Montant HT</th>
             <th>Montant TTC</th>
-            <th>Marge (€)</th>
-            <th>Marge (%)</th>
+            <th>Marge co (€)</th>
+            <th>Marge co (%)</th>
             <th>Clôturé</th>
             <th>Action</th>
           </tr>

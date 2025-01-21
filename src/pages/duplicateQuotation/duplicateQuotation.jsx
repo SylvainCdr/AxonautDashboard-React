@@ -133,7 +133,7 @@ export default function DuplicateQuotation() {
               ) /
                 quotation.pre_tax_amount) *
               100
-            ).toFixed(0)
+            ).toFixed(1)
           : "0",
     },
   ];
@@ -558,7 +558,7 @@ export default function DuplicateQuotation() {
                         ) /
                           quotation.pre_tax_amount) *
                         100
-                      ).toFixed(0)
+                      ).toFixed(1)
                     : "0"}{" "}
                   %
                 </td>
