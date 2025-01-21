@@ -25,7 +25,11 @@ export default function Quotations() {
   // Mise à jour de l'état "Clôturé"
   const handleToggleClosed = async (quotationId, currentState) => {
     try {
-      const quotationRef = doc(db, "isClosedQuotations", quotationId.toString());
+      const quotationRef = doc(
+        db,
+        "isClosedQuotations",
+        quotationId.toString()
+      );
       await setDoc(quotationRef, { isClosed: !currentState });
 
       setQuotations((prev) =>
@@ -76,7 +80,7 @@ export default function Quotations() {
     loadQuotationsData();
   }, [page]);
 
-  console.log (quotations)
+  console.log(quotations);
 
   // Optimisation de la fonction pour récupérer le nom de l'utilisateur en charge
   const getQuotationUser = (quotation) => {
@@ -87,26 +91,25 @@ export default function Quotations() {
       ? `${axonautUser.firstname} ${axonautUser.lastname}`
       : "Inconnu";
   };
-  
 
-// Chargement des données des employés
-useEffect(() => {
-  const loadAxonautUsersData = async () => {
-    try {
-      const data = await fetchAxonautUsers();
-      setAxonautUsers(data);
+  // Chargement des données des employés
+  useEffect(() => {
+    const loadAxonautUsersData = async () => {
+      try {
+        const data = await fetchAxonautUsers();
+        setAxonautUsers(data);
 
-      // Ajout des logs pour vérifier les données
-      console.log("AxonautUsers chargés :", data);
-    } catch (err) {
-      console.error(
-        "Erreur lors de la récupération des données des employés :",
-        err
-      );
-    }
-  };
-  loadAxonautUsersData();
-}, []);
+        // Ajout des logs pour vérifier les données
+        console.log("AxonautUsers chargés :", data);
+      } catch (err) {
+        console.error(
+          "Erreur lors de la récupération des données des employés :",
+          err
+        );
+      }
+    };
+    loadAxonautUsersData();
+  }, []);
 
   // Navigation entre les pages
   const handleNextPage = () => setPage((prev) => prev + 1);
@@ -123,24 +126,18 @@ useEffect(() => {
 
   if (error) return <p>Erreur : {error}</p>;
 
-  const statusColor = (status) => {
-    if (status === "accepted") return "green";
-    if (status === "pending") return "orange";
-    if (status === "refused") return "red";
-    return "black";
-  };
+
 
   const hasPixProductCode = (quotation) =>
     quotation.quotation_lines?.some((line) =>
       line.product_code?.startsWith("Pix_")
     );
 
-    const decodeHtmlEntities = (text) => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(text, "text/html");
-      return doc.documentElement.textContent;
-    };
-    
+  const decodeHtmlEntities = (text) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, "text/html");
+    return doc.documentElement.textContent;
+  };
 
   return (
     <div className={styles.quotationsContainer}>
@@ -151,7 +148,7 @@ useEffect(() => {
       <table className={styles.quotationTable}>
         <thead>
           <tr>
-            <th>ID</th>
+            {/* <th>ID</th> */}
             <th>Numéro</th>
             <th>Titre</th>
             <th>Client</th>
@@ -159,7 +156,7 @@ useEffect(() => {
             <th>Date</th>
             {/* <th>Statut</th> */}
             <th>Montant HT</th>
-            <th>Montant TTC</th>
+            {/* <th>Montant TTC</th> */}
             <th>Marge co (€)</th>
             <th>Marge co (%)</th>
             <th>Clôturé</th>
@@ -176,24 +173,60 @@ useEffect(() => {
                   : "white", // Blanc pour les autres
               }}
             >
-              <td>{quotation.id}</td>
+              {/* <td>{quotation.id}</td> */}
               <td>{quotation.number}</td>
-              <td>
-                {decodeHtmlEntities(quotation.title)}
-              </td>
+              <td>{decodeHtmlEntities(quotation.title)}</td>
               <td>{quotation.company_name || "Inconnue"}</td>
               <td>{getQuotationUser(quotation)}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
-        
+
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
-              <td>{quotation.total_amount.toFixed(2)} €</td>
+              {/* <td>{quotation.total_amount.toFixed(2)} €</td> */}
               <td>{quotation.margin.toFixed(2)} €</td>
-              <td>
-                {(
-                  (quotation.margin / quotation.pre_tax_amount) *
-                  100
-                ).toFixed(2)}{" "}
+              {/* <td>
+                {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                  2
+                )}{" "}
                 %
+              </td> */}
+                {/* // marge en % , si en dessous de 15 alors rouge, si en dessous de 29 alors orange et au dessus de 30 alors vert  */}
+              <td> 
+                {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                  2
+                ) < 15 ? (
+                  <span style={{ color: "red" }}>
+                    {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                      2
+                    )}{" "}
+                    %
+                  </span>
+                ) : ((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                  2
+                ) < 28 ? (
+                  <span style={{ color: "orange" }}>
+                    {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                      2
+                    )}{" "}
+                    %
+                  </span>
+                ) : (
+                  <span style={{ color: "green" }}>
+                    {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
+                      2
+                    )}{" "}
+                    %
+                  </span>
+                )}
+
+
+              
+
+
+
+              
+
+
+                
               </td>
               <td>
                 <input

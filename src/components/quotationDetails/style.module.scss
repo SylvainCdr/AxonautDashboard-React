@@ -50,6 +50,25 @@
         margin-bottom: 10px;
         font-weight: 500;
       }
+
+      .realMarginIndicators {
+     
+        gap: 20px;
+        margin-bottom: 10px;
+
+        .realMargin {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+
+        
+
+          p {
+            font-size: 0.9rem;
+            color: #555;
+          }
+        }
+      }
     }
   }
 
