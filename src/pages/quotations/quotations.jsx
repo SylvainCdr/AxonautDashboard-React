@@ -135,6 +135,13 @@ useEffect(() => {
       line.product_code?.startsWith("Pix_")
     );
 
+    const decodeHtmlEntities = (text) => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, "text/html");
+      return doc.documentElement.textContent;
+    };
+    
+
   return (
     <div className={styles.quotationsContainer}>
       <h1>Gestion des Devis & Projets</h1>
@@ -147,9 +154,10 @@ useEffect(() => {
             <th>ID</th>
             <th>Numéro</th>
             <th>Titre</th>
+            <th>Client</th>
             <th>Commercial(e)</th>
             <th>Date</th>
-            <th>Statut</th>
+            {/* <th>Statut</th> */}
             <th>Montant HT</th>
             <th>Montant TTC</th>
             <th>Marge (€)</th>
@@ -170,14 +178,13 @@ useEffect(() => {
             >
               <td>{quotation.id}</td>
               <td>{quotation.number}</td>
-              <td>{quotation.title || "Inconnue"}</td>
+              <td>
+                {decodeHtmlEntities(quotation.title)}
+              </td>
+              <td>{quotation.company_name || "Inconnue"}</td>
               <td>{getQuotationUser(quotation)}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
-              <td>
-                <span style={{ color: statusColor(quotation.status) }}>
-                  {quotation.status}
-                </span>
-              </td>
+        
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
               <td>{quotation.total_amount.toFixed(2)} €</td>
               <td>{quotation.margin.toFixed(2)} €</td>

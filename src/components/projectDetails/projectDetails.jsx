@@ -58,65 +58,6 @@ export default function ProjectDetails() {
 
   console.log("project", project);
 
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     if (!project.name || !project.estimated_start) {
-  //       console.error(
-  //         "Le nom du projet ou la date de début estimée est indéfini."
-  //       );
-  //       return;
-  //     }
-
-  //     console.log("Nom du projet utilisé pour la recherche :", project.name);
-  //     console.log("Date de début estimée :", project.estimated_start);
-
-  //     try {
-  //       setLoadingContracts(true); // Début du chargement
-  //       setLoadingExpenses(true); // Début du chargement
-
-  //       // Charger les contrats fournisseurs
-  //       const supplierContractsData =
-  //         await fetchSupplierContractsByProjectTitle(
-  //           project.name,
-  //           project.estimated_start
-  //         );
-
-  //       // Charger les dépenses
-  //       const expensesData = await fetchExpensesByProject(
-  //         project.estimated_start,
-  //         project.estimated_end,
-  //         projectId
-  //       );
-
-  //       console.log("Dépenses chargées :", expensesData);
-
-  //       // Extraire tous les IDs des dépenses
-  //       const expenseIds = expensesData.map((expense) => expense.id);
-
-  //       // Ajouter les IDs des dépenses comme une propriété supplémentaire
-  //       const updatedSupplierContracts = supplierContractsData.map(
-  //         (contract) => ({
-  //           ...contract,
-  //           hasExpense: contract.expenses.some((expense) =>
-  //             expenseIds.includes(expense.id)
-  //           ),
-  //         })
-  //       );
-
-  //       // Mettre à jour les états
-  //       setSupplierContracts(updatedSupplierContracts);
-  //       setExpenses(expensesData);
-  //     } catch (err) {
-  //       console.error(err);
-  //       setError("Erreur lors du chargement des données.");
-  //     } finally {
-  //       setLoadingContracts(false); // Fin du chargement
-  //       setLoadingExpenses(false); // Fin du chargement
-  //     }
-  //   };
-
-  //   loadData();
-  // }, [project.name, project.estimated_start, project.estimated_end, projectId]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -179,9 +120,29 @@ export default function ProjectDetails() {
   // Préparation des données pour le graphique
   const difference = project.actual_revenue - project.actual_expenses_cost || 0;
 
-  const supplierContractAmount = supplierContracts
-    .filter((contract) => !contract.hasExpense)
-    .reduce((acc, contract) => acc + contract.pre_tax_amount, 0);
+  // Collecter tous les IDs des dépenses associées aux supplierContracts
+  const linkedExpenseIds = new Set(
+    supplierContracts.flatMap((contract) =>
+      contract.expenses.map((expense) => expense.id)
+    )
+  );
+  
+  // Filtrer les contrats non liés pour calculer les dépenses à venir
+  const unlinkedContracts = supplierContracts.filter(
+    (contract) =>
+      !contract.expenses.some((expense) => linkedExpenseIds.has(expense.id))
+  );
+  // const supplierContractAmount = supplierContracts
+  //   .filter((contract) => !contract.hasExpense)
+  //   .reduce((acc, contract) => acc + contract.pre_tax_amount, 0);
+
+    // Calcul des montants pour les dépenses à venir
+const supplierContractAmount = unlinkedContracts.reduce(
+  (acc, contract) => acc + contract.pre_tax_amount,
+  0
+);
+
+
 
   const chartData = [
     { name: "Commande", estimatedRevenue: project.estimated_revenue },
@@ -203,6 +164,14 @@ export default function ProjectDetails() {
     (acc, expense) => acc + expense.left_to_pay,
     0
   );
+
+
+
+
+
+
+
+
 
   // Calcul du pourcentage restant à payer
   const percentageLeftToPay = totalExpensesTTC
@@ -349,6 +318,7 @@ export default function ProjectDetails() {
           <table>
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Titre</th>
                 <th>Date</th>
                 <th>Montant HT</th>
@@ -364,6 +334,7 @@ export default function ProjectDetails() {
               {expenses.map((expense) => (
                 <React.Fragment key={expense.id}>
                   <tr onClick={() => toggleExpense(expense.id)}>
+                    <td>{expense.id}</td>
                     <td>
                       <span>+</span>
                       {expense.title}
@@ -442,38 +413,41 @@ export default function ProjectDetails() {
               </tr>
             </thead>
             <tbody>
-              {supplierContracts.map((contract) => (
-                <tr
-                  key={contract.id}
-                  style={{
-                    backgroundColor: contract.hasExpense
-                      ? "lightgreen"
-                      : "white",
-                  }}
-                >
-                  <td>{contract.title}</td>
-                  <td>{new Date(contract.start_date).toLocaleDateString()}</td>
-                  <td>{contract.pre_tax_amount.toFixed(2)} €</td>
-                  <td>{contract.total_amount.toFixed(2)} €</td>
-                  <td>{contract.supplier.name}</td>
-                  <td>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: contract.comments
-                          ? contract.comments.slice(0, 90) +
-                            (contract.comments.length > 90 ? "..." : "")
-                          : "Aucun commentaire",
-                      }}
-                    ></div>
-                  </td>
-                  <td>
-                    {contract.expenses.map((expense) => (
-                      <span key={expense.id}>{expense.id}, </span>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {supplierContracts.map((contract) => (
+    <tr
+      key={contract.id}
+      style={{
+        backgroundColor: contract.expenses.some((expense) =>
+          linkedExpenseIds.has(expense.id)
+        )
+          ? "lightgreen" // Surlignage en vert
+          : "white", // Couleur par défaut
+      }}
+    >
+      <td>{contract.title}</td>
+      <td>{new Date(contract.start_date).toLocaleDateString()}</td>
+      <td>{contract.pre_tax_amount.toFixed(2)} €</td>
+      <td>{contract.total_amount.toFixed(2)} €</td>
+      <td>{contract.supplier.name}</td>
+      <td>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: contract.comments
+              ? contract.comments.slice(0, 90) +
+                (contract.comments.length > 90 ? "..." : "")
+              : "Aucun commentaire",
+          }}
+        ></div>
+      </td>
+      <td>
+        {contract.expenses.map((expense) => (
+          <span key={expense.id}>{expense.id}, </span>
+        ))}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         ) : (
           <p>Aucune commande fournisseur trouvée.</p>

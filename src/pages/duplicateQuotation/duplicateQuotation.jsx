@@ -95,15 +95,13 @@ export default function DuplicateQuotation() {
   const finalizeApproStudy = async () => {
     try {
       const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
-      await updateDoc(docRef, { ...quotation, appro_study_finished: true })
+      await updateDoc(docRef, { ...quotation, appro_study_finished: true });
       alert("Etude finalisée avec succès !");
     } catch (err) {
       console.error("Erreur lors de la finalisation de l'étude :", err);
       alert("Erreur lors de la finalisation de l'étude.");
     }
   };
-
-
 
   if (loading) {
     return (
@@ -118,7 +116,8 @@ export default function DuplicateQuotation() {
     return <p className={styles.error}>{error}</p>;
   }
 
-  // preparation des données pour la jauge avec les marges, on reprend les marges des t footer
+  // preparation des données pour la jauge avec les marges, on reprend les marges des t footer, si 100% alors on affiche : etude d'appro nécessaire
+
   const data = [
     { value: ((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1) },
     {
@@ -236,22 +235,32 @@ export default function DuplicateQuotation() {
           </p>
         </div>
         <div className={styles.section1Right}>
-          {/* // Jauges avec les marges */}
+          {/* // Jauges avec les marges,  si 100% alors on affiche : etude d'appro nécessaire */}
           <div className={styles.gaugeChart}>
-            {data.map((entry, index) => (
-              <div key={index} className={styles.gaugeContainer}>
-                <h4>{index === 0 ? "Marge commerciale" : "Marge réelle"}</h4>
-                <GaugeChart
-                  id={`gauge-chart-${index}`}
-                  nrOfLevels={6}
-                  colors={["#FF5F6D", "#0ef124"]}
-                  arcWidth={0.3}
-                  percent={entry.value / 100}
-                  textColor="#000"
-                />
-              </div>
-            ))}
+            {data.map(
+              (entry, index) =>
+                entry.value !== "100" && (
+                  <div key={index} className={styles.gaugeContainer}>
+                    <h4>
+                      {index === 0 ? "Marge commerciale" : "Marge réelle"}
+                    </h4>
+                    <GaugeChart
+                      id={`gauge-chart-${index}`}
+                      nrOfLevels={6}
+                      colors={["#FF5F6D", "#0ef124"]}
+                      arcWidth={0.3}
+                      percent={entry.value / 100}
+                      textColor="#000"
+                    />
+                  </div>
+                )
+            )}
           </div>
+          {data[1].value === "100" && (
+            <p className={styles.waitingMessage}>
+              ⚠️ En attente de l'étude d'appro 
+            </p>
+          )}
         </div>
       </div>
 
@@ -525,7 +534,6 @@ export default function DuplicateQuotation() {
 
                 <td></td>
                 <td>
-                  {/* Total coût réel */}
                   {quotation.quotation_lines
                     .reduce(
                       (acc, line) =>
@@ -569,8 +577,6 @@ export default function DuplicateQuotation() {
       <button onClick={finalizeApproStudy} className={styles.saveButton}>
         Finaliser l'étude
       </button>
-      
-
     </div>
   );
 }
