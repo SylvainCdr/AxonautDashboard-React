@@ -6,7 +6,7 @@ import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import GaugeChart from "react-gauge-chart";
 import { db } from "../../firebase/firebase";
-import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs, doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 export default function QuotationDetails() {
@@ -50,23 +50,45 @@ export default function QuotationDetails() {
     }
   };
 
-  // Duplique le devis
+
+  // const duplicateQuotation = async () => {
+  //   try {
+  //     const docRef = await addDoc(collection(db, "DuplicateQuotation"), {
+  //       ...quotation,
+  //       quotation_id: quotationId,
+  //     });
+  //     console.log("Document dupliqué avec succès avec l'ID :", docRef.id);
+  //     setIsDuplicate(true);
+  //     setDuplicateQuotationId(docRef.id);
+
+  //     // Naviguer automatiquement après duplication
+  //     navigate(`/duplicate-quotation/${docRef.id}`);
+  //   } catch (e) {
+  //     console.error("Erreur lors de la duplication du document :", e);
+  //   }
+  
   const duplicateQuotation = async () => {
     try {
-      const docRef = await addDoc(collection(db, "DuplicateQuotation"), {
+      // Utiliser le même ID que le devis original pour le nouvel objet
+      const docRef = doc(db, "DuplicateQuotation", quotationId.toString());
+      
+      await setDoc(docRef, {
         ...quotation,
         quotation_id: quotationId,
       });
-      console.log("Document dupliqué avec succès avec l'ID :", docRef.id);
+  
+      console.log("Document dupliqué avec succès avec l'ID :", quotationId);
       setIsDuplicate(true);
-      setDuplicateQuotationId(docRef.id);
-
+      setDuplicateQuotationId(quotationId);
+  
       // Naviguer automatiquement après duplication
-      navigate(`/duplicate-quotation/${docRef.id}`);
+      navigate(`/duplicate-quotation/${quotationId}`);
     } catch (e) {
       console.error("Erreur lors de la duplication du document :", e);
     }
   };
+  
+
 
   useEffect(() => {
     const loadQuotationData = async () => {

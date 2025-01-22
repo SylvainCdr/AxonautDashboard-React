@@ -264,6 +264,8 @@ export default function DuplicateQuotation() {
         </div>
         <div className={styles.section1Right}>
           {/* // Jauges avec les marges,  si 100% alors on affiche : etude d'appro nécessaire */}
+
+          
           <div className={styles.gaugeChart}>
             {data.map(
               (entry, index) =>

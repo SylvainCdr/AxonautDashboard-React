@@ -8,6 +8,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import SearchQuotations from "../../components/searchQuotations/searchQuotations";
 
+
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
@@ -63,6 +64,27 @@ export default function Quotations() {
     setQuotations(updatedQuotations);
   };
 
+  // on va chercher dans la collection DuplicateQuotation de firestore les quotation.id qui corresponde au quotation_id de la collection Quotation, et si appro_study_finished est a true alors on affiche la valeur reat_margin_percent
+  
+  // Fonction pour récupérer la marge réelle depuis DuplicateQuotation
+  // const fetchRealMargin = async (quotationId) => {
+  //   try {
+  //     const docRef = doc(db, "DuplicateQuotation", quotationId.toString());
+  //     const snapshot = await getDoc(docRef);
+  //     if (snapshot.exists() && snapshot.data().appro_study_finished) {
+  //       return snapshot.data().real_margin_percent || null;
+  //     }
+  //     return null;
+  //   } catch (err) {
+  //     console.error(`Erreur lors de la récupération de la marge réelle pour ${quotationId}:`, err);
+  //     return null;
+  //   }
+  // };
+
+
+  
+
+
   // Chargement des données des devis
   useEffect(() => {
     const loadQuotationsData = async () => {
@@ -81,6 +103,9 @@ export default function Quotations() {
   }, [page]);
 
   console.log(quotations);
+
+
+  
 
   // Optimisation de la fonction pour récupérer le nom de l'utilisateur en charge
   const getQuotationUser = (quotation) => {
@@ -159,6 +184,7 @@ export default function Quotations() {
             {/* <th>Montant TTC</th> */}
             <th>Marge co (€)</th>
             <th>Marge co (%)</th>
+            <th>Marge réelle (%) </th>
             <th>Clôturé</th>
             <th>Action</th>
           </tr>
@@ -217,17 +243,9 @@ export default function Quotations() {
                     %
                   </span>
                 )}
-
-
-              
-
-
-
-              
-
-
-                
               </td>
+
+
               <td>
                 <input
                   type="checkbox"
