@@ -8,7 +8,6 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import SearchQuotations from "../../components/searchQuotations/searchQuotations";
 
-
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
@@ -53,59 +52,61 @@ export default function Quotations() {
     return snapshot.exists() ? snapshot.data().isClosed : false;
   };
 
-  // Chargement des états "Clôturé" pour chaque devis
-  const loadClosedStatuses = async (quotationsList) => {
+ 
+  // Chargement des états "Clôturé" et des marges réelles pour chaque devis
+  const loadQuotationData = async (quotationsList) => {
     const updatedQuotations = await Promise.all(
       quotationsList.map(async (quotation) => {
+        // Vérifie si le devis est marqué comme "Clôturé"
         const isClosed = await fetchClosedStatus(quotation.id);
-        return { ...quotation, isClosed };
+
+        // Vérifie s'il existe une marge réelle dans supplyStudy
+        const realMarginPercent = await fetchRealMarginPercent(quotation.id);
+
+        return { ...quotation, isClosed, realMarginPercent };
       })
     );
     setQuotations(updatedQuotations);
   };
 
-  // on va chercher dans la collection DuplicateQuotation de firestore les quotation.id qui corresponde au quotation_id de la collection Quotation, et si appro_study_finished est a true alors on affiche la valeur reat_margin_percent
-  
-  // Fonction pour récupérer la marge réelle depuis DuplicateQuotation
-  // const fetchRealMargin = async (quotationId) => {
-  //   try {
-  //     const docRef = doc(db, "DuplicateQuotation", quotationId.toString());
-  //     const snapshot = await getDoc(docRef);
-  //     if (snapshot.exists() && snapshot.data().appro_study_finished) {
-  //       return snapshot.data().real_margin_percent || null;
-  //     }
-  //     return null;
-  //   } catch (err) {
-  //     console.error(`Erreur lors de la récupération de la marge réelle pour ${quotationId}:`, err);
-  //     return null;
-  //   }
-  // };
-
-
-  
-
-
-  // Chargement des données des devis
+  // Chargement des devis avec les données supplémentaires
   useEffect(() => {
     const loadQuotationsData = async () => {
       try {
         setLoading(true);
         const data = await fetchQuotations(page);
         const limitedData = data.slice(0, 500); // On limite à 500 éléments
-        await loadClosedStatuses(limitedData);
+
+        // Charge les données supplémentaires (Clôturé et Marges réelles)
+        await loadQuotationData(limitedData);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+
     loadQuotationsData();
   }, [page]);
 
-  console.log(quotations);
+  // Fonction pour récupérer la marge réelle depuis supplyStudy
+  const fetchRealMarginPercent = async (quotationId) => {
+    try {
+      const docRef = doc(db, "supplyStudy", quotationId.toString());
+      const snapshot = await getDoc(docRef);
 
-
-  
+      if (snapshot.exists()) {
+        return snapshot.data().real_margin_percent || 0; // Retourne la marge réelle si elle existe
+      }
+      return 0; // Retourne 0 si aucune donnée n'est trouvée
+    } catch (err) {
+      console.error(
+        `Erreur lors de la récupération de la marge réelle pour ${quotationId}:`,
+        err
+      );
+      return 0; // Retourne 0 en cas d'erreur
+    }
+  };
 
   // Optimisation de la fonction pour récupérer le nom de l'utilisateur en charge
   const getQuotationUser = (quotation) => {
@@ -150,8 +151,6 @@ export default function Quotations() {
   }
 
   if (error) return <p>Erreur : {error}</p>;
-
-
 
   const hasPixProductCode = (quotation) =>
     quotation.quotation_lines?.some((line) =>
@@ -215,36 +214,60 @@ export default function Quotations() {
                 )}{" "}
                 %
               </td> */}
-                {/* // marge en % , si en dessous de 15 alors rouge, si en dessous de 29 alors orange et au dessus de 30 alors vert  */}
-              <td> 
+              {/* // marge en % , si en dessous de 15 alors rouge, si en dessous de 29 alors orange et au dessus de 30 alors vert  */}
+              <td>
                 {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
                   2
                 ) < 15 ? (
                   <span style={{ color: "red" }}>
-                    {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                      2
-                    )}{" "}
+                    {(
+                      (quotation.margin / quotation.pre_tax_amount) *
+                      100
+                    ).toFixed(1)}{" "}
                     %
                   </span>
-                ) : ((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                  2
-                ) < 28 ? (
+                ) : (
+                    (quotation.margin / quotation.pre_tax_amount) *
+                    100
+                  ).toFixed(1) < 28 ? (
                   <span style={{ color: "orange" }}>
-                    {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                      2
-                    )}{" "}
+                    {(
+                      (quotation.margin / quotation.pre_tax_amount) *
+                      100
+                    ).toFixed(1)}{" "}
                     %
                   </span>
                 ) : (
                   <span style={{ color: "green" }}>
-                    {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                      2
-                    )}{" "}
+                    {(
+                      (quotation.margin / quotation.pre_tax_amount) *
+                      100
+                    ).toFixed(1)}{" "}
                     %
                   </span>
                 )}
               </td>
 
+              {/* // marge réelle */}
+              <td>
+                {quotation.realMarginPercent == 0 ? (
+                  <span role="img" aria-label="cross mark">
+                    ❌
+                  </span>
+                ) : quotation.realMarginPercent < 15 ? (
+                  <span style={{ color: "red" }}>
+                    {quotation.realMarginPercent.toFixed(1)} %
+                  </span>
+                ) : quotation.realMarginPercent < 28 ? (
+                  <span style={{ color: "orange" }}>
+                    {quotation.realMarginPercent.toFixed(1)} %
+                  </span>
+                ) : (
+                  <span style={{ color: "green" }}>
+                    {quotation.realMarginPercent.toFixed(1)} %
+                  </span>
+                )}
+              </td>
 
               <td>
                 <input

@@ -241,9 +241,10 @@ export default function QuotationDetails() {
                 <th>Référence</th>
                 <th>Désignation</th>
                 <th>Quantité</th>
-                <th>Prix unitaire HT</th>
+                <th>Prix unit HT</th>
                 <th>Montant total HT</th>
-                <th>Coût d'achat unit</th>
+                <th>PA unit</th>
+                <th>PA total</th>
                 <th>Marge total</th>
                 <th>Marge en %</th>
               </tr>
@@ -257,7 +258,8 @@ export default function QuotationDetails() {
                   <td>{line.price} €</td>
                   <td>{line.pre_tax_amount} €</td>
                   <td>{line.unit_job_costing} €</td>
-                  <td>{line.margin.toFixed(1)} %</td>
+                  <td>{line.unit_job_costing * line.quantity} €</td>
+                  <td>{line.margin.toFixed(1)} €</td>
                   <td>
                     {((line.margin / line.pre_tax_amount) * 100).toFixed(1)} %
                   </td>
@@ -281,7 +283,7 @@ export default function QuotationDetails() {
           </p>
           <p>
             <strong>Marge % :</strong>{" "}
-            {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(2)} %
+            {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
           </p>
 
           <p>
