@@ -14,6 +14,7 @@ export default function Quotations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  
 
   const navigate = useNavigate();
 
@@ -52,7 +53,6 @@ export default function Quotations() {
     return snapshot.exists() ? snapshot.data().isClosed : false;
   };
 
- 
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
   const loadQuotationData = async (quotationsList) => {
     const updatedQuotations = await Promise.all(
@@ -89,6 +89,8 @@ export default function Quotations() {
     loadQuotationsData();
   }, [page]);
 
+  console.log(quotations);
+
   // Fonction pour récupérer la marge réelle depuis supplyStudy
   const fetchRealMarginPercent = async (quotationId) => {
     try {
@@ -124,9 +126,6 @@ export default function Quotations() {
       try {
         const data = await fetchAxonautUsers();
         setAxonautUsers(data);
-
-        // Ajout des logs pour vérifier les données
-        console.log("AxonautUsers chargés :", data);
       } catch (err) {
         console.error(
           "Erreur lors de la récupération des données des employés :",
@@ -137,9 +136,21 @@ export default function Quotations() {
     loadAxonautUsersData();
   }, []);
 
+
   // Navigation entre les pages
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
+
+  const hasPixProductCode = (quotation) =>
+    quotation.quotation_lines?.some((line) =>
+      line.product_code?.startsWith("Pix_")
+    );
+
+  const decodeHtmlEntities = (text) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, "text/html");
+    return doc.documentElement.textContent;
+  };
 
   if (loading) {
     return (
@@ -152,16 +163,7 @@ export default function Quotations() {
 
   if (error) return <p>Erreur : {error}</p>;
 
-  const hasPixProductCode = (quotation) =>
-    quotation.quotation_lines?.some((line) =>
-      line.product_code?.startsWith("Pix_")
-    );
 
-  const decodeHtmlEntities = (text) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, "text/html");
-    return doc.documentElement.textContent;
-  };
 
   return (
     <div className={styles.quotationsContainer}>

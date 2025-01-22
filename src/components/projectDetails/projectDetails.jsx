@@ -57,6 +57,7 @@ export default function ProjectDetails() {
   }, [projectId]);
 
   console.log("project", project);
+  // console.log ("company", company);
 
 
   useEffect(() => {
@@ -132,9 +133,6 @@ export default function ProjectDetails() {
     (contract) =>
       !contract.expenses.some((expense) => linkedExpenseIds.has(expense.id))
   );
-  // const supplierContractAmount = supplierContracts
-  //   .filter((contract) => !contract.hasExpense)
-  //   .reduce((acc, contract) => acc + contract.pre_tax_amount, 0);
 
     // Calcul des montants pour les dépenses à venir
 const supplierContractAmount = unlinkedContracts.reduce(
@@ -173,10 +171,6 @@ const supplierContractAmount = unlinkedContracts.reduce(
 
 
 
-  // Calcul du pourcentage restant à payer
-  const percentageLeftToPay = totalExpensesTTC
-    ? (totalLeftToPayTTC / totalExpensesTTC) * 100
-    : 0;
 
   if (loading) {
     return (
@@ -257,8 +251,8 @@ const supplierContractAmount = unlinkedContracts.reduce(
               nrOfLevels={5}
               percent={
                 project.actual_revenue
-                  ? (project.actual_revenue - project.actual_expenses_cost) /
-                    project.actual_revenue
+                  ? ((project.actual_revenue - project.actual_expenses_cost) /
+                    project.actual_revenue).toFixed(3)
                   : 0
               }
               arcsLength={[0.15, 0.1, 0.3, 0.45]}
@@ -364,7 +358,7 @@ const supplierContractAmount = unlinkedContracts.reduce(
                             <tr>
                               <th>Article</th>
                               <th>Quantité</th>
-                              <th>Montant HT</th>
+                              <th>Total HT</th>
                             </tr>
                           </thead>
                           <tbody>

@@ -2,11 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchCompanyById } from "../../services/api/companies";
+import { fetchContractById } from "../../services/api/contracts";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import GaugeChart from "react-gauge-chart";
 import { db } from "../../firebase/firebase";
-import { addDoc, collection, query, where, getDocs, doc, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 export default function QuotationDetails() {
@@ -21,6 +30,7 @@ export default function QuotationDetails() {
   const [realCostTotal, setRealCostTotal] = useState(0);
   const [realMarginPercent, setRealMarginPercent] = useState(0);
   const [realMarginValue, setRealMarginValue] = useState(0);
+  const [contract, setContract] = useState({});
   const navigate = useNavigate();
 
   const checkDuplicateQuotation = async () => {
@@ -50,63 +60,26 @@ export default function QuotationDetails() {
     }
   };
 
-  // const checkDuplicateQuotation = async () => {
-  //   try {
-  //     const duplicateQuotationQuery = query(
-  //       collection(db, "supplyStudy"),
-  //       where("quotation_id", "==", quotationId)
-  //     );
-  //     const duplicateQuotationSnapshot = await getDocs(duplicateQuotationQuery);
-
-  //     if (duplicateQuotationSnapshot.size > 0) {
-  //       setIsDuplicate(true);
-  //       setDuplicateQuotationId(duplicateQuotationSnapshot.docs[0].id);
-  //     }
-  //   } catch (e) {
-  //     console.error("Erreur lors de la vérification de la duplication :", e);
-  //   }
-  // };
-
-
-
-  // const duplicateQuotation = async () => {
-  //   try {
-  //     const docRef = await addDoc(collection(db, "DuplicateQuotation"), {
-  //       ...quotation,
-  //       quotation_id: quotationId,
-  //     });
-  //     console.log("Document dupliqué avec succès avec l'ID :", docRef.id);
-  //     setIsDuplicate(true);
-  //     setDuplicateQuotationId(docRef.id);
-
-  //     // Naviguer automatiquement après duplication
-  //     navigate(`/duplicate-quotation/${docRef.id}`);
-  //   } catch (e) {
-  //     console.error("Erreur lors de la duplication du document :", e);
-  //   }
-  
   const duplicateQuotation = async () => {
     try {
       // Utiliser le même ID que le devis original pour le nouvel objet
       const docRef = doc(db, "supplyStudy", quotationId.toString());
-      
+
       await setDoc(docRef, {
         ...quotation,
         quotation_id: quotationId,
       });
-  
+
       console.log("Document dupliqué avec succès avec l'ID :", quotationId);
       setIsDuplicate(true);
       setDuplicateQuotationId(quotationId);
-  
+
       // Naviguer automatiquement après duplication
       navigate(`/supply-study/${quotationId}`);
     } catch (e) {
       console.error("Erreur lors de la duplication du document :", e);
     }
   };
-  
-
 
   useEffect(() => {
     const loadQuotationData = async () => {
@@ -114,9 +87,11 @@ export default function QuotationDetails() {
         setLoading(true);
         const data = await fetchQuotationById(quotationId);
         const companyData = await fetchCompanyById(data.company_id);
+        const contractData = await fetchContractById(data.contract_id);
 
         setQuotation(data);
         setCompany(companyData);
+        setContract(contractData);
         await checkDuplicateQuotation(); // Vérifie la duplication
       } catch (err) {
         setError("Impossible de charger les données du devis.");
@@ -126,6 +101,9 @@ export default function QuotationDetails() {
     };
     loadQuotationData();
   }, [quotationId]);
+
+  
+  console.log("contract from quotationDetails", contract);
 
   if (loading) {
     return (
@@ -145,6 +123,14 @@ export default function QuotationDetails() {
   return (
     <div className={styles.quotationContainer}>
       <h1>Détails du devis - {quotation.number}</h1>
+
+     {/* // ici un badge si le contract.end_date est différent de null */}
+      {contract.end_date && (
+        <div className={styles.badge}>
+          <p>Affaire cloturée le {contract.end_date} </p>
+        </div>
+      )}
+
 
       <div className={styles.header}>
         <div className={styles.section1}>
@@ -185,7 +171,6 @@ export default function QuotationDetails() {
           <h3>
             <strong>Marge prévi :</strong> {quotation.margin.toFixed(2)} €
           </h3>
-      
 
           <GaugeChart
             id="margin-gauge"
@@ -197,29 +182,28 @@ export default function QuotationDetails() {
             needleColor="#4520ff"
           />
 
-             {/* // jauge avec les données du duplicateQuotation */}
-      {isDuplicate && (
-        <div className={styles.realMarginIndicators}>
-          <h3>Données de l'étude d'appro :</h3>
-          <p>
-            <strong>Coût de revient total :</strong> {realCostTotal} €
-          </p>
-          <p>
-            <strong>Marge réelle :</strong> {realMarginValue} €
-          </p>
+          {/* // jauge avec les données du duplicateQuotation */}
+          {isDuplicate && (
+            <div className={styles.realMarginIndicators}>
+              <h3>Données de l'étude d'appro :</h3>
+              <p>
+                <strong>Coût de revient total :</strong> {realCostTotal} €
+              </p>
+              <p>
+                <strong>Marge réelle :</strong> {realMarginValue} €
+              </p>
 
-          <GaugeChart
-            id="margin-gauge"
-            nrOfLevels={6}
-            colors={["#FF5F6D", "#0ef124"]}
-            arcWidth={0.3}
-            percent={(realMarginPercent / 100).toFixed(3)}
-            textColor="#000"
-            needleColor="#4520ff"
-          />
-
-        </div>
-      )}
+              <GaugeChart
+                id="margin-gauge"
+                nrOfLevels={6}
+                colors={["#FF5F6D", "#0ef124"]}
+                arcWidth={0.3}
+                percent={(realMarginPercent / 100).toFixed(3)}
+                textColor="#000"
+                needleColor="#4520ff"
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -316,17 +300,13 @@ export default function QuotationDetails() {
           </button>
         ) : (
           <button
-            onClick={() =>
-              navigate(`/supply-study/${duplicateQuotationId}`)
-            }
+            onClick={() => navigate(`/supply-study/${duplicateQuotationId}`)}
             className={styles.button}
           >
             Voir l'étude d'appro
           </button>
         )}
       </div>
-
-   
     </div>
   );
 }
