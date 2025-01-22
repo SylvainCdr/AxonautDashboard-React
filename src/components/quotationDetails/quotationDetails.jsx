@@ -26,7 +26,7 @@ export default function QuotationDetails() {
   const checkDuplicateQuotation = async () => {
     try {
       const duplicateQuotationQuery = query(
-        collection(db, "DuplicateQuotation"),
+        collection(db, "supplyStudy"),
         where("quotation_id", "==", quotationId)
       );
 
@@ -50,6 +50,24 @@ export default function QuotationDetails() {
     }
   };
 
+  // const checkDuplicateQuotation = async () => {
+  //   try {
+  //     const duplicateQuotationQuery = query(
+  //       collection(db, "supplyStudy"),
+  //       where("quotation_id", "==", quotationId)
+  //     );
+  //     const duplicateQuotationSnapshot = await getDocs(duplicateQuotationQuery);
+
+  //     if (duplicateQuotationSnapshot.size > 0) {
+  //       setIsDuplicate(true);
+  //       setDuplicateQuotationId(duplicateQuotationSnapshot.docs[0].id);
+  //     }
+  //   } catch (e) {
+  //     console.error("Erreur lors de la vérification de la duplication :", e);
+  //   }
+  // };
+
+
 
   // const duplicateQuotation = async () => {
   //   try {
@@ -70,7 +88,7 @@ export default function QuotationDetails() {
   const duplicateQuotation = async () => {
     try {
       // Utiliser le même ID que le devis original pour le nouvel objet
-      const docRef = doc(db, "DuplicateQuotation", quotationId.toString());
+      const docRef = doc(db, "supplyStudy", quotationId.toString());
       
       await setDoc(docRef, {
         ...quotation,
@@ -82,7 +100,7 @@ export default function QuotationDetails() {
       setDuplicateQuotationId(quotationId);
   
       // Naviguer automatiquement après duplication
-      navigate(`/duplicate-quotation/${quotationId}`);
+      navigate(`/supply-study/${quotationId}`);
     } catch (e) {
       console.error("Erreur lors de la duplication du document :", e);
     }
@@ -297,7 +315,7 @@ export default function QuotationDetails() {
         ) : (
           <button
             onClick={() =>
-              navigate(`/duplicate-quotation/${duplicateQuotationId}`)
+              navigate(`/supply-study/${duplicateQuotationId}`)
             }
             className={styles.button}
           >

@@ -23,7 +23,7 @@ function App() {
           <Route path="/companies/:companyId" element={<CompanyDetails />} />
           <Route path="/quotations/:quotationId/project/:projectId" element={<QuotationAndProjectDetails />} />
           <Route path="/expense-report" element={<ExpenseReport />} />
-          <Route path="/duplicate-quotation/:duplicateQuotationId" element={<DuplicateQuotation />} />
+          <Route path="/supply-study/:duplicateQuotationId" element={<DuplicateQuotation />} />
 
 
         </Route>

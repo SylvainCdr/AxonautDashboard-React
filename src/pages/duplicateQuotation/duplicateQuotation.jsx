@@ -29,7 +29,7 @@ export default function DuplicateQuotation() {
     const fetchDuplicateQuotation = async () => {
       try {
         setLoading(true);
-        const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
+        const docRef = doc(db, "supplyStudy", duplicateQuotationId);
         const snapshot = await getDoc(docRef);
 
         if (snapshot.exists()) {
@@ -82,12 +82,13 @@ export default function DuplicateQuotation() {
   // Sauvegarde les modifications dans Firestore
   const saveChanges = async () => {
     try {
-      const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
+      const docRef = doc(db, "supplyStudy", duplicateQuotationId);
       await updateDoc(docRef, quotation);
-      alert("Devis mis à jour avec succès !");
+      alert("Modifications enregistrées avec succès !");
     } catch (err) {
-      console.error("Erreur lors de la mise à jour :", err);
-      alert("Erreur lors de la mise à jour du devis.");
+      console.error("Erreur lors de la sauvegarde des modifications :", err);
+      alert("Erreur lors de la sauvegarde des modifications.");
+
     }
   };
 
@@ -115,10 +116,10 @@ export default function DuplicateQuotation() {
           : 0;
 
       // Mise à jour dans Firebase
-      const docRef = doc(db, "DuplicateQuotation", duplicateQuotationId);
+      const docRef = doc(db, "supplyStudy", duplicateQuotationId);
       await updateDoc(docRef, {
         ...quotation,
-        appro_study_finished: true,
+        supply_study_finished: true,
         real_margin_percent: parseFloat(realMarginPercent.toFixed(2)),
         real_margin_value: parseFloat(realMarginValue.toFixed(2)),
         real_cost_total: parseFloat(realCostTotal.toFixed(2)),
