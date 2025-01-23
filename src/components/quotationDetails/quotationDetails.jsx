@@ -161,7 +161,7 @@ export default function QuotationDetails() {
         </div>
         <div className={styles.section2}>
           <div className={styles.gauge}>
-            <h3>Marge commerciale </h3>
+            <h3>Marge co </h3>
             <p>
               <strong>Marge prévi :</strong> {quotation.margin.toFixed(2)} €
             </p>
@@ -175,34 +175,38 @@ export default function QuotationDetails() {
               needleColor="#4520ff"
             />
           </div>
+{/* // jauge avec les données du duplicateQuotation */}
+{isDuplicate && !isNaN(realMarginValue) && realMarginValue !== 0 ? (
+  <div className={styles.gauge}>
+    <h3>Marge réelle</h3>
+    <p>
+      <strong>Marge réelle : </strong> {realMarginValue.toFixed(2)} €
+    </p>
+    <GaugeChart
+      id="margin-gauge"
+      nrOfLevels={6}
+      colors={["#FF5F6D", "#0ef124"]}
+      arcWidth={0.3}
+      percent={(realMarginPercent / 100).toFixed(3)}
+      textColor="#000"
+      needleColor="#4520ff"
+    />
+  </div>
+) : (
+  // Message si pas de duplicateQuotation ou si marge réelle indisponible
+  <div className={styles.gauge}>
+    <p>Étude d'appro</p>
+    <span
+      role="img"
+      aria-label="hourglass"
+      style={{ color: "orange", marginLeft: "8px" }}
+    >
+      ⏳
+    </span>
+    <p>En attente</p>
+  </div>
+)}
 
-          {/* // jauge avec les données du duplicateQuotation */}
-          {isDuplicate ? (
-            <div className={styles.gauge}>
-              <h3>Marge réelle</h3>
-
-              <p>
-                <strong>Marge réelle </strong> {realMarginValue} €
-              </p>
-              <GaugeChart
-                id="margin-gauge"
-                nrOfLevels={6}
-                colors={["#FF5F6D", "#0ef124"]}
-                arcWidth={0.3}
-                percent={(realMarginPercent / 100).toFixed(3)}
-                textColor="#000"
-                needleColor="#4520ff"
-              />
-            </div>
-          ) : (
-            //msg si pas de duplicateQuotation
-            <div className={styles.gauge}>
-              
-              <i className="fa-solid fa-hourglass"></i>
-              <p>Etude d'appro en attente</p>
-              
-            </div>
-          )}
         </div>
       </div>
 

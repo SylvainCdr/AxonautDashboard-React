@@ -7,24 +7,27 @@
   min-height: 60vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
   text-align: center;
   color: black;
+  width: 100%;
+  max-width: 1400px;
 }
 
 .quotationContainer {
-  padding: 20px;
+  padding: 10px;
   background-color: #f9f9f9aa;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding-top: 2rem;
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem;
 
 
-  max-width: 1400px;
-  margin-bottom: 5rem;
+
+
   .header {
     display: inline-flex;
     justify-content: space-between;
-    width: 100%;
+  
     margin-bottom: 20px;
     gap: 10px;
 

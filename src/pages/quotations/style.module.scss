@@ -19,6 +19,33 @@
   min-height: 100vh;
   margin: 0 auto;
 
+  .filterContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  
+    .toggleButton {
+      padding: 0.5rem 1rem;
+      background-color: #ddd;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+  
+      &:hover {
+        background-color: #bbb;
+      }
+  
+      &.activeButton {
+        background-color: #007bff;
+        color: white;
+      }
+    }
+  }
+  
+
   table {
     width: 100%;
     border-collapse: collapse;

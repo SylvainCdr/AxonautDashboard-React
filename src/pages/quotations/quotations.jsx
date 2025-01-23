@@ -17,6 +17,13 @@ export default function Quotations() {
 
   const navigate = useNavigate();
 
+  const [showClosed, setShowClosed] = useState(false); // false = En cours, true = Clôturés
+
+  const filteredQuotations = quotations.filter(
+    (quotation) => quotation.isClosed === showClosed
+  );
+  
+
   // Fonction pour naviguer vers les détails du projet
   const handleClickProject = (quotationId, projectId) => {
     navigate(`/quotations/${quotationId}/project/${projectId}`);
@@ -170,7 +177,29 @@ export default function Quotations() {
 
   return (
     <div className={styles.quotationsContainer}>
+
+
       <h1>Gestion des Devis & Projets</h1>
+
+      <div className={styles.filterContainer}>
+  <button
+    className={`${styles.toggleButton} ${
+      !showClosed ? styles.activeButton : ""
+    }`}
+    onClick={() => setShowClosed(false)}
+  >
+    En cours
+  </button>
+  <button
+    className={`${styles.toggleButton} ${
+      showClosed ? styles.activeButton : ""
+    }`}
+    onClick={() => setShowClosed(true)}
+  >
+    Clôturés
+  </button>
+</div>
+
 
       <SearchQuotations />
 
@@ -194,7 +223,7 @@ export default function Quotations() {
           </tr>
         </thead>
         <tbody>
-          {quotations.map((quotation) => (
+        {filteredQuotations.map((quotation) => (
             <tr
               key={quotation.id}
               style={{

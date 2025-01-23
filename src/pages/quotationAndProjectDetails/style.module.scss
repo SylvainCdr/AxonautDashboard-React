@@ -18,7 +18,7 @@
     padding-top: 6rem;
     display: flex;
     justify-content: space-around;
-    gap: 2rem; /* Espacement entre les sections */
+    gap: 1rem; /* Espacement entre les sections */
     flex-wrap: wrap;
   }
   
@@ -33,14 +33,14 @@
   
   /* Section principale */
   .section {
-    flex: 1 1 45%; /* Prend 30% de la largeur de l'écran */
-    padding: 1.5rem;
+   flex : 1 1 45%; /* Prend 30% de la largeur de l'écran */
+    padding: 1rem;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
   }
   
   /* Titre de chaque section */
@@ -51,7 +51,7 @@
   
   /* Cartes d'information avec des marges et de l'ombrage */
   .card {
-    padding: 1.5rem;
+    padding: 1rem;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

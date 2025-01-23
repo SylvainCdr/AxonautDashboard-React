@@ -60,17 +60,11 @@ export default function SearchQuotations() {
     }
   };
 
-  // const handleQuotationClick = (quotationId) => {
-  //   // navigate(`/quotations/${quotationId}`); // Naviguer vers la page du projet
-  //   navigate(`/quotations/${quotationId}`); // Naviguer vers la page du projet
-  // };
-
   const handleQuotationClick = (quotationId, projectId) => {
     // Naviguer vers le chemin incluant `quotationId` et `projectId`
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
-  
-  
+
   const statusColor = (status) => {
     if (status === "accepted") return "green";
     if (status === "pending") return "orange";
@@ -98,37 +92,38 @@ export default function SearchQuotations() {
       <div className={styles.searchResults}>
         {paginatedQuotations.length > 0
           ? paginatedQuotations.map((quotation) => (
-            <div
-            key={quotation.id}
-            onClick={() => handleQuotationClick(quotation.id, quotation.project_id)}
-            className={styles.projectRow}
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Numéro</th>
-                  <th>Nom</th>
-                  <th>Client</th>
-                  <th>Date de début</th>
-                  <th>Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{quotation.number}</td>
-                  <td>{quotation.title}</td>
-                  <td>{quotation.company_name}</td>
-                  <td>{new Date(quotation.date).toLocaleDateString()}</td>
-                  <td>
-                    <span style={{ color: statusColor(quotation.status) }}>
-                      {quotation.status}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
+              <div
+                key={quotation.id}
+                onClick={() =>
+                  handleQuotationClick(quotation.id, quotation.project_id)
+                }
+                className={styles.projectRow}
+              >
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Numéro</th>
+                      <th>Nom</th>
+                      <th>Client</th>
+                      <th>Date de début</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{quotation.number}</td>
+                      <td>{quotation.title}</td>
+                      <td>{quotation.company_name}</td>
+                      <td>{new Date(quotation.date).toLocaleDateString()}</td>
+                      <td>
+                        <span style={{ color: statusColor(quotation.status) }}>
+                          {quotation.status}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             ))
           : submittedSearch &&
             !loading && <p>Aucun projet trouvé pour "{submittedSearch}".</p>}
