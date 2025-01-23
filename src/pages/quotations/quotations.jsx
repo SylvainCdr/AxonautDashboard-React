@@ -6,8 +6,8 @@ import { GridLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
-import SearchQuotations from "../../components/searchQuotations/searchQuotations";
-
+// import SearchQuotations from "../../components/searchQuotations/searchQuotations";
+import SearchQuotationsV2 from "../../components/searchQuotationsV2/searchQuotationsV2";
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
@@ -201,7 +201,7 @@ export default function Quotations() {
 </div>
 
 
-      <SearchQuotations />
+      <SearchQuotationsV2 />
 
       <table className={styles.quotationTable}>
         <thead>
