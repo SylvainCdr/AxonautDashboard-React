@@ -13,7 +13,6 @@
     font-size: 1.2rem;
     color: #555;
     // color:  #c783ff;
-   
   }
 }
 
@@ -53,12 +52,12 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      
+
       .gaugeContainer {
         text-align: center;
         display: inline-block;
       }
-      
+
       .gaugeContainer h4 {
         font-size: 1.2rem;
         margin-bottom: 10px;
@@ -69,22 +68,17 @@
         font-size: 1.1rem;
         margin-top: 40px;
         margin-bottom: 10px;
-        padding-left : 2rem;
-       
-  
+        padding-left: 2rem;
       }
-
-   
-  
     }
   }
 
   .section2 {
-    margin-bottom : 3rem  ;
+    margin-bottom: 3rem;
 
     .warningMessage {
       color: #d9534f;
-  font-size: 1.3rem;
+      font-size: 1.3rem;
       margin-top: 40px;
       margin-bottom: 30px;
       text-align: center;
@@ -95,10 +89,8 @@
       -moz-border-radius: 5px;
       -ms-border-radius: 5px;
       -o-border-radius: 5px;
-}
-
+    }
   }
-
 
   .lines {
     background-color: #ffffff;
@@ -247,5 +239,11 @@
     &:hover {
       background-color: #218838;
     }
+  }
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+
+    margin-top: 1rem;
   }
 }

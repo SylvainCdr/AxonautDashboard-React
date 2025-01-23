@@ -14,7 +14,6 @@ export default function Quotations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  
 
   const navigate = useNavigate();
 
@@ -57,13 +56,16 @@ export default function Quotations() {
   const loadQuotationData = async (quotationsList) => {
     const updatedQuotations = await Promise.all(
       quotationsList.map(async (quotation) => {
-        // Vérifie si le devis est marqué comme "Clôturé"
         const isClosed = await fetchClosedStatus(quotation.id);
+        const { realMarginPercent, supplyStudyFinished } =
+          await fetchRealMarginPercent(quotation.id);
 
-        // Vérifie s'il existe une marge réelle dans supplyStudy
-        const realMarginPercent = await fetchRealMarginPercent(quotation.id);
-
-        return { ...quotation, isClosed, realMarginPercent };
+        return {
+          ...quotation,
+          isClosed,
+          realMarginPercent,
+          supplyStudyFinished,
+        };
       })
     );
     setQuotations(updatedQuotations);
@@ -98,15 +100,19 @@ export default function Quotations() {
       const snapshot = await getDoc(docRef);
 
       if (snapshot.exists()) {
-        return snapshot.data().real_margin_percent || 0; // Retourne la marge réelle si elle existe
+        const data = snapshot.data();
+        return {
+          realMarginPercent: data.real_margin_percent || null, // Null si non défini
+          supplyStudyFinished: data.supply_study_finished || false, // False si non défini
+        };
       }
-      return 0; // Retourne 0 si aucune donnée n'est trouvée
+      return { realMarginPercent: null, supplyStudyFinished: false }; // Valeurs par défaut
     } catch (err) {
       console.error(
         `Erreur lors de la récupération de la marge réelle pour ${quotationId}:`,
         err
       );
-      return 0; // Retourne 0 en cas d'erreur
+      return { realMarginPercent: null, supplyStudyFinished: false }; // Valeurs par défaut en cas d'erreur
     }
   };
 
@@ -136,7 +142,6 @@ export default function Quotations() {
     loadAxonautUsersData();
   }, []);
 
-
   // Navigation entre les pages
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
@@ -162,8 +167,6 @@ export default function Quotations() {
   }
 
   if (error) return <p>Erreur : {error}</p>;
-
-
 
   return (
     <div className={styles.quotationsContainer}>
@@ -208,15 +211,7 @@ export default function Quotations() {
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
 
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
-              {/* <td>{quotation.total_amount.toFixed(2)} €</td> */}
               <td>{quotation.margin.toFixed(2)} €</td>
-              {/* <td>
-                {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                  2
-                )}{" "}
-                %
-              </td> */}
-              {/* // marge en % , si en dessous de 15 alors rouge, si en dessous de 29 alors orange et au dessus de 30 alors vert  */}
               <td>
                 {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
                   2
@@ -252,21 +247,34 @@ export default function Quotations() {
 
               {/* // marge réelle */}
               <td>
-                {quotation.realMarginPercent == 0 ? (
-                  <span role="img" aria-label="cross mark">
+                {quotation.realMarginPercent === null ? (
+                  <span
+                    role="img"
+                    aria-label="cross mark"
+                    style={{ color: "red", marginLeft: "25px" }}
+                  >
                     ❌
                   </span>
-                ) : quotation.realMarginPercent < 15 ? (
-                  <span style={{ color: "red" }}>
-                    {quotation.realMarginPercent.toFixed(1)} %
-                  </span>
-                ) : quotation.realMarginPercent < 28 ? (
-                  <span style={{ color: "orange" }}>
-                    {quotation.realMarginPercent.toFixed(1)} %
-                  </span>
                 ) : (
-                  <span style={{ color: "green" }}>
-                    {quotation.realMarginPercent.toFixed(1)} %
+                  <span style={{ color: "black" }}>
+                    {quotation.supplyStudyFinished && (
+                      <span
+                        role="img"
+                        aria-label="check mark"
+                        style={{ color: "green", marginLeft: "8px" }}
+                      >
+                        ✅
+                      </span>
+                    ) || (
+                      <span
+                        role="img"
+                        aria-label="hourglass"
+                        style={{ color: "orange", marginLeft: "8px" }}
+                      >
+                        ⏳
+                      </span>
+                    )}
+                    {quotation.realMarginPercent.toFixed(1)}%
                   </span>
                 )}
               </td>

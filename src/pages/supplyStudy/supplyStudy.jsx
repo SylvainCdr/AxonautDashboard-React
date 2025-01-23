@@ -82,20 +82,6 @@ export default function SupplyStudy() {
   // Sauvegarde les modifications dans Firestore
   const saveChanges = async () => {
     try {
-      const docRef = doc(db, "supplyStudy", duplicateQuotationId);
-      await updateDoc(docRef, quotation);
-      alert("Modifications enregistrées avec succès !");
-    } catch (err) {
-      console.error("Erreur lors de la sauvegarde des modifications :", err);
-      alert("Erreur lors de la sauvegarde des modifications.");
-
-    }
-  };
-
-  // ajoute le champs etude terminée boolean dans la base de données
-  // Fonction pour finaliser l'étude et persister les données du tfooter
-  const finalizeApproStudy = async () => {
-    try {
       const realCostTotal = quotation.quotation_lines.reduce(
         (acc, line) =>
           acc + (line.final_quantity || 0) * (line.actual_cost || 0),
@@ -115,14 +101,31 @@ export default function SupplyStudy() {
           ? (realMarginValue / quotation.pre_tax_amount) * 100
           : 0;
 
+      const updatedQuotation = {
+        ...quotation,
+        real_margin_percent: parseFloat(realMarginPercent.toFixed(2)),
+        real_margin_value: parseFloat(realMarginValue.toFixed(2)),
+        real_cost_total: parseFloat(realCostTotal.toFixed(2)),
+      };
+
+      const docRef = doc(db, "supplyStudy", duplicateQuotationId);
+      await updateDoc(docRef, updatedQuotation);
+      alert("Modifications enregistrées avec succès !");
+    } catch (err) {
+      console.error("Erreur lors de la sauvegarde des modifications :", err);
+      alert("Erreur lors de la sauvegarde des modifications.");
+    }
+  };
+
+  // ajoute le champs etude terminée boolean dans la base de données
+  // Fonction pour finaliser l'étude et persister les données du tfooter
+  const finalizeApproStudy = async () => {
+    try {
       // Mise à jour dans Firebase
       const docRef = doc(db, "supplyStudy", duplicateQuotationId);
       await updateDoc(docRef, {
         ...quotation,
         supply_study_finished: true,
-        real_margin_percent: parseFloat(realMarginPercent.toFixed(2)),
-        real_margin_value: parseFloat(realMarginValue.toFixed(2)),
-        real_cost_total: parseFloat(realCostTotal.toFixed(2)),
       });
 
       alert("Étude finalisée et données enregistrées avec succès !");
@@ -266,7 +269,6 @@ export default function SupplyStudy() {
         <div className={styles.section1Right}>
           {/* // Jauges avec les marges,  si 100% alors on affiche : etude d'appro nécessaire */}
 
-          
           <div className={styles.gaugeChart}>
             {data.map(
               (entry, index) =>
@@ -602,14 +604,16 @@ export default function SupplyStudy() {
           <p>Aucune ligne de devis disponible.</p>
         )}
       </div>
-      <button onClick={saveChanges} className={styles.saveButton}>
-        Enregistrer les modifications
-      </button>
+      <div className={styles.buttons}>
+        <button onClick={saveChanges} className={styles.saveButton}>
+          Enregistrer les modifications
+        </button>
 
-      {/* // bouton pour notifier que l etude est finalisée */}
-      <button onClick={finalizeApproStudy} className={styles.saveButton}>
-        Finaliser l'étude
-      </button>
+        {/* // bouton pour notifier que l etude est finalisée */}
+        <button onClick={finalizeApproStudy} className={styles.saveButton}>
+          Notifier comme étude terminée
+        </button>
+      </div>
     </div>
   );
 }
