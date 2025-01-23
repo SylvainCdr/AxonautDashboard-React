@@ -8,7 +8,7 @@ import Employees from "./pages/employees/employees";
 import CompanyDetails from "./pages/companyDetails/companyDetails";
 import QuotationAndProjectDetails from "./pages/quotationAndProjectDetails/quotationAndProjectDetails";
 import ExpenseReport from "./pages/expenseReport/expenseReport";
-import DuplicateQuotation from "./pages/duplicateQuotation/duplicateQuotation";
+import SupplyStudy from "./pages/supplyStudy/supplyStudy";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           <Route path="/companies/:companyId" element={<CompanyDetails />} />
           <Route path="/quotations/:quotationId/project/:projectId" element={<QuotationAndProjectDetails />} />
           <Route path="/expense-report" element={<ExpenseReport />} />
-          <Route path="/supply-study/:duplicateQuotationId" element={<DuplicateQuotation />} />
+          <Route path="/supply-study/:duplicateQuotationId" element={<SupplyStudy />} />
 
 
         </Route>

@@ -15,7 +15,7 @@ import {
 } from "recharts";
 import GaugeChart from "react-gauge-chart";
 
-export default function DuplicateQuotation() {
+export default function SupplyStudy() {
   const { duplicateQuotationId } = useParams();
   const [quotation, setQuotation] = useState(null);
   const [loading, setLoading] = useState(true);
