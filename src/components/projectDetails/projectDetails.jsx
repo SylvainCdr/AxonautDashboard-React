@@ -36,6 +36,10 @@ export default function ProjectDetails() {
     }));
   };
 
+  const [showExpenses, setShowExpenses] = useState(false);
+  const [showSupplierContracts, setShowSupplierContracts] = useState(false);
+
+
   useEffect(() => {
     const loadProjectData = async () => {
       try {
@@ -58,7 +62,6 @@ export default function ProjectDetails() {
 
   console.log("project", project);
   // console.log ("company", company);
-
 
   useEffect(() => {
     const loadData = async () => {
@@ -127,20 +130,18 @@ export default function ProjectDetails() {
       contract.expenses.map((expense) => expense.id)
     )
   );
-  
+
   // Filtrer les contrats non liés pour calculer les dépenses à venir
   const unlinkedContracts = supplierContracts.filter(
     (contract) =>
       !contract.expenses.some((expense) => linkedExpenseIds.has(expense.id))
   );
 
-    // Calcul des montants pour les dépenses à venir
-const supplierContractAmount = unlinkedContracts.reduce(
-  (acc, contract) => acc + contract.pre_tax_amount,
-  0
-);
-
-
+  // Calcul des montants pour les dépenses à venir
+  const supplierContractAmount = unlinkedContracts.reduce(
+    (acc, contract) => acc + contract.pre_tax_amount,
+    0
+  );
 
   const chartData = [
     { name: "Commande", estimatedRevenue: project.estimated_revenue },
@@ -162,15 +163,6 @@ const supplierContractAmount = unlinkedContracts.reduce(
     (acc, expense) => acc + expense.left_to_pay,
     0
   );
-
-
-
-
-
-
-
-
-
 
   if (loading) {
     return (
@@ -201,10 +193,10 @@ const supplierContractAmount = unlinkedContracts.reduce(
             <strong>Date de début réelle : </strong>
             {new Date(project.actual_start).toLocaleDateString()}
           </p>
-          <p>
+          {/* <p>
             <strong>Date de fin réelle : </strong>
             {new Date(project.actual_end).toLocaleDateString()}
-          </p>
+          </p> */}
           <p>
             <strong>Entreprise :</strong>{" "}
             {company.name || "Entreprise inconnue"}
@@ -215,10 +207,6 @@ const supplierContractAmount = unlinkedContracts.reduce(
           <p>
             <strong>Ville :</strong> {company.address_city} {company.zip_code} (
             {company.address_country})
-          </p>
-          <p>
-            <strong>Commercial en charge :</strong>{" "}
-            {company.business_manager?.name || "Inconnu"}
           </p>
         </div>
         <div className={styles.section2}>
@@ -251,8 +239,10 @@ const supplierContractAmount = unlinkedContracts.reduce(
               nrOfLevels={5}
               percent={
                 project.actual_revenue
-                  ? ((project.actual_revenue - project.actual_expenses_cost) /
-                    project.actual_revenue).toFixed(3)
+                  ? (
+                      (project.actual_revenue - project.actual_expenses_cost) /
+                      project.actual_revenue
+                    ).toFixed(3)
                   : 0
               }
               arcsLength={[0.15, 0.1, 0.3, 0.45]}
@@ -260,6 +250,7 @@ const supplierContractAmount = unlinkedContracts.reduce(
               textColor="#000"
               needleColor="#4520ff"
               arcPadding={0.02}
+              responsive
             />
           ) : (
             <p className={styles.noDataMessage}>
@@ -300,153 +291,171 @@ const supplierContractAmount = unlinkedContracts.reduce(
         </ResponsiveContainer>
       </div>
 
-      {/* Section des dépenses */}
-      <div className={styles.expenses}>
-        <h1>Dépenses</h1>
-        {loadingExpenses ? ( // Affichage du loader pour les dépenses
-          <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingExpenses} width={200} />
-            <p>Chargement des dépenses...</p>
-          </div>
-        ) : expenses.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Titre</th>
-                <th>Date</th>
-                <th>Montant HT</th>
-                <th>Montant TTC</th>
-                <th>Reste à payer TTC</th>
-                <th>Nom comptable</th>
-                <th>Fournisseur</th>
-                <th>Projet</th>
-                <th>Détails</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.map((expense) => (
-                <React.Fragment key={expense.id}>
-                  <tr onClick={() => toggleExpense(expense.id)}>
-                    <td>{expense.id}</td>
-                    <td>
-                      <span>+</span>
-                      {expense.title}
-                    </td>
-                    <td>{new Date(expense.date).toLocaleDateString()}</td>
-                    <td>{expense.pre_tax_amount.toFixed(2)} €</td>
-                    <td>{expense.total_amount.toFixed(2)} €</td>
-                    <td>{expense.left_to_pay.toFixed(2)} €</td>
-                    <td>{expense.accounting_code_name}</td>
-                    <td>{expense.supplier_name}</td>
-                    <td>{expense.project_id}</td>
-                    <td>
-                      <a
-                        href={expense.public_path}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Lien
-                      </a>
+ {/* Section des dépenses */}
+<div className={styles.expenses}>
+  <h1>Dépenses</h1>
+  {/* Bouton de toggle pour afficher/masquer les dépenses */}
+  <button
+    className={styles.toggleButton}
+    onClick={() => setShowExpenses(!showExpenses)}
+  >
+    {showExpenses ? "Masquer les dépenses" : "Afficher les dépenses"}
+  </button>
+
+  {showExpenses && ( // Affichage conditionnel des dépenses
+    <>
+      {loadingExpenses ? ( // Affichage du loader pour les dépenses
+        <div className={styles.loaderContainer}>
+          <BarLoader color="#4520ff" loading={loadingExpenses} width={200} />
+          <p>Chargement des dépenses...</p>
+        </div>
+      ) : expenses.length > 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Titre</th>
+              <th>Date</th>
+              <th>Montant HT</th>
+              <th>Reste à payer TTC</th>
+              <th>Nom comptable</th>
+              <th>Fournisseur</th>
+              <th>Projet</th>
+              <th>Détails</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expenses.map((expense) => (
+              <React.Fragment key={expense.id}>
+                <tr onClick={() => toggleExpense(expense.id)}>
+                  <td>{expense.id}</td>
+                  <td>
+                    <span>+</span>
+                    {expense.title}
+                  </td>
+                  <td>{new Date(expense.date).toLocaleDateString()}</td>
+                  <td>{expense.pre_tax_amount.toFixed(2)} €</td>
+                  <td>{expense.left_to_pay.toFixed(2)} €</td>
+                  <td>{expense.accounting_code_name}</td>
+                  <td>{expense.supplier_name}</td>
+                  <td>{expense.project_id}</td>
+                  <td>
+                    <a
+                      href={expense.public_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Lien
+                    </a>
+                  </td>
+                </tr>
+                {expandedExpenses[expense.id] && (
+                  <tr>
+                    <td colSpan="9">
+                      <table className={styles.expenseDetails}>
+                        <thead>
+                          <tr>
+                            <th>Article</th>
+                            <th>Quantité</th>
+                            <th>Total HT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {expense.expense_lines.map((line, index) => (
+                            <tr key={index}>
+                              <td>{line.title}</td>
+                              <td>{line.quantity}</td>
+                              <td>
+                                {line.total_pre_tax_amount.toFixed(2)} €
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </td>
                   </tr>
-                  {expandedExpenses[expense.id] && (
-                    <tr>
-                      <td colSpan="9">
-                        <table className={styles.expenseDetails}>
-                          <thead>
-                            <tr>
-                              <th>Article</th>
-                              <th>Quantité</th>
-                              <th>Total HT</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {expense.expense_lines.map((line, index) => (
-                              <tr key={index}>
-                                <td>{line.title}</td>
-                                <td>{line.quantity}</td>
-                                <td>
-                                  {line.total_pre_tax_amount.toFixed(2)} €
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>Aucune dépense trouvée.</p>
-        )}
-      </div>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>Aucune dépense trouvée.</p>
+      )}
+    </>
+  )}
+</div>
 
       {/* Section des contrats fournisseurs */}
       <div className={styles.supplierContracts}>
         <h1>Commandes fournisseurs</h1>
-        {loadingContracts ? ( // Affichage du loader pour les contrats fournisseurs
-          <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingContracts} width={200} />
-            <p>Chargement des commandes fournisseurs...</p>
-          </div>
-        ) : supplierContracts.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Titre</th>
-                <th>Date de début</th>
-                <th>Montant HT</th>
-                <th>Montant TTC</th>
-                <th>Fournisseur</th>
-                <th>Commentaire</th>
-                <th>expense ID</th>
-              </tr>
-            </thead>
-            <tbody>
-  {supplierContracts.map((contract) => (
-    <tr
-      key={contract.id}
-      style={{
-        backgroundColor: contract.expenses.some((expense) =>
-          linkedExpenseIds.has(expense.id)
-        )
-          ? "lightgreen" // Surlignage en vert
-          : "white", // Couleur par défaut
-      }}
-    >
-      <td>{contract.title}</td>
-      <td>{new Date(contract.start_date).toLocaleDateString()}</td>
-      <td>{contract.pre_tax_amount.toFixed(2)} €</td>
-      <td>{contract.total_amount.toFixed(2)} €</td>
-      <td>{contract.supplier.name}</td>
-      <td>
-        <div
-          dangerouslySetInnerHTML={{
-            __html: contract.comments
-              ? contract.comments.slice(0, 90) +
-                (contract.comments.length > 90 ? "..." : "")
-              : "Aucun commentaire",
-          }}
-        ></div>
-      </td>
-      <td>
-        {contract.expenses.map((expense) => (
-          <span key={expense.id}>{expense.id}, </span>
-        ))}
-      </td>
-    </tr>
-  ))}
-</tbody>
+        <button
+    className={styles.toggleButton}
+    onClick={() => setShowSupplierContracts(!showSupplierContracts)}
+  >
+    {showSupplierContracts ? "Masquer les dépenses" : "Afficher les dépenses"}
+  </button>
 
-          </table>
-        ) : (
-          <p>Aucune commande fournisseur trouvée.</p>
-        )}
+  {showSupplierContracts && ( // Affichage conditionnel des contrats fournisseurs
+    loadingContracts ? ( // Affichage du loader pour les contrats fournisseurs
+      <div className={styles.loaderContainer}>
+        <BarLoader color="#4520ff" loading={loadingContracts} width={200} />
+        <p>Chargement des commandes fournisseurs...</p>
       </div>
+    ) : supplierContracts.length > 0 ? (
+      <table>
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Date de début</th>
+            <th>Montant HT</th>
+            <th>Montant TTC</th>
+            <th>Fournisseur</th>
+            <th>Commentaire</th>
+            <th>expense ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {supplierContracts.map((contract) => (
+            <tr
+              key={contract.id}
+              style={{
+                backgroundColor: contract.expenses.some((expense) =>
+                  linkedExpenseIds.has(expense.id)
+                )
+                  ? "lightgreen" // Surlignage en vert
+                  : "white", // Couleur par défaut
+              }}
+            >
+              <td>{contract.title}</td>
+              <td>{new Date(contract.start_date).toLocaleDateString()}</td>
+              <td>{contract.pre_tax_amount.toFixed(2)} €</td>
+              <td>{contract.total_amount.toFixed(2)} €</td>
+              <td>{contract.supplier.name}</td>
+              <td>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: contract.comments
+                      ? contract.comments.slice(0, 90) +
+                        (contract.comments.length > 90 ? "..." : "")
+                      : "Aucun commentaire",
+                  }}
+                ></div>
+              </td>
+              <td>
+                {contract.expenses.map((expense) => (
+                  <span key={expense.id}>{expense.id}, </span>
+                ))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p>Aucune commande fournisseur trouvée.</p>
+    )
+  )}
+</div>
     </div>
   );
 }

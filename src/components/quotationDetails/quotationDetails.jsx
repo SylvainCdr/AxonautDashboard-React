@@ -102,7 +102,6 @@ export default function QuotationDetails() {
     loadQuotationData();
   }, [quotationId]);
 
-  
   console.log("contract from quotationDetails", contract);
 
   if (loading) {
@@ -122,27 +121,22 @@ export default function QuotationDetails() {
 
   return (
     <div className={styles.quotationContainer}>
-      <h1>Détails du devis - {quotation.number}</h1>
+      <h1>Détails de la commande - {quotation.number}</h1>
 
-     {/* // ici un badge si le contract.end_date est différent de null */}
+      {/* // ici un badge si le contract.end_date est différent de null */}
       {contract.end_date && (
         <div className={styles.badge}>
           <p>Affaire cloturée le {contract.end_date} </p>
         </div>
       )}
 
-
       <div className={styles.header}>
         <div className={styles.section1}>
-          <p>
-            <strong>Numéro :</strong> {quotation.number}
-          </p>
-
           <p>
             <strong>Titre :</strong> {quotation.title}
           </p>
           <p>
-            <strong>Nom de l'entreprise :</strong> {quotation.company_name}
+            <strong>Entreprise :</strong> {quotation.company_name}
           </p>
           <p>
             <strong>Date :</strong>{" "}
@@ -153,11 +147,12 @@ export default function QuotationDetails() {
             <strong>Commercial :</strong>{" "}
             {company.business_manager?.name || "Inconnu"}
           </p>
-          <p>
-            <strong>Statut :</strong>{" "}
-          </p>
+
           <p>
             <strong>Commentaire(s):</strong> {quotation.comments}
+          </p>
+          <p>
+            <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
           </p>
 
           <p>
@@ -165,34 +160,30 @@ export default function QuotationDetails() {
           </p>
         </div>
         <div className={styles.section2}>
-          <h3>
-            <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
-          </h3>
-          <h3>
-            <strong>Marge prévi :</strong> {quotation.margin.toFixed(2)} €
-          </h3>
-
-          <GaugeChart
-            id="margin-gauge"
-            nrOfLevels={6}
-            colors={["#FF5F6D", "#0ef124"]}
-            arcWidth={0.3}
-            percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
-            textColor="#000"
-            needleColor="#4520ff"
-          />
+          <div className={styles.gauge}>
+            <h3>Marge commerciale </h3>
+            <p>
+              <strong>Marge prévi :</strong> {quotation.margin.toFixed(2)} €
+            </p>
+            <GaugeChart
+              id="margin-gauge"
+              nrOfLevels={6}
+              colors={["#FF5F6D", "#0ef124"]}
+              arcWidth={0.3}
+              percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
+              textColor="#000"
+              needleColor="#4520ff"
+            />
+          </div>
 
           {/* // jauge avec les données du duplicateQuotation */}
-          {isDuplicate && (
-            <div className={styles.realMarginIndicators}>
-              <h3>Données de l'étude d'appro :</h3>
-              <p>
-                <strong>Coût de revient total :</strong> {realCostTotal} €
-              </p>
-              <p>
-                <strong>Marge réelle :</strong> {realMarginValue} €
-              </p>
+          {isDuplicate ? (
+            <div className={styles.gauge}>
+              <h3>Marge réelle</h3>
 
+              <p>
+                <strong>Marge réelle </strong> {realMarginValue} €
+              </p>
               <GaugeChart
                 id="margin-gauge"
                 nrOfLevels={6}
@@ -202,6 +193,14 @@ export default function QuotationDetails() {
                 textColor="#000"
                 needleColor="#4520ff"
               />
+            </div>
+          ) : (
+            //msg si pas de duplicateQuotation
+            <div className={styles.gauge}>
+              
+              <i className="fa-solid fa-hourglass"></i>
+              <p>Etude d'appro en attente</p>
+              
             </div>
           )}
         </div>
@@ -286,14 +285,7 @@ export default function QuotationDetails() {
         >
           Voir le devis dans Axonaut
         </a>
-        {/* <a
-          href={quotation.customer_portal_url}
-          target="_blank"
-          rel="noreferrer"
-          className={styles.button}
-        >
-          Voir le devis dans le portail client
-        </a> */}
+
         {!isDuplicate ? (
           <button onClick={duplicateQuotation} className={styles.button}>
             Réaliser l'étude d'appro
