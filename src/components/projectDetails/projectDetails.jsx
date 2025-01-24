@@ -322,9 +322,9 @@ export default function ProjectDetails() {
               <th>Date</th>
               <th>Montant HT</th>
               <th>Reste à payer TTC</th>
-              <th>Nom comptable</th>
+              {/* <th>Nom comptable</th> */}
               <th>Fournisseur</th>
-              <th>Projet</th>
+              {/* <th>Projet</th> */}
               <th>Détails</th>
             </tr>
           </thead>
@@ -340,9 +340,9 @@ export default function ProjectDetails() {
                   <td>{new Date(expense.date).toLocaleDateString()}</td>
                   <td>{expense.pre_tax_amount.toFixed(2)} €</td>
                   <td>{expense.left_to_pay.toFixed(2)} €</td>
-                  <td>{expense.accounting_code_name}</td>
+                  {/* <td>{expense.accounting_code_name}</td> */}
                   <td>{expense.supplier_name}</td>
-                  <td>{expense.project_id}</td>
+                  {/* <td>{expense.project_id}</td> */}
                   <td>
                     <a
                       href={expense.public_path}

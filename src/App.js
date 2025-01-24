@@ -9,6 +9,7 @@ import CompanyDetails from "./pages/companyDetails/companyDetails";
 import QuotationAndProjectDetails from "./pages/quotationAndProjectDetails/quotationAndProjectDetails";
 import ExpenseReport from "./pages/expenseReport/expenseReport";
 import SupplyStudy from "./pages/supplyStudy/supplyStudy";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -25,9 +26,9 @@ function App() {
           <Route path="/expense-report" element={<ExpenseReport />} />
           <Route path="/supply-study/:duplicateQuotationId" element={<SupplyStudy />} />
 
-
         </Route>
       </Routes>
+          <ToastContainer />
     </BrowserRouter>
   );
 }

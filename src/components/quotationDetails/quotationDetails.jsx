@@ -115,9 +115,9 @@ export default function QuotationDetails() {
 
   if (error) return <p className={styles.error}>{error}</p>;
 
-  const totalPixProductCode = quotation.quotation_lines
-    .filter((line) => line.product_code.startsWith("Pix_"))
-    .reduce((acc, line) => acc + line.unit_job_costing, 0);
+  // const totalPixProductCode = quotation.quotation_lines
+  //   .filter((line) => line.product_code.startsWith("Pix_"))
+  //   .reduce((acc, line) => acc + line.unit_job_costing, 0);
 
   return (
     <div className={styles.quotationContainer}>
@@ -240,7 +240,7 @@ export default function QuotationDetails() {
             <tbody>
               {quotation.quotation_lines.map((line) => (
                 <tr key={line.id}>
-                  <td>{line.product_code}</td>
+                  <td>{line?.product_code || ""}</td>
                   <td>{line.product_name}</td>
                   <td>{line.quantity}</td>
                   <td>{line.price} €</td>
@@ -274,10 +274,10 @@ export default function QuotationDetails() {
             {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
           </p>
 
-          <p>
+          {/* <p>
             <strong>Cout total des prestations :</strong> {totalPixProductCode}{" "}
             €
-          </p>
+          </p> */}
         </div>
       </div>
 

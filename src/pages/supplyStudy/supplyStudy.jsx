@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import GaugeChart from "react-gauge-chart";
+import { toast } from "react-toastify";
 
 export default function SupplyStudy() {
   const { duplicateQuotationId } = useParams();
@@ -77,6 +78,9 @@ export default function SupplyStudy() {
       ...prev,
       quotation_lines: [...prev.quotation_lines, newLine],
     }));
+
+    // Affiche une notification
+    toast.success("Nouvelle ligne ajoutée avec succès !");
   };
 
   // Sauvegarde les modifications dans Firestore
@@ -110,10 +114,11 @@ export default function SupplyStudy() {
 
       const docRef = doc(db, "supplyStudy", duplicateQuotationId);
       await updateDoc(docRef, updatedQuotation);
-      alert("Modifications enregistrées avec succès !");
+toast.success("Modifications enregistrées avec succès !");
+
     } catch (err) {
       console.error("Erreur lors de la sauvegarde des modifications :", err);
-      alert("Erreur lors de la sauvegarde des modifications.");
+      toast.error("Erreur lors de la sauvegarde des modifications.");
     }
   };
 
@@ -128,7 +133,8 @@ export default function SupplyStudy() {
         supply_study_finished: true,
       });
 
-      alert("Étude finalisée et données enregistrées avec succès !");
+
+      toast.success("L'étude a été notifiée comme finalisée !");
     } catch (err) {
       console.error("Erreur lors de la finalisation de l'étude :", err);
       alert("Erreur lors de la finalisation de l'étude.");
