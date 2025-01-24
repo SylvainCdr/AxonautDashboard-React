@@ -116,11 +116,6 @@ export default function ProjectDetails() {
 
   console.log("supplierContracts :", supplierContracts);
 
-  // Calcul de la marge réelle
-  const margeReelle =
-    (project.actual_revenue - project.actual_expenses_cost) /
-    project.actual_revenue;
-
   // Préparation des données pour le graphique
   const difference = project.actual_revenue - project.actual_expenses_cost || 0;
 
@@ -154,15 +149,6 @@ export default function ProjectDetails() {
     { name: "Marge Nette Actuelle", difference },
   ];
 
-  // Calcul des totaux pour les dépenses TTC
-  const totalExpensesTTC = expenses.reduce(
-    (acc, expense) => acc + expense.total_amount,
-    0
-  );
-  const totalLeftToPayTTC = expenses.reduce(
-    (acc, expense) => acc + expense.left_to_pay,
-    0
-  );
 
   if (loading) {
     return (

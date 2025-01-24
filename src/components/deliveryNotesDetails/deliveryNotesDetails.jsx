@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchDeliveryNotesByProject, downloadDeliveryNote } from "../../services/api/deliveryNotes";
+import { fetchDeliveryNotesByProject } from "../../services/api/deliveryNotes";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 

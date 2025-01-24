@@ -3,7 +3,6 @@ import { fetchQuotations } from "../../services/api/quotations";
 import { fetchAxonautUsers } from "../../services/api/employees";
 import React, { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 // import SearchQuotations from "../../components/searchQuotations/searchQuotations";
@@ -15,7 +14,7 @@ export default function Quotations() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
 
-  const navigate = useNavigate();
+
 
   const [showClosed, setShowClosed] = useState(false); // false = En cours, true = Clôturés
 
@@ -284,7 +283,7 @@ export default function Quotations() {
                   </span>
                 ) : (
                   <span style={{ color: "black" }}>
-                    {quotation.supplyStudyFinished && (
+                    {quotation.supplyStudyFinished ? (
                       <span
                         role="img"
                         aria-label="check mark"
@@ -292,7 +291,7 @@ export default function Quotations() {
                       >
                         ✅
                       </span>
-                    ) || (
+                    ) : (
                       <span
                         role="img"
                         aria-label="hourglass"

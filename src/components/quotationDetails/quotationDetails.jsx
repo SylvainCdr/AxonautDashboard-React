@@ -8,7 +8,6 @@ import styles from "./style.module.scss";
 import GaugeChart from "react-gauge-chart";
 import { db } from "../../firebase/firebase";
 import {
-  addDoc,
   collection,
   query,
   where,

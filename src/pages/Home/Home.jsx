@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import styles from "./style.module.scss";
@@ -24,7 +24,6 @@ const item = {
 };
 
 function Homepage() {
-  const [loading, setLoading] = useState(true);
 
   return (
     <motion.div
@@ -64,7 +63,7 @@ function Homepage() {
           <Link to="/companies">Entreprises</Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/quotations">Projets</Link>
+          <Link to="/quotations">Commmandes & Projets</Link>
         </motion.div>
         <motion.div variants={item}>
           <Link to="/expense-report">Note de frais</Link>
