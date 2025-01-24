@@ -164,7 +164,7 @@ export default function Quotations() {
     return (
       <div className={styles.loaderContainer}>
         <GridLoader color="#4520ff" loading={loading} size={20} />
-        <p>Chargement des devis...</p>
+        <p>Chargement des commandes...</p>
       </div>
     );
   }
