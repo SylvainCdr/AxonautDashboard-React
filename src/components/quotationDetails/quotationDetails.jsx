@@ -124,8 +124,8 @@ export default function QuotationDetails() {
 
       {/* // ici un badge si le contract.end_date est différent de null */}
       {contract.end_date && (
-        <div className={styles.badge}>
-          <p>Affaire cloturée le {contract.end_date} </p>
+        <div className={styles.badgeClosed}>
+          <p>Affaire cloturée sur Axonaut le {contract.end_date}</p>
         </div>
       )}
 
