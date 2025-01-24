@@ -1,15 +1,13 @@
+import { BASE_URL } from "../../url";
+
 export const fetchQuotations = async (page = 1) => {
   try {
-    const response = await fetch(
-      `http://localhost:3001/quotations?page=${page}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
+    const response = await fetch(`${BASE_URL}/quotations?page=${page}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Erreur HTTP ! Status : ${response.status}`);
@@ -26,52 +24,37 @@ export const fetchQuotations = async (page = 1) => {
   }
 };
 
-
-
-
 export const fetchQuotationById = async (quotationId) => {
-  const response = await fetch(
-    `http://localhost:3001/quotations/${quotationId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(`${BASE_URL}/quotations/${quotationId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des données du projet");
   }
   return response.json();
 };
-
-
 
 export const fetchQuotationByProjectId = async (projectId) => {
-  const response = await fetch(
-    `http://localhost:3001/quotations/project/${projectId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(`${BASE_URL}/quotations/project/${projectId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des données du projet");
   }
   return response.json();
 };
-
-
-// router.get("/quotations/search/:quotationNumber", SearchQuotationByNumber);
-
 
 export const searchQuotationByNumber = async (quotationNumber) => {
   const response = await fetch(
-    `http://localhost:3001/quotations/search/${quotationNumber}`,
+    `${BASE_URL}/quotations/search/${quotationNumber}`,
     {
       method: "GET",
       headers: {
@@ -84,7 +67,4 @@ export const searchQuotationByNumber = async (quotationNumber) => {
     throw new Error("Erreur lors de la récupération des données du projet");
   }
   return response.json();
-}
-
-
-
+};

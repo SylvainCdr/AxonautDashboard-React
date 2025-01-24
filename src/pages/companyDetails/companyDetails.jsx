@@ -60,6 +60,9 @@ export default function CompanyDetails() {
     loadInvoices();
   }, [companyId]);
 
+  console.log(company);
+  console.log(invoices);
+
   const statusColor = (status) => {
     if (status === "accepted") return "green";
     if (status === "pending") return "orange";
@@ -79,20 +82,9 @@ export default function CompanyDetails() {
         <p>Zip code: {company.address_zip_code}</p>
         <p>City: {company.address_city}</p>
         <p>Country: {company.address_country}</p>
-        <p>Comments: {company.comments}</p>
-        <p>Is prospect: {company.is_prospect ? "Yes" : "No"}</p>
-        <p>Is customer: {company.is_customer ? "Yes" : "No"}</p>
-        <p>Currency: {company.currency}</p>
-        <p>Language: {company.language}</p>
-        <p>Thirdparty code: {company.thirdparty_code}</p>
-        <p>Supplier thirdparty code: {company.supplier_thirdparty_code}</p>
-        <p>Intracommunity number: {company.intracommunity_number}</p>
-        <p>Siret: {company.siret}</p>
-        <p>Internal id: {company.internal_id}</p>
-        <p>Is B2C: {company.isB2C ? "Yes" : "No"}</p>
+      
         <p>Business manager: {company.business_manager?.name}</p>
-        <p>Custom fields: {JSON.stringify(company.custom_fields)}</p>
-        <p>Categories: {company.categories?.name}</p>
+       
         <p>
           Employees:{" "}
           {company.employees?.map((employee) => employee.firstname).join(", ")}
@@ -100,7 +92,7 @@ export default function CompanyDetails() {
         <p>Documents: {company.documents?.length}</p>
       </div>
       <div className={styles.section2}>
-        <h1>Devis & projet </h1>
+        <h1>commandes / projets </h1>
         <table>
           <thead>
             <tr>
@@ -148,9 +140,11 @@ export default function CompanyDetails() {
           <thead>
             <tr>
               <th>Number</th>
-              <th>Date</th>
+              <th>Date d'émission</th>
+              <th>Date de paiement</th>
               <th>Statut</th>
               <th>Montant HT</th>
+             
               <th>Voir </th>
             </tr>
           </thead>
@@ -161,16 +155,21 @@ export default function CompanyDetails() {
                 <td>{invoice.number}</td>
                 <td>{new Date(invoice.date).toLocaleDateString()}</td>
                 <td>{new Date(invoice.due_date).toLocaleDateString()}</td>
+                <td>
+                  <span style={{ color: statusColor(invoice.status) }}>
+                    {invoice.status}
+                  </span>
+                </td>
                 <td>{invoice.pre_tax_amount} €</td>
                 <td>
-                  <Link to={invoice.paid_invoice_pdf}>Voir</Link>
+                  <Link to={invoice.customer_portal_url}>Voir</Link>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <button onClick={() => navigate(-1)}>Back</button>
+      <button onClick={() => navigate(-1)}>Retour</button>
 
     </div>
   );

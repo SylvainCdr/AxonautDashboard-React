@@ -160,9 +160,9 @@ export default function QuotationDetails() {
         </div>
         <div className={styles.section2}>
           <div className={styles.gauge}>
-            <h3>Marge co </h3>
+            <h3>Marge commerciale </h3>
             <p>
-              <strong>Marge prévi :</strong> {quotation.margin.toFixed(2)} €
+              <strong>Marge prévisionnelle :</strong> {quotation.margin.toFixed(2)} €
             </p>
             <GaugeChart
               id="margin-gauge"
@@ -176,11 +176,11 @@ export default function QuotationDetails() {
             />
           </div>
 {/* // jauge avec les données du duplicateQuotation */}
+<h3>Marge réelle</h3>
 {isDuplicate && !isNaN(realMarginValue) && realMarginValue !== 0 ? (
   <div className={styles.gauge}>
-    <h3>Marge réelle</h3>
     <p>
-      <strong>Marge réelle : </strong> {realMarginValue.toFixed(2)} €
+      <strong> Marge réelle : </strong> {realMarginValue.toFixed(2)} €
     </p>
     <GaugeChart
       id="margin-gauge"

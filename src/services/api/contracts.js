@@ -1,13 +1,12 @@
+import { BASE_URL } from "../../url";
+
 export const fetchContractById = async (contractId) => {
-  const response = await fetch(
-    `http://localhost:3001/contracts/${contractId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(`${BASE_URL}/contracts/${contractId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des données du projet");
@@ -15,11 +14,18 @@ export const fetchContractById = async (contractId) => {
   return response.json();
 };
 
-export const fetchSupplierContractsByProjectTitle = async (projectTitle, estimatedStart) => {
+export const fetchSupplierContractsByProjectTitle = async (
+  projectTitle,
+  estimatedStart
+) => {
   if (!projectTitle) {
     throw new Error("Le titre du projet est requis.");
   }
-  console.log("fetchSupplierContractsByProjectTitle", projectTitle, estimatedStart);
+  console.log(
+    "fetchSupplierContractsByProjectTitle",
+    projectTitle,
+    estimatedStart
+  );
 
   try {
     const encodedTitle = encodeURIComponent(projectTitle.trim());
@@ -27,7 +33,7 @@ export const fetchSupplierContractsByProjectTitle = async (projectTitle, estimat
       ? `?estimatedStart=${encodeURIComponent(estimatedStart)}`
       : "";
     const response = await fetch(
-      `http://localhost:3001/supplier-contracts/${encodedTitle}${queryParams}`,
+      `${BASE_URL}/supplier-contracts/${encodedTitle}${queryParams}`,
       {
         method: "GET",
         headers: {

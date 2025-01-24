@@ -1,24 +1,28 @@
+import { BASE_URL } from "../../url";
 
 export const fetchExpensesByProject = async (startDate, endDate, projectId) => {
   try {
     if (!startDate || !endDate || !projectId) {
-      throw new Error("Les paramètres 'startDate', 'endDate', et 'projectId' sont requis.");
+      throw new Error(
+        "Les paramètres 'startDate', 'endDate', et 'projectId' sont requis."
+      );
     }
 
-
-
-    const url = `http://localhost:3001/expensesByProject?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(
-      endDate
-    )}&projectId=${encodeURIComponent(projectId)}`;
+    const url = `${BASE_URL}/expensesByProject?startDate=${encodeURIComponent(
+      startDate
+    )}&endDate=${encodeURIComponent(endDate)}&projectId=${encodeURIComponent(
+      projectId
+    )}`;
 
     const response = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur lors de la récupération des dépenses : ${response.statusText}`);
+      throw new Error(
+        `Erreur lors de la récupération des dépenses : ${response.statusText}`
+      );
     }
 
     const data = await response.json();
@@ -30,10 +34,9 @@ export const fetchExpensesByProject = async (startDate, endDate, projectId) => {
   }
 };
 
-
 export const postExpenseReport = async (expense) => {
   try {
-    const url = "http://localhost:3001/create-expense-report";
+    const url = "${BASE_URL}/create-expense-report";
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,7 +46,9 @@ export const postExpenseReport = async (expense) => {
     if (!response.ok) {
       const errorResponse = await response.json();
       console.error("Erreur API côté backend :", errorResponse);
-      throw new Error(`Erreur API : ${errorResponse.message || response.statusText}`);
+      throw new Error(
+        `Erreur API : ${errorResponse.message || response.statusText}`
+      );
     }
 
     return await response.json();
@@ -52,4 +57,3 @@ export const postExpenseReport = async (expense) => {
     throw error;
   }
 };
-

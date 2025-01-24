@@ -1,67 +1,139 @@
-// style.module.scss
 .companyDetailsContainer {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-width: 900px;
-  color: #555;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  color: #333;
   margin: 0 auto;
-  padding-top: 6rem;
-
-.section2, .section3 {
-  margin-top: 3rem;
-}
 
 
-p {
-  font-size: 1rem;
 
-  line-height: 1.5;
-  margin: 10px 0;
-}
+  .section1, .section2, .section3 {
+    margin-top: 2rem;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
-p strong {
-  font-weight: 600;
-}
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
 
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
+      thead {
+        background-color: #4520ff;
+        color: white;
+        font-size: 1rem;
+      }
 
-  &:hover {
-    background-color: #0056b3;
+      th, td {
+        text-align: left;
+        padding: 12px;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #ddd;
+      }
+
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+
+      th {
+        font-weight: 600;
+      }
+
+      td {
+        color: #555;
+      }
+
+      .action {
+        text-align: center;
+      }
+    }
+
+    button {
+      background-color: #4520ff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #3018b5;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    a {
+      color: #4520ff;
+      text-decoration: none;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #3018b5;
+      }
+    }
   }
 
-  &:focus {
-    outline: none;
-  }
-}
+ 
 
-// Spacing between different sections
-.companyDetailsContainer p + p {
-  margin-top: 10px;
-}
 
-// Responsive design for small screens
-@media (max-width: 768px) {
-  .companyDetailsContainer {
-    padding: 15px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
 
   p {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 10px 0;
+
+    strong {
+      font-weight: 700;
+      color: #4520ff;
+    }
   }
-}
+
+  button.back {
+    display: block;
+    margin: 30px auto;
+    background-color: #6c757d;
+    &:hover {
+      background-color: #5a6268;
+    }
+  }
+
+  .noDataMessage {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+
+    h1 {
+      font-size: 1.8rem;
+    }
+
+    .section1, .section2, .section3 {
+      padding: 15px;
+
+      table {
+        th, td {
+          font-size: 0.85rem;
+          padding: 10px;
+        }
+      }
+    }
+
+    button {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+    }
+  }
 }

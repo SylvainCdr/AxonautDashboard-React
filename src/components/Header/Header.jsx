@@ -66,7 +66,7 @@ function Header() {
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              Clients
+              Entreprises
             </NavLink>
           </li>
           <li className={styles.navLi}>
@@ -75,7 +75,7 @@ function Header() {
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              Commandes & Projets
+              Commandes / Projets
             </NavLink>
           </li>
           <li className={styles.navLi}>

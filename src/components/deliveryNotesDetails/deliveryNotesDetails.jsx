@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { fetchDeliveryNotesByProject } from "../../services/api/deliveryNotes";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
+import { BASE_URL } from "../../url";
 
 export default function DeliveryNotesDetails() {
   const { projectId } = useParams();
@@ -31,7 +32,7 @@ export default function DeliveryNotesDetails() {
   const handleDownloadDeliveryNote = async (deliveryNoteId) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/downloadDeliveryNote?deliveryNoteId=${deliveryNoteId}`
+        `${BASE_URL}/downloadDeliveryNote?deliveryNoteId=${deliveryNoteId}`
       );
       const data = await response.json();
       const base64PDF = data.deliveryNote;
@@ -85,10 +86,12 @@ export default function DeliveryNotesDetails() {
 
       {/* Bouton pour charger les bons de livraison */}
       {!showDeliveryNotes && (
-        <button onClick={() => {
-          loadDeliveryNotes(); // Charge les données au clic
-          setShowDeliveryNotes(true); // Affiche les bons de livraison après chargement
-        }}>
+        <button
+          onClick={() => {
+            loadDeliveryNotes(); // Charge les données au clic
+            setShowDeliveryNotes(true); // Affiche les bons de livraison après chargement
+          }}
+        >
           Voir les Bons de livraison
         </button>
       )}
@@ -116,10 +119,16 @@ export default function DeliveryNotesDetails() {
                   <tr onClick={() => toggleDeliveryNote(note.id)}>
                     <td>{note.file_name}</td>
                     <td>
-                      {new Date(note.delivery_form_date.date).toLocaleDateString()}
+                      {new Date(
+                        note.delivery_form_date.date
+                      ).toLocaleDateString()}
                     </td>
                     <td>
-                      {note.address.delivery_address_company_name}, {note.address.delivery_address_street}, {note.address.delivery_address_zip_code} {note.address.delivery_address_town}, {note.address.delivery_address_country}
+                      {note.address.delivery_address_company_name},{" "}
+                      {note.address.delivery_address_street},{" "}
+                      {note.address.delivery_address_zip_code}{" "}
+                      {note.address.delivery_address_town},{" "}
+                      {note.address.delivery_address_country}
                     </td>
                     <td>{note.comment || "Aucun commentaire"}</td>
                     <td>
@@ -128,7 +137,9 @@ export default function DeliveryNotesDetails() {
                       </button>
                     </td>
                     <td>
-                      <button onClick={() => handleDownloadDeliveryNote(note.id)}>
+                      <button
+                        onClick={() => handleDownloadDeliveryNote(note.id)}
+                      >
                         Télécharger
                       </button>
                     </td>
@@ -141,7 +152,9 @@ export default function DeliveryNotesDetails() {
                         <ul className={styles.productsList}>
                           {note.products.map((product) => (
                             <li key={product.id}>
-                              <strong>{product.name}</strong> - {product.description} - {parseFloat(product.price).toFixed(2)} €
+                              <strong>{product.name}</strong> -{" "}
+                              {product.description} -{" "}
+                              {parseFloat(product.price).toFixed(2)} €
                             </li>
                           ))}
                         </ul>

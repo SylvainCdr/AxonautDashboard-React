@@ -1,114 +1,123 @@
 .loaderContainer {
   display: flex;
-  flex-direction: column; 
-  gap : 3rem;
-  justify-content: center; /* Centrage horizontal */
-  align-items: center; /* Centrage vertical */
-  min-height: 100vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   text-align: center;
-  color : black;
-
+  color: black;
 }
 
 .companiesContainer {
   display: flex;
-  flex-direction: column; 
-  gap : 3rem;
-  justify-content: center; /* Centrage horizontal */
-  align-items: center; /* Centrage vertical */
-  min-height: 100vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
-  text-align: center;
-  color : black;
-  padding-top : 6rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  color: #333;
+  padding-top: 6rem;
   width: 100%;
- 
+  max-width: 1400px;
+  margin: 0 auto;
+}
 
-  .filterContainer {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+
+
+
+.companiesContainer table {
+  width: 95%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.companiesContainer th,
+.companiesContainer td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.companiesContainer th {
+  padding: 15px;
+  background-color: #4520ff;
+  color: white;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.companiesContainer tr:hover {
+  background-color: #f1f8ff;
+}
+
+.companiesContainer td {
+  background-color: white;
+}
+
+.companiesContainer td button {
+  padding: 8px 16px;
+  background-color: #4520ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.companiesContainer td button:hover {
+  background-color: #0056b3;
+}
+
+.paginationButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.paginationButtons button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.paginationButtons button:hover {
+  background-color: #218838;
+}
+
+.paginationButtons button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .companiesContainer {
+    padding: 1rem;
   }
-  
-  .filterContainer button {
-    padding: 10px 15px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    cursor: pointer;
-  }
-  
-  .filterContainer button.active {
-    background-color: #3498db;
-    color: #fff;
-    border-color: #3498db;
-  }
-  
 
-
-
-  table {
-    max-width: 1200px;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    color : black;
-
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border: 1px solid #ddd;
-      background-color: #f4f4f4;
-    }
-
-    th {
-      background-color: #f4f4f4;
-      font-weight: bold;
-    }
-
-  
-    tr:hover {
-      background-color: #bababa;
-    }
-
-    td {
-      font-size: 0.95rem;
-    }
-
-    button {
-      padding: 5px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-
-      &:hover {
-        background-color: #0056b3;
-      }
-    }
+  .companiesContainer h1 {
+    font-size: 1.5rem;
   }
 
-  .paginationButtons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+  .companiesContainer table {
+    font-size: 0.85rem;
+  }
 
-    button {
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-
-      &:hover {
-        background-color: #218838;
-      }
-    }
-
-    button:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
-    }
+  .paginationButtons button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
   }
 }
