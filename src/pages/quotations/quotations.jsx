@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 // import SearchQuotations from "../../components/searchQuotations/searchQuotations";
-import SearchQuotationsV2 from "../../components/searchQuotationsV2/searchQuotationsV2";
+import SearchQuotationV2 from "../../components/searchQuotationV2/searchQuotationV2";
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
@@ -24,10 +24,6 @@ export default function Quotations() {
   );
   
 
-  // Fonction pour naviguer vers les détails du projet
-  const handleClickProject = (quotationId, projectId) => {
-    navigate(`/quotations/${quotationId}/project/${projectId}`);
-  };
 
   // Mise à jour de l'état "Clôturé"
   const handleToggleClosed = async (quotationId, currentState) => {
@@ -201,7 +197,9 @@ export default function Quotations() {
 </div>
 
 
-      <SearchQuotationsV2 />
+      {/* <SearchQuotationsV2 /> */}
+      <SearchQuotationV2 cachedQuotations={quotations} />
+
 
       <table className={styles.quotationTable}>
         <thead>
@@ -307,7 +305,6 @@ export default function Quotations() {
                   </span>
                 )}
               </td>
-
               <td>
                 <input
                   type="checkbox"
@@ -319,13 +316,26 @@ export default function Quotations() {
                 />
               </td>
               <td className={styles.actionCell}>
+                {/* // bouton mais voir dans une autre fenetre */}
                 <button
+                  onClick={() => {
+                    window.open(`/quotations/${quotation.id}/project/${quotation.project_id}`);
+                  }}
+                >
+                  Voir
+                </button>
+                
+                
+               
+
+
+                {/* <button
                   onClick={() =>
                     handleClickProject(quotation.id, quotation.project_id)
                   }
                 >
                   Voir
-                </button>
+                </button> */}
               </td>
             </tr>
           ))}
