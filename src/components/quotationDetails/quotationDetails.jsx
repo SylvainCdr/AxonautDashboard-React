@@ -173,6 +173,7 @@ export default function QuotationDetails() {
               percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
               textColor="#000"
               needleColor="#4520ff"
+              size={200}
             />
           </div>
 {/* // jauge avec les données du duplicateQuotation */}

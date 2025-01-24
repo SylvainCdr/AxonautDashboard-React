@@ -7,8 +7,8 @@
   min-height: 60vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
   text-align: center;
   color: black;
-  width: 100%;
   max-width: 1400px;
+  margin: auto;
 }
 
 .quotationContainer {
@@ -26,8 +26,6 @@
 
   .header {
     display: inline-flex;
-    justify-content: space-between;
-  
     margin-bottom: 20px;
     gap: 10px;
 

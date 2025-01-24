@@ -233,6 +233,7 @@ export default function ProjectDetails() {
           <h3>
             <strong>Marge (%) </strong>
           </h3>
+          <div className={styles.projectGauge}>
           {project.actual_revenue && project.actual_expenses_cost ? (
             <GaugeChart
               id="margin-gauge"
@@ -246,17 +247,20 @@ export default function ProjectDetails() {
                   : 0
               }
               arcsLength={[0.15, 0.1, 0.3, 0.45]}
+              arcWidth={0.3}
               colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
               textColor="#000"
               needleColor="#4520ff"
               arcPadding={0.02}
-              responsive
-            />
-          ) : (
-            <p className={styles.noDataMessage}>
+              size={200}
+              />
+            )
+            : (
+              <p className={styles.noDataMessage}>
               Pas assez de données pour afficher la jauge.
             </p>
           )}
+          </div>
         </div>
       </div>
 
