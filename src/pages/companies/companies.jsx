@@ -3,6 +3,7 @@ import { fetchCompanies } from "../../services/api/companies";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import { useNavigate } from "react-router-dom";
+import SearchCompany from "../../components/searchCompany/searchCompany";
 
 export default function Companies() {
   const [companies, setCompanies] = useState([]);
@@ -51,6 +52,7 @@ export default function Companies() {
     <div className={styles.companiesContainer}>
       <h1>Liste des entreprises</h1>
 
+   <SearchCompany cachedCompanies={companies} />
   
 
       <table>

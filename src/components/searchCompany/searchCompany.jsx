@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { searchCompanyByName } from "../../services/api/quotations";
+import { searchCompanyByName } from "../../services/api/companies";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { searchCompanyByName } from "../../services/api/companies";
 
-export default function SearchQuotation({ cachedCompanies = [] }) {
+export default function SearchCompany({ cachedCompanies = [] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
-  const [company, setCompany] = useState({});
-  const [hasSearched, setHasSearched] = useState(false); // Nouvel état pour suivre les recherches
+  const [companies, setCompanies] = useState([]); // Stocke tous les résultats
+  const [hasSearched, setHasSearched] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchSubmit = async () => {
@@ -22,22 +21,20 @@ export default function SearchQuotation({ cachedCompanies = [] }) {
     const normalizedSearch = search.toLowerCase();
 
     // Étape 1 : Recherche côté client
-    const clientResult = cachedCompanies.find((company) => {
-      const normalizedCompanyName = company.name
-        .toLowerCase()
-      return normalizedCompanyName === normalizedSearch;
-    });
+    const clientResults = cachedCompanies.filter((company) =>
+      company.name.toLowerCase().includes(normalizedSearch)
+    );
 
-    if (clientResult) {
-      setCompany(clientResult);
-      return; // Arrêter ici si un résultat est trouvé côté client
+    if (clientResults.length > 0) {
+      setCompanies(clientResults);
+      return; // Arrêter ici si des résultats sont trouvés côté client
     }
 
     // Étape 2 : Recherche côté serveur si aucun résultat côté client
     setLoading(true);
     try {
       const data = await searchCompanyByName(normalizedSearch);
-      setCompany(data);
+      setCompanies(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -51,8 +48,8 @@ export default function SearchQuotation({ cachedCompanies = [] }) {
     }
   };
 
-  const handleQuotationClick = (companyId) => {
-    navigate(`/Companies/${companyId}`);
+  const handleCompanyClick = (companyId) => {
+    navigate(`/companies/${companyId}`);
   };
 
   return (
@@ -73,41 +70,48 @@ export default function SearchQuotation({ cachedCompanies = [] }) {
       )}
       {error && <p className={styles.error}>{error}</p>}
 
-      <div className={styles.searchResults}>
-        {quotation.id ? (
-          <div
-            key={quotation.id}
-            onClick={() =>
-              handleQuotationClick(quotation.id, quotation.project_id)
-            }
-            className={styles.projectRow}
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Adresse</th>
-                  <th>Code postal</th>
-                  <th>Ville</th>
-                  <th>Pays</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
+      {/* Tableau unique pour tous les résultats */}
+      {companies.length > 0 ? (
+        <div className={styles.resultsContainer}>
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Adresse</th>
+                <th>Création</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {companies.map((company) => (
+                <tr
+                  key={company.id}
+                  className={styles.projectRow}
+                >
                   <td>{company.name}</td>
-                  <td>{company.address}</td>
-                  <td>{company.zip_code}</td>
-                  <td>{company.city}</td>
-                  <td>{company.country}</td>
+                  <td>
+                    {company.address_street}, {company.address_city} (
+                    {company.address_zip_code})
+                  </td>
+                  <td>
+                    {new Date(company.creation_date).toLocaleDateString()}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleCompanyClick(company.id)}
+                      className={styles.actionButton}
+                    >
+                      Voir
+                    </button>
+                  </td>
                 </tr>
-              </tbody>
-            </table>
-          </div>
-        ) : hasSearched ? (
-          <p>Aucun résultat trouvé</p>
-        ) : null}
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        hasSearched && <p>Aucun résultat trouvé</p>
+      )}
     </div>
   );
 }
-
