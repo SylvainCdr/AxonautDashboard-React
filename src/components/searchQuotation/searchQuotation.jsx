@@ -1,58 +1,49 @@
-import React, { useState } from "react";
-import { fetchQuotations } from "../../services/api/quotations";
+import { useState } from "react";
+import { searchQuotationByNumber } from "../../services/api/quotations";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 
-export default function SearchQuotation() {
-  const [quotations, setQuotations] = useState([]); // Projets récupérés après recherche
+export default function SearchQuotation({ cachedQuotations = [] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
-  const [submittedSearch, setSubmittedSearch] = useState(""); // Garde la recherche soumise
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 10; // Nombre de projets par page
-  const navigate = useNavigate(); // Hook pour la navigation
+  const [quotation, setQuotation] = useState({});
+  const [hasSearched, setHasSearched] = useState(false); // Nouvel état pour suivre les recherches
+  const navigate = useNavigate();
 
   const handleSearchSubmit = async () => {
     if (!search.trim()) return; // Ne rien faire si le champ est vide
-    setLoading(true);
     setError(null);
-    setSubmittedSearch(search); // Enregistre la recherche effectuée
+    setHasSearched(true); // Marquer qu'une recherche a été effectuée
+
+    // Normalisez la saisie de l'utilisateur
+    const normalizedSearch = search.toLowerCase().replace(/^pix/, "");
+
+    // Étape 1 : Recherche côté client
+    const clientResult = cachedQuotations.find((quotation) => {
+      const normalizedQuotationNumber = quotation.number
+        .toLowerCase()
+        .replace(/^pix/, ""); // Normalisez le numéro des devis
+      return normalizedQuotationNumber === normalizedSearch;
+    });
+
+    if (clientResult) {
+      setQuotation(clientResult);
+      return; // Arrêter ici si un résultat est trouvé côté client
+    }
+
+    // Étape 2 : Recherche côté serveur si aucun résultat côté client
+    setLoading(true);
     try {
-      const data = await fetchQuotations(); // Charger tous les projets
-      const lowerSearch = search.toLowerCase();
-      const filtered = data.filter(
-        (quotation) =>
-          quotation.title.toLowerCase().includes(lowerSearch) ||
-          quotation.company_name.toLowerCase().includes(lowerSearch)
-      );
-      setQuotations(filtered);
-      setPage(1); // Réinitialiser la pagination
+      const data = await searchQuotationByNumber(normalizedSearch);
+      setQuotation(data);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className={styles.loaderContainer}>
-        <BarLoader color="#4520ff" loading={loading} size={20} />
-        <p>Chargement des résultats...</p>
-      </div>
-    );
-  }
-
-  const handlePageChange = (direction) => {
-    setPage((prevPage) => Math.max(1, prevPage + direction)); // Pagination (1 minimum)
-  };
-
-  const paginatedQuotations = quotations.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -61,87 +52,61 @@ export default function SearchQuotation() {
   };
 
   const handleQuotationClick = (quotationId, projectId) => {
-    // Naviguer vers le chemin incluant `quotationId` et `projectId`
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
 
-  const statusColor = (status) => {
-    if (status === "accepted") return "green";
-    if (status === "pending") return "orange";
-    if (status === "refused") return "red";
-    return "black";
-  };
-
   return (
-    <div className={styles.searchProjectContainer}>
-      <div className={styles.searchBar}>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyPress={handleKeyPress} // Recherche au clavier (Enter)
-          placeholder="Entreprise ou numéro du devis"
-        />
-        <button onClick={handleSearchSubmit}>Rechercher</button>
-      </div>
-
-      {error && <p>Erreur : {error}</p>}
-
-      {/* {!submittedSearch && !loading && <p>Veuillez entrer un terme de recherche.</p>} */}
-
-      <div className={styles.searchResults}>
-        {paginatedQuotations.length > 0
-          ? paginatedQuotations.map((quotation) => (
-              <div
-                key={quotation.id}
-                onClick={() =>
-                  handleQuotationClick(quotation.id, quotation.project_id)
-                }
-                className={styles.projectRow}
-              >
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Numéro</th>
-                      <th>Nom</th>
-                      <th>Client</th>
-                      <th>Date de début</th>
-                      <th>Statut</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{quotation.number}</td>
-                      <td>{quotation.title}</td>
-                      <td>{quotation.company_name}</td>
-                      <td>{new Date(quotation.date).toLocaleDateString()}</td>
-                      <td>
-                        <span style={{ color: statusColor(quotation.status) }}>
-                          {quotation.status}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            ))
-          : submittedSearch &&
-            !loading && <p>Aucun projet trouvé pour "{submittedSearch}".</p>}
-      </div>
-
-      {quotations.length > itemsPerPage && (
-        <div>
-          <button onClick={() => handlePageChange(-1)} disabled={page <= 1}>
-            Page précédente
-          </button>
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={page * itemsPerPage >= quotations.length}
-          >
-            Page suivante
-          </button>
+    <div className={styles.searchContainer}>
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={handleKeyPress}
+        placeholder="Numéro de devis"
+      />
+      <button onClick={handleSearchSubmit}>Rechercher</button>
+      {loading && (
+        <div className={styles.loaderContainer}>
+          <BarLoader color="#4520ff" loading={loading} size={20} />
+          <p>Chargement des résultats...</p>
         </div>
       )}
+      {error && <p className={styles.error}>{error}</p>}
+
+      <div className={styles.searchResults}>
+        {quotation.id ? (
+          <div
+            key={quotation.id}
+            onClick={() =>
+              handleQuotationClick(quotation.id, quotation.project_id)
+            }
+            className={styles.projectRow}
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>Numéro</th>
+                  <th>Nom</th>
+                  <th>Client</th>
+                  <th>Date de début</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{quotation.number}</td>
+                  <td>{quotation.title}</td>
+                  <td>{quotation.company_name}</td>
+                  <td>{new Date(quotation.date).toLocaleDateString()}</td>
+                  <td>{quotation.status}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          hasSearched && <p>Aucun résultat trouvé</p> // Afficher uniquement si une recherche a été effectuée
+        )}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { auth } from "../../firebase/firebase";
+import { auth, db } from "../../firebase/firebase"; // Assurez-vous d'importer Firestore
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore"; // Firestore utilities
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import styles from "./style.module.scss";
@@ -17,12 +18,34 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log("Utilisateur connecté :", userCredential.user);
+      // Connexion utilisateur
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      console.log("Utilisateur connecté :", user);
+
+      // Récupérer la référence du document utilisateur
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        // Si le document utilisateur n'existe pas, le créer
+        await setDoc(userDocRef, {
+          id: user.uid,
+          uid: user.uid,
+          email: user.email,
+          role: "user", // Rôle par défaut
+          createdAt: serverTimestamp(),
+          lastConnection: serverTimestamp(),
+        });
+        console.log("Nouvel utilisateur ajouté à Firestore.");
+      } else {
+        // Si le document utilisateur existe, mettre à jour la dernière connexion
+        await updateDoc(userDocRef, {
+          lastConnection: serverTimestamp(),
+        });
+        console.log("Dernière connexion mise à jour.");
+      }
 
       // Afficher une notification de succès
       toast.success("Connexion réussie !");
@@ -32,7 +55,7 @@ export default function Login() {
     } catch (err) {
       console.error("Erreur de connexion :", err.message);
 
-      // Afficher un message d'erreur clair
+      // Gérer les erreurs
       if (err.code === "auth/user-not-found") {
         setError("Utilisateur non trouvé.");
       } else if (err.code === "auth/wrong-password") {
@@ -57,9 +80,7 @@ export default function Login() {
   };
 
   return (
-    <div className={styles.loginContainer}> 
-
-      {/* Animation spéciale pour l'image */}
+    <div className={styles.loginContainer}>
       <motion.img
         src="assets/logo-dark.png"
         alt=""
@@ -72,7 +93,6 @@ export default function Login() {
         }}
       />
       <p className={styles.cross}>X</p>
-      {/* Animation spéciale pour l'image */}
       <motion.img
         src="assets/axo.png"
         alt=""
@@ -91,7 +111,6 @@ export default function Login() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         onKeyDown={handleKeyPress}
-       
       />
       <input
         type="password"
@@ -99,16 +118,11 @@ export default function Login() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyDown={handleKeyPress}
-   
       />
-      <button
-        onClick={handleSignIn}
-        disabled={loading}
-     
-      >
+      <button onClick={handleSignIn} disabled={loading}>
         {loading ? "Connexion en cours..." : "Se connecter"}
       </button>
-      {error && <p >{error}</p>}
+      {error && <p>{error}</p>}
     </div>
   );
 }

@@ -5,8 +5,11 @@ import React, { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
-// import SearchQuotations from "../../components/searchQuotations/searchQuotations";
-import SearchQuotationV2 from "../../components/searchQuotationV2/searchQuotationV2";
+import SearchQuotation from "../../components/searchQuotation/searchQuotation";
+import { toast } from "react-toastify";
+
+
+
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
@@ -33,6 +36,14 @@ export default function Quotations() {
         quotationId.toString()
       );
       await setDoc(quotationRef, { isClosed: !currentState });
+      // alert
+      toast.success(
+        `La commande ${quotationId} a été ${
+          !currentState ? "clôturée" : "réouverte"
+        } avec succès.`
+      );
+      // Mise à jour de l'état dans le tableau
+
 
       setQuotations((prev) =>
         prev.map((quotation) =>
@@ -174,7 +185,7 @@ export default function Quotations() {
     <div className={styles.quotationsContainer}>
 
 
-      <h1>Gestion des Devis & Projets</h1>
+      <h1>Liste des Commandes & Projets</h1>
 
       <div className={styles.filterContainer}>
   <button
@@ -197,7 +208,7 @@ export default function Quotations() {
 
 
       {/* <SearchQuotationsV2 /> */}
-      <SearchQuotationV2 cachedQuotations={quotations} />
+      <SearchQuotation cachedQuotations={quotations} />
 
 
       <table className={styles.quotationTable}>

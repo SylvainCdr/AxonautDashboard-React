@@ -9,56 +9,53 @@
   color : black;
 
 }
-
-
-
-.searchProjectContainer {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f98e;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.searchContainer {
+  max-width: 1400px;
+  margin: 2rem auto;
+  // padding: 2rem;
+  background-color: #fdfdfd;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
   
-  
-  .searchBar {
-    width: 100%;
-    
-    display: flex;
-
- 
-
 
 
   input {
-    width: 70%;
-    padding: 10px;
-    margin-right: 10px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px 16px;
+    font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 16px;
     outline: none;
+    margin-bottom: 1rem;
     transition: border-color 0.3s;
-
 
     &:focus {
       border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
     }
   }
 
   button {
-    width: 30%;
     padding: 10px 20px;
-    background-color: #3498db;
+    font-size: 16px;
     color: #fff;
+    background-color: #3498db;
     border: none;
     border-radius: 4px;
-    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 
     &:hover {
-      background-color: #2980b9;
+      background-color: #217dbb;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      background-color: #1a5e91;
+      transform: translateY(1px);
     }
 
     &:disabled {
@@ -66,74 +63,93 @@
       cursor: not-allowed;
     }
   }
+
+  .error {
+    margin-top: 1rem;
+    color: #e74c3c;
+    font-size: 0.9rem;
+  }
+
+  .searchResults {
+    margin-top: 2rem;
+    .projectRow {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      transition: box-shadow 0.3s, transform 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: scale(1.02);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid #eee;
+        }
+
+        th {
+          background-color: #f4f4f4;
+          font-weight: 600;
+          font-size: 1rem;
+          color : #4520ff;
+        }
+
+        td {
+          font-size: 0.95rem;
+          color: #555;
+        }
+      }
+    }
+
+    p {
+      color: #555;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+  }
 }
 
-.searchResults {
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
 
-  width: 1200px;
+  p {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #3498db;
+  }
+}
 
-  .projectRow {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: box-shadow 0.3s, transform 0.3s;
-    cursor: pointer;
+@media (max-width: 768px) {
+  .searchContainer {
+    padding: 1.5rem;
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
 
-    &:hover {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transform: scale(1.01);
+  .searchResults {
+    .projectRow {
+      padding: 0.8rem;
     }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-
-      th, td {
-        text-align: left;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-        color : black;
+      th,
+      td {
+        font-size: 0.9rem;
       }
-
-      th {
-        background-color: #f4f4f4;
-        font-weight: bold;
-      }
-    }
-  }
-}
-
-  .pagination {
-    margin-top: 20px;
-    text-align: center;
-
-    button {
-      margin: 0 5px;
-      padding: 8px 12px;
-      font-size: 14px;
-    }
-  }
-
-  p {
-    margin-top: 20px;
-    text-align: center;
-    color: #555;
-    font-size: 16px;
-  }
-
-  .loaderContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 150px;
-
-    p {
-      margin-top: 10px;
-      color: #3498db;
-      font-size: 14px;
     }
   }
 }

@@ -72,7 +72,6 @@ export const fetchInvoicesByCompanyId = async (companyId) => {
   return response.json();
 };
 
-// router.get("/suppliers", getAllSuppliers);
 export const fetchSuppliers = async () => {
   const response = await fetch(`${BASE_URL}/suppliers`, {
     method: "GET",
@@ -87,3 +86,21 @@ export const fetchSuppliers = async () => {
   }
   return response.json();
 };
+
+export const searchCompanyByName = async (companyName) => {
+  const response = await fetch(
+    `${BASE_URL}/companies/search/${companyName}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Erreur lors de la récupération des données du projet");
+  }
+  return response.json();
+};
+
