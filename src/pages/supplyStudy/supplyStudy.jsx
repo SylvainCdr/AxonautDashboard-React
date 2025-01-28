@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import GaugeChart from "react-gauge-chart";
 import { toast } from "react-toastify";
+import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 
 export default function SupplyStudy() {
   const { duplicateQuotationId } = useParams();
@@ -237,7 +238,7 @@ export default function SupplyStudy() {
             <strong>Numéro :</strong> {quotation.number}
           </p>
           <p>
-            <strong>Titre :</strong> {quotation.title}
+            <strong>Titre :</strong> {decodeHtmlEntities(quotation.title)}
           </p>
           <p>
             <strong>Date :</strong>{" "}
@@ -375,7 +376,7 @@ export default function SupplyStudy() {
                   {/* Ligne du chapitre */}
                   <tr className={styles.chapterRow}>
                     <td colSpan="13" className={styles.chapterHeader}>
-                      <strong>{chapter}</strong>
+                      <strong>{ decodeHtmlEntities(chapter)}</strong>
                     </td>
                   </tr>
 

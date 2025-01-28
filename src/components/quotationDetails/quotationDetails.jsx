@@ -16,6 +16,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 
 export default function QuotationDetails() {
   const { quotationId } = useParams();
@@ -132,7 +133,7 @@ export default function QuotationDetails() {
       <div className={styles.header}>
         <div className={styles.section1}>
           <p>
-            <strong>Titre :</strong> {quotation.title}
+            <strong>Titre :</strong> {decodeHtmlEntities(quotation.title)}
           </p>
           <p>
             <strong>Entreprise :</strong> {quotation.company_name}

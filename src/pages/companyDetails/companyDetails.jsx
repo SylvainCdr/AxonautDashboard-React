@@ -7,6 +7,7 @@ import {
   fetchInvoicesByCompanyId,
 } from "../../services/api/companies";
 import { Link } from "react-router-dom";
+import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 
 export default function CompanyDetails() {
   const [company, setCompany] = useState({});
@@ -109,7 +110,7 @@ export default function CompanyDetails() {
               <tr key={quotation.id}>
                 <td>{quotation.number}</td>
                 <td>{new Date(quotation.date).toLocaleDateString()}</td>
-                <td>{quotation.title}</td>
+                <td>{decodeHtmlEntities(quotation.title)}</td>
                 <td>{quotation.pre_tax_amount} €</td>
                 <td>
                   <span style={{ color: statusColor(quotation.status) }}>

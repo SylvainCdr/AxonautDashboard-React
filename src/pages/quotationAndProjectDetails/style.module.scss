@@ -9,61 +9,49 @@
   color: rgb(0, 0, 0);
 }
 
-
-
 /* Conteneur principal du Dashboard */
 .quotationAndProjectContainer {
-    margin: 0 auto;
-    width: 100%;
-    padding-top: 6rem;
-    display: flex;
-    justify-content: space-around;
-    gap: 1rem; /* Espacement entre les sections */
-    flex-wrap: wrap;
-  }
-  
-  /* Barre latérale de navigation (peut être ajoutée à gauche) */
-  // .sidebar {
-  //   flex: 1 1 20%; /* Prend 20% de la largeur de l'écran */
-  //   background-color: #f8f8f8;
-  //   padding: 1rem;
-  //   border-radius: 8px;
-  //   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  // }
-  
-  /* Section principale */
-  .section {
-   flex : 1 1 45%; /* Prend 30% de la largeur de l'écran */
-    padding: 1rem;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  /* Titre de chaque section */
-  .section h2 {
-    font-size: 1.6rem;
-    color: #333;
-  }
-  
-  /* Cartes d'information avec des marges et de l'ombrage */
-  .card {
-    padding: 1rem;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .card p {
-    font-size: 1rem;
-    color: #555;
-  }
-  
+  margin: 0 auto;
+  width: 100%;
+  padding-top: 6rem;
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem; /* Espacement entre les sections */
+  flex-wrap: wrap;
+}
+
+/* Section principale */
+.section {
+  flex: 1 1 45%; /* Prend 30% de la largeur de l'écran */
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Titre de chaque section */
+.section h2 {
+  font-size: 1.6rem;
+  color: #333;
+}
+
+/* Cartes d'information avec des marges et de l'ombrage */
+.card {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card p {
+  font-size: 1rem;
+  color: #555;
+}

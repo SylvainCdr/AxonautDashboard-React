@@ -7,6 +7,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import SearchQuotation from "../../components/searchQuotation/searchQuotation";
 import { toast } from "react-toastify";
+import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 
 
 
@@ -164,11 +165,6 @@ export default function Quotations() {
       line.product_code?.startsWith("Pix_")
     );
 
-  const decodeHtmlEntities = (text) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, "text/html");
-    return doc.documentElement.textContent;
-  };
 
   if (loading) {
     return (
