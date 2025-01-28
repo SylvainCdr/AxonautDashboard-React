@@ -290,6 +290,7 @@ export default function SupplyStudy() {
                       arcWidth={0.3}
                       percent={entry.value / 100}
                       textColor="#000"
+                      needleColor="#4909c069"
                     />
                   </div>
                 )
@@ -333,7 +334,7 @@ export default function SupplyStudy() {
         )}
       </div>
 
-      <div className={styles.lines}>
+      <div className={styles.section3}>
         <h2>
           <i
             className="fa-solid fa-list"

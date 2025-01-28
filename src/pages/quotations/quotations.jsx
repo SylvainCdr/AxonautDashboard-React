@@ -9,8 +9,6 @@ import SearchQuotation from "../../components/searchQuotation/searchQuotation";
 import { toast } from "react-toastify";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 
-
-
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
@@ -18,15 +16,11 @@ export default function Quotations() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
 
-
-
   const [showClosed, setShowClosed] = useState(false); // false = En cours, true = Clôturés
 
   const filteredQuotations = quotations.filter(
     (quotation) => quotation.isClosed === showClosed
   );
-  
-
 
   // Mise à jour de l'état "Clôturé"
   const handleToggleClosed = async (quotationId, currentState) => {
@@ -44,7 +38,6 @@ export default function Quotations() {
         } avec succès.`
       );
       // Mise à jour de l'état dans le tableau
-
 
       setQuotations((prev) =>
         prev.map((quotation) =>
@@ -165,7 +158,6 @@ export default function Quotations() {
       line.product_code?.startsWith("Pix_")
     );
 
-
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -179,39 +171,35 @@ export default function Quotations() {
 
   return (
     <div className={styles.quotationsContainer}>
-
-
       <h1>Liste des Commandes & Projets</h1>
 
       <div className={styles.filterContainer}>
-  <button
-    className={`${styles.toggleButton} ${
-      !showClosed ? styles.activeButton : ""
-    }`}
-    onClick={() => setShowClosed(false)}
-  >
-    En cours
-  </button>
-  <button
-    className={`${styles.toggleButton} ${
-      showClosed ? styles.activeButton : ""
-    }`}
-    onClick={() => setShowClosed(true)}
-  >
-    Clôturés
-  </button>
-</div>
-
+        <button
+          className={`${styles.toggleButton} ${
+            !showClosed ? styles.activeButton : ""
+          }`}
+          onClick={() => setShowClosed(false)}
+        >
+          En cours
+        </button>
+        <button
+          className={`${styles.toggleButton} ${
+            showClosed ? styles.activeButton : ""
+          }`}
+          onClick={() => setShowClosed(true)}
+        >
+          Clôturés
+        </button>
+      </div>
 
       {/* <SearchQuotationsV2 /> */}
       <SearchQuotation cachedQuotations={quotations} />
-
 
       <table className={styles.quotationTable}>
         <thead>
           <tr>
             {/* <th>ID</th> */}
-            <th>Numéro</th>
+            <th>N°</th>
             <th>Titre</th>
             <th>Client</th>
             <th>Commercial(e)</th>
@@ -222,12 +210,12 @@ export default function Quotations() {
             <th>Marge co (€)</th>
             <th>Marge co (%)</th>
             <th>Marge réelle (%) </th>
-            <th>Clôturé</th>
+            <th>Fermer</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-        {filteredQuotations.map((quotation) => (
+          {filteredQuotations.map((quotation) => (
             <tr
               key={quotation.id}
               style={{
@@ -325,15 +313,13 @@ export default function Quotations() {
                 {/* // bouton mais voir dans une autre fenetre */}
                 <button
                   onClick={() => {
-                    window.open(`/quotations/${quotation.id}/project/${quotation.project_id}`);
+                    window.open(
+                      `/quotations/${quotation.id}/project/${quotation.project_id}`
+                    );
                   }}
                 >
                   Voir
                 </button>
-                
-                
-               
-
 
                 {/* <button
                   onClick={() =>

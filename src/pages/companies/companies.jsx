@@ -31,10 +31,6 @@ export default function Companies() {
     loadCompanies();
   }, [page]);
 
-
-
-  
-
   const handleNextPage = () => setPage((prev) => prev + 1);
   const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
@@ -52,16 +48,13 @@ export default function Companies() {
     <div className={styles.companiesContainer}>
       <h1>Liste des entreprises</h1>
 
-   <SearchCompany cachedCompanies={companies} />
-  
+      <SearchCompany cachedCompanies={companies} />
 
       <table>
         <thead>
           <tr>
             <th>Nom</th>
             <th>Adresse</th>
-            {/* <th>Code postal</th>
-            <th>Ville</th> */}
             <th>Création</th>
             <th>Actions</th>
           </tr>
@@ -71,8 +64,13 @@ export default function Companies() {
           {companies.map((company) => (
             <tr key={company.id}>
               <td>{company.name}</td>
-              <td>{company.address_street}, {company.address_city} ({company.address_zip_code})</td>
-           
+              <td>
+                {
+                  `${company.address_street || "N/A"}, ${
+                    company.address_city || "N/A"
+                  } (${company.address_zip_code || "N/A"})`.slice(0, 80).at
+                }
+              </td>
               <td>{new Date(company.creation_date).toLocaleDateString()}</td>
               <td>
                 <button
@@ -81,7 +79,6 @@ export default function Companies() {
                 >
                   Voir
                 </button>
-                
               </td>
             </tr>
           ))}

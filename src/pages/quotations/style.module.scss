@@ -12,11 +12,11 @@
 .quotationsContainer {
   display: flex;
   flex-direction: column;
-  padding: 2rem;
   background-color: #f9f9f9;
-  padding-top: 7rem;
+  padding-top: 6rem;
   max-width: 1400px;
   min-height: 100vh;
+  width: 100%;
   margin: 0 auto;
 
   .filterContainer {
@@ -24,7 +24,7 @@
     justify-content: center;
     margin-bottom: 1rem;
     gap: 1rem;
-  
+
     .toggleButton {
       padding: 0.5rem 1rem;
       background-color: #ddd;
@@ -33,20 +33,20 @@
       font-size: 1rem;
       cursor: pointer;
       transition: background-color 0.3s;
-  
+
       &:hover {
         background-color: #bbb;
       }
-  
+
       &.activeButton {
         background-color: #007bff;
         color: white;
       }
     }
   }
-  
 
   table {
+    max-width: 1400px;
     width: 100%;
     border-collapse: collapse;
     text-align: left;
@@ -65,7 +65,7 @@
           text-align: left;
           font-weight: bold;
           color: #fff;
-          font-size: 1rem;
+          font-size: 0.9rem;
           text-transform: uppercase;
           letter-spacing: 0.05rem;
         }
@@ -85,9 +85,10 @@
         }
 
         td {
-          padding: 0.8rem 1rem;
+          padding: 0.5rem 0.5rem;
           border-bottom: 1px solid #ddd;
           color: #333;
+          font-size: 0.8rem;
 
           &:first-child {
             font-weight: bold;
@@ -155,4 +156,3 @@
     }
   }
 }
-

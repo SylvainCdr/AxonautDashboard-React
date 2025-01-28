@@ -222,8 +222,6 @@ export default function CompanyDetails() {
           <p>Aucune facture trouvée.</p>
         )}
       </div>
-
-      <button onClick={() => navigate(-1)}>Retour</button>
     </div>
   );
 }

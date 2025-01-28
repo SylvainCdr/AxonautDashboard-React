@@ -26,19 +26,21 @@
     flex-wrap: wrap;
     margin-top: 20px;
 
-    img {
-      width: 150px;
-      height: 150px;
-      margin: 0 auto;
-      display: block;
-    }
-
     .companyLeft,
     .companyCenter,
     .companyRight {
       flex: 1;
       min-width: 300px;
       margin: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    img {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
     }
 
     p {
@@ -171,11 +173,6 @@
           padding: 10px;
         }
       }
-    }
-
-    button {
-      font-size: 0.85rem;
-      padding: 6px 12px;
     }
   }
 }

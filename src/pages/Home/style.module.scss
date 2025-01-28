@@ -10,17 +10,15 @@
 
   img {
     width: 100%;
-    max-width: 30%;
+    max-width: 25%;
   }
 
   .cross {
     font-size: 3rem;
     margin-top: 1.5rem;
     font-weight: 1000;
-    font-family:'Courier New', Courier, monospace;
+    font-family: "Courier New", Courier, monospace;
     color: rgb(198, 1, 1);
-    
- 
   }
 
   h1 {
@@ -36,12 +34,11 @@
     grid-template-columns: repeat(2, 1fr);
     justify-content: center;
     gap: 10px;
-    margin-top : 3rem;
-    
+    margin-top: 2rem;
+
     padding: 10px;
     background-color: var(--col1);
     border-radius: 3rem;
-
 
     a {
       text-decoration: none;
@@ -65,11 +62,11 @@
       -moz-border-radius: 3rem;
       -ms-border-radius: 3rem;
       -o-border-radius: 3rem;
-}
+    }
 
     a:hover {
       background-color: #53cbff;
-      color : white;
+      color: white;
       scale: 1.03;
     }
   }

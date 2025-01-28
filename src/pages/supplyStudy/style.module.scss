@@ -28,7 +28,7 @@
     display: flex;
     width: 95%;
     margin-bottom: 2rem;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
@@ -37,8 +37,8 @@
       width: 65%;
 
       p {
-        font-size: 1.1rem;
-        margin: 0.8rem 0;
+        font-size: 1rem;
+        padding: 0.4rem 0;
         color: #444;
 
         strong {
@@ -59,12 +59,13 @@
       }
 
       .gaugeContainer h4 {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
         color: #333; // Couleur des titres
       }
       .waitingMessage {
         color: #d9534f;
+
         font-size: 1.1rem;
         margin-top: 40px;
         margin-bottom: 10px;
@@ -78,7 +79,7 @@
 
     .warningMessage {
       color: #d9534f;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       margin-top: 40px;
       margin-bottom: 30px;
       text-align: center;
@@ -92,9 +93,9 @@
     }
   }
 
-  .lines {
+  .section3 {
     background-color: #ffffff;
-    padding: 2rem;
+
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
@@ -122,11 +123,18 @@
           color: #fff;
 
           th {
-            padding: 1rem;
             text-transform: uppercase;
+            padding: 0.4rem;
             font-size: 1rem;
           }
         }
+      }
+
+      input {
+        padding: 0.3rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 0.9rem;
       }
 
       tbody {
@@ -138,8 +146,8 @@
           }
 
           td {
-            padding: 1rem;
-            font-size: 1rem;
+            padding: 0.3rem;
+            font-size: 0.9rem;
             text-align: center;
 
             &.indicator {
