@@ -54,7 +54,7 @@ function Header() {
         <NavLink to="/" onClick={handleLinkClick}>
           <img
             // src="https://uploads.pixecurity.com/files/fav-pix-shop_1.png"
-            src="assets/axopix.png"
+            src="https://uploads.pixecurity.com/files/axopix.png"
             alt="ACCUEIL"
             className={styles.logo}
             loading="lazy"

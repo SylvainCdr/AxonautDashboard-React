@@ -73,6 +73,11 @@ export default function CompanyDetails() {
     loadInvoices();
   }, [companyId]);
 
+  console.log(company);
+  console.log(quotations);
+  console.log('invoices', invoices);
+
+ 
   const statusColor = (status) => {
     if (status === "accepted") return "green";
     if (status === "pending") return "orange";
