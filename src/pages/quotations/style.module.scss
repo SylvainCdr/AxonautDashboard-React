@@ -50,7 +50,7 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    font-size: 0.9rem;
+    font-size: 1rem;
     background: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -85,10 +85,10 @@
         }
 
         td {
-          padding: 0.5rem 0.5rem;
+          padding: 0.6rem 0.5rem;
           border-bottom: 1px solid #ddd;
           color: #333;
-          font-size: 0.8rem;
+          font-size: 0.9rem;
 
           &:first-child {
             font-weight: bold;
