@@ -142,7 +142,9 @@
           font-size: 0.9rem;
           color: white;
         }
+    
       }
+
 
       tbody {
         tr {
@@ -159,7 +161,14 @@
             font-size: 0.9rem;
             color: #555;
           }
+          .chapterRow {
+            background-color: #fdf1cc;
+            font-weight: bold;
+            text-align: center
+          }
         }
+   
+        
       }
     }
   }

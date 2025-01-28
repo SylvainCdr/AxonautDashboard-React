@@ -223,39 +223,60 @@ export default function QuotationDetails() {
         </button>
 
         {showDetails && (
-          <table>
-            <thead>
-              <tr>
-                <th>Référence</th>
-                <th>Désignation</th>
-                <th>Quantité</th>
-                <th>Prix unit HT</th>
-                <th>Montant total HT</th>
-                <th>PA unit</th>
-                <th>PA total</th>
-                <th>Marge total</th>
-                <th>Marge en %</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quotation.quotation_lines.map((line) => (
-                <tr key={line.id}>
-                  <td>{line?.product_code || ""}</td>
-                  <td>{line.product_name}</td>
-                  <td>{line.quantity}</td>
-                  <td>{line.price} €</td>
-                  <td>{line.pre_tax_amount} €</td>
-                  <td>{line.unit_job_costing} €</td>
-                  <td>{line.unit_job_costing * line.quantity} €</td>
-                  <td>{line.margin.toFixed(1)} €</td>
-                  <td>
-                    {((line.margin / line.pre_tax_amount) * 100).toFixed(1)} %
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+  <table>
+    <thead>
+      <tr>
+        <th>Référence</th>
+        <th>Désignation</th>
+        <th>Quantité</th>
+        <th>Prix unit HT</th>
+        <th>Montant total HT</th>
+        <th>PA unit</th>
+        <th>PA total</th>
+        <th>Marge total</th>
+        <th>Marge en %</th>
+      </tr>
+    </thead>
+    <tbody>
+      {Object.entries(
+        quotation.quotation_lines.reduce((groups, line) => {
+          const chapter = line.chapter || "Autres"; // Regroupez par `chapter`, ou "Autres" si non défini
+          if (!groups[chapter]) groups[chapter] = [];
+          groups[chapter].push(line);
+          return groups;
+        }, {})
+      ).map(([chapter, lines], chapterIndex) => (
+        <React.Fragment key={chapterIndex}>
+          {/* Affichage du chapitre */}
+          <tr >
+            <td colSpan="9" className={styles.chapterRow} >
+            {decodeHtmlEntities(chapter)}
+            </td>
+          </tr>
+          {/* Affichage des lignes dans le chapitre */}
+          {lines.map((line) => (
+            <tr key={line.id}>
+              <td>{line?.product_code || ""}</td>
+              <td>{line.product_name}</td>
+              <td>{line.quantity}</td>
+              <td>{line.price} €</td>
+              <td>{line.pre_tax_amount} €</td>
+              <td>{line.unit_job_costing} €</td>
+              <td>{(line.unit_job_costing * line.quantity).toFixed(2)} €</td>
+              <td>{line.margin.toFixed(1)} €</td>
+              <td>
+                {(
+                  (line.margin / line.pre_tax_amount) *
+                  100
+                ).toFixed(1)} %
+              </td>
+            </tr>
+          ))}
+        </React.Fragment>
+      ))}
+    </tbody>
+  </table>
+)}
 
         <div className={styles.totals}>
           <p>
