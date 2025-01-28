@@ -167,9 +167,9 @@ export default function QuotationDetails() {
             </p>
             <GaugeChart
               id="margin-gauge"
-              nrOfLevels={6}
-              colors={["#FF5F6D", "#0ef124"]}
-              arcWidth={0.3}
+              arcsLength={[0.15, 0.13, 0.27, 0.45]}
+              arcWidth={0.2}
+              colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
               percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
               textColor="#000"
               needleColor="#4520ff"
@@ -185,9 +185,9 @@ export default function QuotationDetails() {
     </p>
     <GaugeChart
       id="margin-gauge"
-      nrOfLevels={6}
-      colors={["#FF5F6D", "#0ef124"]}
+      arcsLength={[0.15, 0.13, 0.27, 0.45]}
       arcWidth={0.3}
+      colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
       percent={(realMarginPercent / 100).toFixed(3)}
       textColor="#000"
       needleColor="#4520ff"
@@ -195,7 +195,7 @@ export default function QuotationDetails() {
   </div>
 ) : (
   // Message si pas de duplicateQuotation ou si marge réelle indisponible
-  <div className={styles.gauge}>
+  <div className={styles.emptyGauge}>
     <p>Étude d'appro</p>
     <span
       role="img"

@@ -63,7 +63,7 @@
         color: #333;
         margin-bottom: 10px;
         font-weight: 500;
-        background-color: #12a0f340;
+        background-color: #12a1f325;
         padding: 8px 0px;
         border-radius: 8px;
       }
@@ -82,6 +82,17 @@
         justify-content: center;
         max-height: 300px;
         max-width: 350px;
+      }
+
+      .emptyGauge {
+        width: 100%;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        max-height: 300px;
+        max-width: 350px;
+        background-color: #fffcea;
+        border-radius: 8px;
       }
     }
   }

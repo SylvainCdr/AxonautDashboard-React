@@ -139,14 +139,14 @@ export default function ProjectDetails() {
   );
 
   const chartData = [
-    { name: "Commande", estimatedRevenue: project.estimated_revenue },
-    { name: "Facturation", actualRevenue: project.actual_revenue },
     {
-      name: "Dépenses/Commandes",
-      actualExpenses: project.actual_expenses_cost, // Dépenses réelles
-      supplierContracts: supplierContractAmount, // Commandes à venir
+      name: "Total",
+      "Commande": project.estimated_revenue,
+      "Facturation": project.actual_revenue,
+      "Dépenses/Commandes": project.actual_expenses_cost, // Dépenses réelles
+      "Commandes à venir": supplierContractAmount, // Commandes à venir
+      "Marge Nette Actuelle": difference,
     },
-    { name: "Marge Nette Actuelle", difference },
   ];
 
 
@@ -232,11 +232,11 @@ export default function ProjectDetails() {
                     ).toFixed(3)
                   : 0
               }
-              arcsLength={[0.15, 0.1, 0.3, 0.45]}
+              arcsLength={[0.15, 0.13, 0.27, 0.45]}
               arcWidth={0.3}
               colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
               textColor="#000"
-              needleColor="#4520ff"
+              needleColor="#6428fd5c"
               arcPadding={0.02}
               size={200}
               />
@@ -250,38 +250,38 @@ export default function ProjectDetails() {
         </div>
       </div>
 
-      {/* Section Graphique */}
-      <div className={styles.graphContainer}>
-        <h2>Graphique des coûts et revenus</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={chartData}
-            margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
-          >
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="estimatedRevenue" fill="#3467ff" name="Commande HT" />
-            <Bar dataKey="actualRevenue" fill="#00950c" name="Facturé" />
-            <Bar
-              dataKey="actualExpenses"
-              stackId="expenses"
-              fill="#e10069"
-              name="Dépenses payées"
-            />
-            <Bar
-              dataKey="supplierContracts"
-              stackId="expenses"
-              fill="#ffa500"
-              name="Dépenses à venir"
-            />
-            <Bar dataKey="difference" fill="#FFD700" name="Marge Nette" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {/* /* Section Graphique */} 
+        <div className={styles.graphContainer}>
+          <h2>Graphique des coûts et revenus</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
+            >
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="Commande" fill="#4a90e2" name="Commande HT" />
+          <Bar dataKey="Facturation" fill="#50e3c2" name="Facturé" />
+          <Bar
+            dataKey="Dépenses/Commandes"
+            stackId="expenses"
+            fill="#e94e77"
+            name="Dépenses payées"
+          />
+          <Bar
+            dataKey="Commandes à venir"
+            stackId="expenses"
+            fill="#f5a623"
+            name="Dépenses à venir"
+          />
+          <Bar dataKey="Marge Nette Actuelle" fill="#f8e71c" name="Marge Nette" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
- {/* Section des dépenses */}
+       {/* Section des dépenses */}
 <div className={styles.expenses}>
   <h1>Dépenses</h1>
   {/* Bouton de toggle pour afficher/masquer les dépenses */}

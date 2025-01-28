@@ -53,10 +53,10 @@ export default function ContractInvoicesDetails() {
   const paymentPercentage =
     totalInvoiceAmount === 0 ? 0 : (totalPaidAmount / totalInvoiceAmount) * 100;
 
-    const isPaidInvoice = (invoice) =>
-      invoice.paid_date && new Date(invoice.paid_date) >= new Date(invoice.date)
-        ? "green"
-        : "red";
+  const isPaidInvoice = (invoice) =>
+    invoice.paid_date && new Date(invoice.paid_date) >= new Date(invoice.date)
+      ? "green"
+      : "red";
 
   if (loading) {
     return (
@@ -78,33 +78,38 @@ export default function ContractInvoicesDetails() {
           <strong>Nom :</strong> {contract.name}
         </p>
 
-        
-       {/* comment : <div style="text-align: center;">Commande IPRO : PIX4376 + PIX4459 + PIX3646</div> */}
+        {/* comment : <div style="text-align: center;">Commande IPRO : PIX4376 + PIX4459 + PIX3646</div> */}
         {/* // le commentaire est soit une valeur soit du code html donc on utilise dangerouslySetInnerHTML */}
-        <p> <strong>Commentaire :</strong> <div dangerouslySetInnerHTML={{__html: contract.comments}}></div> </p>
+        <p>
+          {" "}
+          <strong>Commentaire :</strong>{" "}
+          <div
+            dangerouslySetInnerHTML={{ __html: contract.comments }}
+            className={styles.comment}
+          ></div>{" "}
+        </p>
         {/* <p>
           <strong>Commentaire :</strong> {contract.comments}
         </p> */}
-
 
         <p>
           <strong>Montant total HT du devis :</strong>{" "}
           {contract.quotation.pre_tax_amount.toFixed(2)} €
         </p>
 
-              {/* Jauge de progression */}
-      <div className={styles.progressBarContainer}>
-        <p>
-          <strong>Avancement du paiement :</strong>
-        </p>
-        <div className={styles.progressBar}>
-          <div
-            className={styles.progress}
-            style={{ width: `${paymentPercentage}%` }}
-          ></div>
+        {/* Jauge de progression */}
+        <div className={styles.progressBarContainer}>
+          <p>
+            <strong>Avancement du paiement :</strong>
+          </p>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progress}
+              style={{ width: `${paymentPercentage}%` }}
+            ></div>
+          </div>
+          <p>{paymentPercentage.toFixed()}% payé</p>
         </div>
-        <p>{paymentPercentage.toFixed()}% payé</p>
-      </div>
 
         <h2>Factures liées au contrat</h2>
         <table>
@@ -136,8 +141,6 @@ export default function ContractInvoicesDetails() {
                   </span>
                 </td>
                 <td>
-
-              
                   <a
                     href={invoice.public_path}
                     target="_blank"
@@ -157,8 +160,6 @@ export default function ContractInvoicesDetails() {
           </tbody>
         </table>
       </div>
-
-
     </div>
   );
 }
