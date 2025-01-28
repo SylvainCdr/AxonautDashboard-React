@@ -6,7 +6,7 @@
   max-width: 1200px;
   color: #333;
   margin: 0 auto;
-  min-height : 100vh;
+  min-height: 100vh;
 
   .loaderContainer {
     display: flex;
@@ -33,36 +33,32 @@
       display: block;
     }
 
-  
- 
-  
-  .companyLeft,
-  .companyCenter,
-  .companyRight {
-    flex: 1;
-    min-width: 300px;
-    margin: 10px;
-  }
-  
-   p {
-    font-size: 16px;
-    margin: 8px 0;
-  }
-  
-strong {
-    color: #4520ff;
-  }
-}
-  
+    .companyLeft,
+    .companyCenter,
+    .companyRight {
+      flex: 1;
+      min-width: 300px;
+      margin: 10px;
+    }
 
-   .section2, .section3 {
+    p {
+      font-size: 16px;
+      margin: 8px 0;
+    }
+
+    strong {
+      color: #4520ff;
+    }
+  }
+
+  .section2,
+  .section3 {
     margin-top: 2rem;
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
-  
     table {
       width: 100%;
       border-collapse: collapse;
@@ -74,7 +70,8 @@ strong {
         font-size: 1rem;
       }
 
-      th, td {
+      th,
+      td {
         text-align: left;
         padding: 12px;
         font-size: 0.9rem;
@@ -128,10 +125,6 @@ strong {
     }
   }
 
- 
-
-
-
   p {
     font-size: 1rem;
     line-height: 1.6;
@@ -166,11 +159,14 @@ strong {
       font-size: 1.8rem;
     }
 
-    .section1, .section2, .section3 {
+    .section1,
+    .section2,
+    .section3 {
       padding: 15px;
 
       table {
-        th, td {
+        th,
+        td {
           font-size: 0.85rem;
           padding: 10px;
         }

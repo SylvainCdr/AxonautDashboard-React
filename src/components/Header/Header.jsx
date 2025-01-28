@@ -88,13 +88,13 @@ function Header() {
               Note de frais
             </NavLink>
           </li>
-            <button
-              onClick={handleSignOut}
-              className={styles.logoutButton}
-              title="Déconnexion"
-            >
-              Déconnexion
-            </button>
+          <button
+            onClick={handleSignOut}
+            className={styles.logoutButton}
+            title="Déconnexion"
+          >
+            Déconnexion
+          </button>
         </ul>
         <div
           className={`${styles.header__burgerMenu} ${

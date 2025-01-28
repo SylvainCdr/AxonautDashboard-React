@@ -1,13 +1,12 @@
 .loaderContainer {
   display: flex;
-  flex-direction: column; 
-  gap : 3rem;
+  flex-direction: column;
+  gap: 3rem;
   justify-content: center; /* Centrage horizontal */
   align-items: center; /* Centrage vertical */
   min-height: 20vh; /* Assurez-vous que la hauteur occupe 100% de l'écran */
   text-align: center;
-  color : black;
-
+  color: black;
 }
 .searchContainer {
   max-width: 1350px;
@@ -18,9 +17,6 @@
   text-align: center;
   width: 100%;
 
-  
-
-
   input {
     width: 100%;
     max-width: 1100px;
@@ -29,7 +25,7 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     outline: none;
-    margin : 1rem 0;
+    margin: 1rem 0;
     transition: border-color 0.3s;
 
     &:focus {
@@ -70,50 +66,45 @@
     font-size: 0.9rem;
   }
 
+  .resultsContainer {
+    margin: 0 auto;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: box-shadow 0.3s, transform 0.2s;
+    cursor: pointer;
 
-   
-    .resultsContainer {
-      margin : 0 auto;
-      padding: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background-color: #fff;
-      transition: box-shadow 0.3s, transform 0.2s;
-      cursor: pointer;
+    table {
+      width: 100%;
+      border-collapse: collapse;
 
-     
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
+      th {
+        background-color: #f4f4f4;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #4520ff;
+      }
 
-        th,
-        td {
-          padding: 12px;
-          text-align: left;
-          border-bottom: 1px solid #eee;
-        }
-
-        th {
-          background-color: #f4f4f4;
-          font-weight: 600;
-          font-size: 1rem;
-          color : #4520ff;
-        }
-
-        td {
-          font-size: 0.95rem;
-          color: #555;
-        }
+      td {
+        font-size: 0.95rem;
+        color: #555;
       }
     }
+  }
 
-    p {
-      color: #555;
-      font-size: 1rem;
-      margin-top: 1rem;
-    }
-  
+  p {
+    color: #555;
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
 }
 
 .loaderContainer {
