@@ -10,26 +10,26 @@
 
 }
 .searchContainer {
-  max-width: 1400px;
-  margin: 2rem auto;
-  // padding: 2rem;
+  max-width: 1350px;
+  margin: 0rem auto;
   background-color: #fdfdfd;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 100%;
+
   
 
 
   input {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1100px;
     padding: 10px 16px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
     outline: none;
-    margin-bottom: 1rem;
+    margin : 1rem 0;
     transition: border-color 0.3s;
 
     &:focus {
@@ -70,9 +70,10 @@
     font-size: 0.9rem;
   }
 
-  .searchResults {
-    margin-top: 2rem;
-    .projectRow {
+
+   
+    .resultsContainer {
+      margin : 0 auto;
       padding: 1rem;
       border: 1px solid #ddd;
       border-radius: 8px;
@@ -80,10 +81,7 @@
       transition: box-shadow 0.3s, transform 0.2s;
       cursor: pointer;
 
-      &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: scale(1.02);
-      }
+     
 
       table {
         width: 100%;
@@ -115,7 +113,7 @@
       font-size: 1rem;
       margin-top: 1rem;
     }
-  }
+  
 }
 
 .loaderContainer {

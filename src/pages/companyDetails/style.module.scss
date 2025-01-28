@@ -6,10 +6,56 @@
   max-width: 1200px;
   color: #333;
   margin: 0 auto;
+  min-height : 100vh;
 
+  .loaderContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
 
+  .section1 {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-top: 20px;
 
-  .section1, .section2, .section3 {
+    img {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+      display: block;
+    }
+
+  
+ 
+  
+  .companyLeft,
+  .companyCenter,
+  .companyRight {
+    flex: 1;
+    min-width: 300px;
+    margin: 10px;
+  }
+  
+   p {
+    font-size: 16px;
+    margin: 8px 0;
+  }
+  
+strong {
+    color: #4520ff;
+  }
+}
+  
+
+   .section2, .section3 {
     margin-top: 2rem;
     padding: 20px;
     background-color: #f8f9fa;

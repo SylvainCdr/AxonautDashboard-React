@@ -53,7 +53,8 @@ function Header() {
       <nav className={`${styles.nav} ${menuOpen ? styles.active : ""}`}>
         <NavLink to="/" onClick={handleLinkClick}>
           <img
-            src="https://uploads.pixecurity.com/files/fav-pix-shop_1.png"
+            // src="https://uploads.pixecurity.com/files/fav-pix-shop_1.png"
+            src="assets/axopix.png"
             alt="ACCUEIL"
             className={styles.logo}
             loading="lazy"
@@ -87,7 +88,6 @@ function Header() {
               Note de frais
             </NavLink>
           </li>
-          <li className={styles.navLi}>
             <button
               onClick={handleSignOut}
               className={styles.logoutButton}
@@ -95,7 +95,6 @@ function Header() {
             >
               Déconnexion
             </button>
-          </li>
         </ul>
         <div
           className={`${styles.header__burgerMenu} ${

@@ -1,6 +1,5 @@
 .headerContainer {
-  // background: rgb(255, 255, 255);
- background: var(--col1);
+  background: var(--col1);
   box-shadow: 0 0 10px rgba(255, 254, 254, 0.5);
   margin-bottom: 1.5rem;
   width: 100%;
@@ -8,6 +7,7 @@
   z-index: 1000;
 
   .nav {
+    color: black;
     width: 100%;
     height: 4rem;
     display: flex;
@@ -15,17 +15,28 @@
     justify-content: space-between;
 
     .logo {
-      width: 2.5rem;
-      margin-left: 20%;
+      width: 5.5rem;
+      margin-left: 10%;
       margin-right: 6em;
-      cursor: pointer;
       justify-items: center;
       justify-self: center;
       justify-content: center;
+      cursor: pointer;
+      background-color: white;
+      border-radius: 10px;
+      padding: 0.4rem 0.4rem;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      -ms-border-radius: 10px;
+      -o-border-radius: 10px;
 
       &:hover {
-        transform: scale(1.1);
-      }
+        transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        -moz-transform: scale(1.02);
+        -ms-transform: scale(1.02);
+        -o-transform: scale(1.02);
+}
     }
 
     .navUl {
@@ -47,34 +58,46 @@
       text-align: center;
       line-height: 1.4rem;
 
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+
+      a {
+        color: var(--col3);
+        text-decoration: none;
+      }
+
       .activeLink {
-        border-bottom: 2px solid var(--col1); /* Soulignement de la page active */
+        border-bottom: 2px solid var(--col3); /* Soulignement de la page active */
       }
 
       &:hover {
-        transform: scale(1.1);
+        transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        -moz-transform: scale(1.02);
+        -ms-transform: scale(1.02);
+        -o-transform: scale(1.02);
       }
     }
 
     .logoutButton {
-  padding: 10px 20px;
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+      padding: 8px 12px;
+      background-color: #ff4d4f;
+      text-transform: uppercase;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
 
-  &:hover {
-    background-color: #d9363e;
-  }
+      &:hover {
+        background-color: #d9363e;
+      }
 
-  &:active {
-    background-color: #b02021;
-  }
-}
-
+      &:active {
+        background-color: #b02021;
+      }
+    }
 
     a {
       color: white;
