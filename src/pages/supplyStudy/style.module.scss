@@ -133,10 +133,7 @@
         tr {
           transition: background-color 0.3s ease;
 
-          &:nth-child(even) {
-            background-color: #f9f9f9;
-          }
-
+  
           &:hover {
             background-color: #e9f5ff;
           }
@@ -151,6 +148,18 @@
             }
           }
         }
+        .newLine {
+          background-color: rgba(67, 253, 175, 0.524); // Jaune clair
+          font-weight: bold;
+       
+        }
+
+        .negativeCost {
+          background-color: rgba(153, 76, 255, 0.599); // Couleur rose pour indiquer un coût négatif
+          font-weight: bold;
+        }
+        
+        
       }
 
       .green {
