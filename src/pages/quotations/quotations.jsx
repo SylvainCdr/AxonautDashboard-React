@@ -171,8 +171,10 @@ export default function Quotations() {
 
   return (
     <div className={styles.quotationsContainer}>
-      
-      <h1>  <i class="fas fa-list"></i> {" "} Liste des Commandes & Projets</h1>
+      <h1>
+        {" "}
+        <i class="fas fa-list"></i> Liste des Commandes & Projets
+      </h1>
 
       <div className={styles.filterContainer}>
         <button
@@ -226,8 +228,11 @@ export default function Quotations() {
               }}
             >
               {/* <td>{quotation.id}</td> */}
-              <td>{quotation.number}</td>
-              <td>{decodeHtmlEntities(quotation.title)}</td>
+              <td> {quotation.number}</td>
+              <td>
+                <i class="fa-regular fa-folder-open"></i>{" "}
+                {decodeHtmlEntities(quotation.title)}
+              </td>
               <td>{quotation.company_name || "Inconnue"}</td>
               <td>{getQuotationUser(quotation)}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>

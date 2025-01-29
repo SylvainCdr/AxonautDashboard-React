@@ -63,7 +63,7 @@ export default function Companies() {
         <tbody>
           {companies.map((company) => (
             <tr key={company.id}>
-              <td>{company.name}</td>
+              <td> <i class="fa-regular fa-building"></i> {"  "} {company.name}</td>
               <td>
                 {
                   `${company.address_street || "N/A"}, ${

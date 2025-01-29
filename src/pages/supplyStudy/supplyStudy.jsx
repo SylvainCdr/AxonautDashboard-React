@@ -176,6 +176,10 @@ export default function SupplyStudy() {
     },
   ];
 
+  const gaugeStyle = {
+    width: "300px"
+  };
+
   // Préparation des données pour le graphique
   const chartData = [
     {
@@ -229,7 +233,7 @@ export default function SupplyStudy() {
           className="fa-solid fa-file-alt"
           style={{ color: "#ffff", marginRight: "15px" }}
         ></i>
-        Détails du devis dupliqué - {quotation.number}
+        Etude de projet / appro - {quotation.number}
       </h1>
 
       <div className={styles.section1}>
@@ -297,6 +301,7 @@ export default function SupplyStudy() {
                       percent={entry.value / 100}
                       textColor="#000"
                       needleColor="#4909c069"
+                      style={gaugeStyle}
                     />
                   </div>
                 )
@@ -354,15 +359,15 @@ export default function SupplyStudy() {
               <tr>
                 <th>Référence</th>
                 <th>Désignation</th>
-                <th>Quantité initiale</th>
-                <th>Quantité finale</th>
-                <th>Prix vendu</th>
-                <th>Remise </th>
-                <th>Total prix vendu</th>
-                <th>Cout de revient initial</th>
-                <th>Total cout de revient initial</th>
+                <th>Qté initiale</th>
+                <th>Qté finale</th>
+                <th>PV</th>
+                <th>Remise</th>
+                <th>PV Total</th>
+                <th>PA unit</th>
+                <th>PA Total</th>
                 <th>Marge co %</th>
-                <th>Cout réel</th>
+                <th>Coût réel unit</th>
                 <th>Total réel</th>
                 <th>Total marge réelle %</th>
               </tr>
@@ -447,6 +452,7 @@ export default function SupplyStudy() {
                         <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
                         <td>
                           <input
+                          className={styles.numInput}
                             type="number"
                             value={line.final_quantity || ""}
                             onChange={(e) =>
@@ -489,6 +495,7 @@ export default function SupplyStudy() {
                         </td>
                         <td>
                           <input
+                          className={styles.numInput}
                             type="number"
                             value={line.actual_cost || ""}
                             onChange={(e) =>

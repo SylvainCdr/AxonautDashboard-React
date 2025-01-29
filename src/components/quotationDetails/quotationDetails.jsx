@@ -104,6 +104,10 @@ export default function QuotationDetails() {
 
   console.log("contract from quotationDetails", contract);
 
+  const gaugeStyle = {
+    width: 250,
+  }
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -114,10 +118,6 @@ export default function QuotationDetails() {
   }
 
   if (error) return <p className={styles.error}>{error}</p>;
-
-  // const totalPixProductCode = quotation.quotation_lines
-  //   .filter((line) => line.product_code.startsWith("Pix_"))
-  //   .reduce((acc, line) => acc + line.unit_job_costing, 0);
 
   return (
     <div className={styles.quotationContainer}>
@@ -139,6 +139,8 @@ export default function QuotationDetails() {
             alt="company illustration"
           />
           </div>
+
+          <div className={styles.section1Content}>
           <p>
             <strong>Titre :</strong> {decodeHtmlEntities(quotation.title)}
           </p>
@@ -165,6 +167,7 @@ export default function QuotationDetails() {
           <p>
             <strong> Remise :</strong> {quotation.global_discount_amount} €
           </p>
+          </div>
         </div>
         <div className={styles.section2}>
           <div className={styles.gauge}>
@@ -181,7 +184,7 @@ export default function QuotationDetails() {
               percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
               textColor="#000"
               needleColor="#4909c069"
-              size={200}
+              style={gaugeStyle}
             />
           </div>
           {/* // jauge avec les données du duplicateQuotation */}
@@ -199,6 +202,7 @@ export default function QuotationDetails() {
                 percent={(realMarginPercent / 100).toFixed(3)}
                 textColor="#000"
                 needleColor="#4909c069"
+                style={gaugeStyle}
               />
             </div>
           ) : (

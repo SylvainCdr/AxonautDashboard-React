@@ -4,37 +4,37 @@ import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
+import { toast } from "react-toastify";
 
 export default function SearchQuotation({ cachedQuotations = [] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
-  const [quotation, setQuotation] = useState({});
-  const [hasSearched, setHasSearched] = useState(false); // Nouvel état pour suivre les recherches
+  const [quotation, setQuotation] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchSubmit = async () => {
-    if (!search.trim()) return; // Ne rien faire si le champ est vide
+    if (!search.trim()) return;
     setError(null);
-    setHasSearched(true); // Marquer qu'une recherche a été effectuée
+    setHasSearched(true);
 
-    // Normalisez la saisie de l'utilisateur
     const normalizedSearch = search.toLowerCase().replace(/^pix/, "");
 
-    // Étape 1 : Recherche côté client
+    // Recherche côté client
     const clientResult = cachedQuotations.find((quotation) => {
       const normalizedQuotationNumber = quotation.number
         .toLowerCase()
-        .replace(/^pix/, ""); // Normalisez le numéro des devis
+        .replace(/^pix/, "");
       return normalizedQuotationNumber === normalizedSearch;
     });
 
     if (clientResult) {
       setQuotation(clientResult);
-      return; // Arrêter ici si un résultat est trouvé côté client
+      return;
     }
 
-    // Étape 2 : Recherche côté serveur si aucun résultat côté client
+    // Recherche côté serveur
     setLoading(true);
     try {
       const data = await searchQuotationByNumber(normalizedSearch);
@@ -56,59 +56,91 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
     navigate(`/quotations/${quotationId}/project/${projectId}`);
   };
 
+  const statusColor = (marginPercent) => {
+    if (marginPercent < 15) return "red";
+    if (marginPercent < 28) return "orange";
+    return "green";
+  };
+
   return (
     <div className={styles.searchContainer}>
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={handleKeyPress}
-        placeholder="Numéro d'affaire"
-      />
-   
-      <button onClick={handleSearchSubmit}> <i class="fas fa-search"></i></button>
+      <div className={styles.searchInputContainer}>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Numéro d'affaire"
+        />
+        <button onClick={handleSearchSubmit}>
+          <i className="fas fa-search"></i>
+        </button>
+      </div>
+
       {loading && (
         <div className={styles.loaderContainer}>
           <BarLoader color="#4520ff" loading={loading} size={15} />
           <p>Chargement des résultats...</p>
         </div>
       )}
+
       {error && <p className={styles.error}>{error}</p>}
 
-      <div className={styles.searchResults}>
-        {quotation.id ? (
-          <div
-            key={quotation.id}
-            onClick={() =>
-              handleQuotationClick(quotation.id, quotation.project_id)
-            }
-            className={styles.projectRow}
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Numéro</th>
-                  <th>Nom</th>
-                  <th>Client</th>
-                  <th>Date de début</th>
-                  <th>Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{quotation.number}</td>
-                  <td>{decodeHtmlEntities(quotation.title)}</td>
-                  <td>{quotation.company_name}</td>
-                  <td>{new Date(quotation.date).toLocaleDateString()}</td>
-                  <td>{quotation.status}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          hasSearched && <p>Aucun résultat trouvé</p> // Afficher uniquement si une recherche a été effectuée
-        )}
-      </div>
+      {hasSearched && quotation ? (
+        <div className={styles.searchResults}>
+          <table className={styles.quotationTable}>
+            <thead>
+              <tr>
+                <th>Numéro</th>
+                <th>Nom</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Montant HT</th>
+                <th>Marge co (%)</th>
+                <th>Marge réelle (%)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr key={quotation.id}>
+                <td>{quotation.number}</td>
+                <td>{decodeHtmlEntities(quotation.title)}</td>
+                <td>{quotation.company_name || "Inconnu"}</td>
+                <td>{new Date(quotation.date).toLocaleDateString()}</td>
+                <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
+                <td style={{ color: statusColor((quotation.margin / quotation.pre_tax_amount) * 100) }}>
+                  {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
+                </td>
+                <td>
+                  {quotation.realMarginPercent === null ? (
+                    <span role="img" aria-label="cross mark" style={{ color: "red" }}>❌</span>
+                  ) : (
+                    <span style={{ color: "black" }}>
+                      {quotation.supplyStudyFinished ? (
+                        <span role="img" aria-label="check mark" style={{ color: "green" }}>✅</span>
+                      ) : (
+                        <span role="img" aria-label="hourglass" style={{ color: "orange" }}>⏳</span>
+                      )}
+                      {quotation.realMarginPercent.toFixed(1)}%
+                    </span>
+                  )}
+                </td>
+                <td>
+                  <button
+                    onClick={() =>
+                      window.open(`/quotations/${quotation.id}/project/${quotation.project_id}`)
+                    }
+                  >
+                    Voir
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        hasSearched && <p className={styles.noResults}>Aucun résultat trouvé</p>
+      )}
     </div>
   );
 }
