@@ -46,7 +46,7 @@ export default function Companies() {
 
   return (
     <div className={styles.companiesContainer}>
-      <h1>Liste des entreprises</h1>
+      <h1> <i class="fas fa-list"></i> {" "}Liste des entreprises</h1>
 
       <SearchCompany cachedCompanies={companies} />
 

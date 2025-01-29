@@ -3,6 +3,7 @@ import { searchQuotationByNumber } from "../../services/api/quotations";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 
 export default function SearchQuotation({ cachedQuotations = [] }) {
   const [loading, setLoading] = useState(false);
@@ -62,9 +63,10 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         onKeyDown={handleKeyPress}
-        placeholder="Numéro de devis"
+        placeholder="Numéro d'affaire"
       />
-      <button onClick={handleSearchSubmit}>Rechercher</button>
+   
+      <button onClick={handleSearchSubmit}> <i class="fas fa-search"></i></button>
       {loading && (
         <div className={styles.loaderContainer}>
           <BarLoader color="#4520ff" loading={loading} size={15} />
@@ -95,7 +97,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
               <tbody>
                 <tr>
                   <td>{quotation.number}</td>
-                  <td>{quotation.title}</td>
+                  <td>{decodeHtmlEntities(quotation.title)}</td>
                   <td>{quotation.company_name}</td>
                   <td>{new Date(quotation.date).toLocaleDateString()}</td>
                   <td>{quotation.status}</td>

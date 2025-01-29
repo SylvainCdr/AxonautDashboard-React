@@ -61,7 +61,9 @@ export default function SearchCompany({ cachedCompanies = [] }) {
         onKeyDown={handleKeyPress}
         placeholder="Nom de l'entreprise"
       />
-      <button onClick={handleSearchSubmit}>Rechercher</button>
+      <button onClick={handleSearchSubmit}>
+        <i class="fas fa-search"></i>
+      </button>
       {loading && (
         <div className={styles.loaderContainer}>
           <BarLoader color="#4520ff" loading={loading} size={15} />

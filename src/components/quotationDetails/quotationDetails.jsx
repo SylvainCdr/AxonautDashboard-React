@@ -132,6 +132,13 @@ export default function QuotationDetails() {
 
       <div className={styles.header}>
         <div className={styles.section1}>
+        <div className={styles.section1Header}>
+
+          <img
+            src="https://img.icons8.com/?size=100&id=110478&format=png&color=000000"
+            alt="company illustration"
+          />
+          </div>
           <p>
             <strong>Titre :</strong> {decodeHtmlEntities(quotation.title)}
           </p>
@@ -173,7 +180,7 @@ export default function QuotationDetails() {
               colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
               percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
               textColor="#000"
-              needleColor="#4520ff"
+              needleColor="#4909c069"
               size={200}
             />
           </div>
@@ -191,7 +198,7 @@ export default function QuotationDetails() {
                 colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
                 percent={(realMarginPercent / 100).toFixed(3)}
                 textColor="#000"
-                needleColor="#4520ff"
+                needleColor="#4909c069"
               />
             </div>
           ) : (

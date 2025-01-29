@@ -92,7 +92,7 @@ export default function CompanyDetails() {
         <div className={styles.companyLeft}>
           <img
             src="https://img.icons8.com/?size=200&id=113846&format=png&color=000000"
-            alt=""
+            alt="company illustration"
           />
         </div>
 

@@ -171,7 +171,8 @@ export default function Quotations() {
 
   return (
     <div className={styles.quotationsContainer}>
-      <h1>Liste des Commandes & Projets</h1>
+      
+      <h1>  <i class="fas fa-list"></i> {" "} Liste des Commandes & Projets</h1>
 
       <div className={styles.filterContainer}>
         <button

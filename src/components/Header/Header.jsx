@@ -93,7 +93,7 @@ function Header() {
             className={styles.logoutButton}
             title="Déconnexion"
           >
-            Déconnexion
+            <img src="https://img.icons8.com/?size=30&id=24337&format=png&color=FFFFFF" alt="déconnexion" />
           </button>
         </ul>
         <div
