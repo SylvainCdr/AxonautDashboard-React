@@ -12,6 +12,7 @@ export default function ContractInvoicesDetails() {
   const [contract, setContract] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false); // État pour le pop-up
 
   useEffect(() => {
     const loadQuotationData = async () => {
@@ -26,6 +27,11 @@ export default function ContractInvoicesDetails() {
 
         setContract(contractData);
         setInvoices(invoicesData);
+
+        // Vérifier si un commentaire est présent et afficher le pop-up
+        if (contractData.comments && contractData.comments.trim() !== "") {
+          setShowPopup(true);
+        }
       } catch (err) {
         setError("Impossible de charger les données du projet.");
       } finally {
@@ -71,6 +77,18 @@ export default function ContractInvoicesDetails() {
 
   return (
     <div className={styles.contractInvoicesDetailsContainer}>
+      {/* 🔔 Pop-up si un commentaire est présent */}
+      {showPopup && (
+        <div className={styles.overlay}>
+          <div className={styles.popup}>
+            <h2>🔔 Information importante</h2>
+            <h3>Veuillez prendre note de ce commentaire ajouté à l'affaire </h3>
+            <p dangerouslySetInnerHTML={{ __html: contract.comments }}></p>
+            <button onClick={() => setShowPopup(false)}>Fermer</button>
+          </div>
+        </div>
+      )}
+
       <h1> Détails de la facturation </h1>
 
       <div className={styles.contractDetails}>
@@ -78,19 +96,15 @@ export default function ContractInvoicesDetails() {
           <strong>Nom :</strong> {contract.name}
         </p>
 
-        {/* comment : <div style="text-align: center;">Commande IPRO : PIX4376 + PIX4459 + PIX3646</div> */}
-        {/* // le commentaire est soit une valeur soit du code html donc on utilise dangerouslySetInnerHTML */}
-        <p>
-          {" "}
-          <strong>Commentaire :</strong>{" "}
-          <div
-            dangerouslySetInnerHTML={{ __html: contract.comments }}
-            className={styles.comment}
-          ></div>{" "}
-        </p>
-        {/* <p>
-          <strong>Commentaire :</strong> {contract.comments}
-        </p> */}
+        {contract.comments && contract.comments.trim() !== "" && (
+          <p>
+            <strong>Commentaire :</strong>
+            <div
+              dangerouslySetInnerHTML={{ __html: contract.comments }}
+              className={styles.comment}
+            ></div>
+          </p>
+        )}
 
         <p>
           <strong>Montant total HT du devis :</strong>{" "}
@@ -125,12 +139,7 @@ export default function ContractInvoicesDetails() {
           <tbody>
             {invoices.map((invoice) => (
               <tr key={invoice.id}>
-                <td>
-                  {invoice.number}{" "}
-                  {invoice.mandatory_mentions && (
-                    <strong>{invoice.mandatory_mentions}</strong>
-                  )}
-                </td>
+                <td>{invoice.number}</td>
                 <td>{invoice.pre_tax_amount} €</td>
                 <td>{new Date(invoice.date).toLocaleDateString()}</td>
                 <td>

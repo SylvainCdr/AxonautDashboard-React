@@ -51,7 +51,7 @@ export default function Login() {
       toast.success("Connexion réussie !");
 
       // Redirection après connexion
-      navigate("/"); // Changez "/dashboard" par la route de votre tableau de bord
+      navigate("/home"); // Changez "/dashboard" par la route de votre tableau de bord
     } catch (err) {
       console.error("Erreur de connexion :", err.message);
 

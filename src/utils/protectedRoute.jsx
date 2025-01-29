@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase/firebase";
+import { auth } from "../firebase/firebase";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 

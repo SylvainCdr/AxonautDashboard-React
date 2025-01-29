@@ -39,7 +39,7 @@ function Header() {
     try {
       await signOut(auth);
       toast.success("Vous avez été déconnecté.");
-      navigate("/login"); // Redirige vers la page de connexion
+      navigate("/"); // Redirige vers la page de connexion
     } catch (err) {
       console.error("Erreur lors de la déconnexion :", err.message);
       toast.error("Erreur lors de la déconnexion. Veuillez réessayer.", {
@@ -51,7 +51,7 @@ function Header() {
   return (
     <div className={styles.headerContainer}>
       <nav className={`${styles.nav} ${menuOpen ? styles.active : ""}`}>
-        <NavLink to="/" onClick={handleLinkClick}>
+        <NavLink to="/home" onClick={handleLinkClick}>
           <img
             // src="https://uploads.pixecurity.com/files/fav-pix-shop_1.png"
             src="https://uploads.pixecurity.com/files/axopix.png"

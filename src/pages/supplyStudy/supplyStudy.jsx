@@ -285,9 +285,9 @@ export default function SupplyStudy() {
                     </h4>
                     <GaugeChart
                       id={`gauge-chart-${index}`}
-                      nrOfLevels={6}
-                      colors={["#FF5F6D", "#0ef124"]}
+                      arcsLength={[0.15, 0.13, 0.27, 0.45]}
                       arcWidth={0.3}
+                      colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
                       percent={entry.value / 100}
                       textColor="#000"
                       needleColor="#4909c069"
@@ -499,8 +499,27 @@ export default function SupplyStudy() {
                             ? `${totalLineAmountReal(line).toFixed(2)} €`
                             : "-"}
                         </td>
-                        <td>
+                        <td
+                          className={
+                            realMargin > 50
+                              ? styles.green
+                              : realMargin > 30
+                              ? styles.blue
+                              : realMargin >= 15
+                              ? styles.orange
+                              : realMargin < 0
+                              ? styles.red
+                              : styles.red
+                          }
+                        >
                           {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %
+                          <span>
+                            {realMargin > 50 && "🔥"}
+                            {realMargin > 30 && realMargin <= 50 && "✅"}
+                            {realMargin >= 15 && realMargin <= 30 && "⚠️"}
+                            {realMargin < 0 && "☠️"}
+                            {realMargin >= 0 && realMargin < 15 && "⬇️"}
+                          </span>
                         </td>
                       </tr>
                     );
