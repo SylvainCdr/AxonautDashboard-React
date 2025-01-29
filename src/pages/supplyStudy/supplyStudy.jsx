@@ -227,13 +227,16 @@ export default function SupplyStudy() {
       <h1>
         <i
           className="fa-solid fa-file-alt"
-          style={{ color: "#4520ff", marginRight: "10px" }}
+          style={{ color: "#ffff", marginRight: "15px" }}
         ></i>
         Détails du devis dupliqué - {quotation.number}
       </h1>
 
       <div className={styles.section1}>
         <div className={styles.section1Left}>
+          <img src="https://img.icons8.com/?size=250&id=112158&format=png&color=000000" alt="" />
+          </div>
+        <div className={styles.section1Center}>
           <p>
             <strong>Numéro :</strong> {quotation.number}
           </p>
@@ -291,6 +294,8 @@ export default function SupplyStudy() {
                       percent={entry.value / 100}
                       textColor="#000"
                       needleColor="#4909c069"
+                     
+
                     />
                   </div>
                 )

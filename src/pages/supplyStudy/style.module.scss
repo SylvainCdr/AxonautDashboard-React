@@ -32,9 +32,22 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-
     .section1Left {
-      width: 65%;
+      width: 30%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: 250px;
+        height: 250px;
+      }
+    }
+    .section1Center {
+      width: 40%;
+      align-self: center;
+      justify-content: center;
 
       p {
         font-size: 1rem;
@@ -48,7 +61,7 @@
       }
     }
     .section1Right {
-      width: 30%;
+      width: 40%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -56,20 +69,20 @@
       .gaugeContainer {
         text-align: center;
         display: inline-block;
-      }
+       
+        .gaugeContainer h4 {
+          font-size: 1.1rem;
+          margin-bottom: 0.3rem;
+          color: #333; // Couleur des titres
+        }
+        .waitingMessage {
+          color: #d9534f;
 
-      .gaugeContainer h4 {
-        font-size: 1.1rem;
-        margin-bottom: 0.3rem;
-        color: #333; // Couleur des titres
-      }
-      .waitingMessage {
-        color: #d9534f;
-
-        font-size: 1.1rem;
-        margin-top: 40px;
-        margin-bottom: 10px;
-        padding-left: 2rem;
+          font-size: 1.1rem;
+          margin-top: 40px;
+          margin-bottom: 10px;
+          padding-left: 2rem;
+        }
       }
     }
   }
@@ -183,7 +196,7 @@
 
       span {
         font-size: 1.3rem;
-      margin-left : 0.5rem;
+        margin-left: 0.5rem;
       }
 
       tfoot {
