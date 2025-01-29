@@ -18,11 +18,12 @@
   justify-content: space-around;
   gap: 1rem; /* Espacement entre les sections */
   flex-wrap: wrap;
+  max-width: 1800px;
 }
 
 /* Section principale */
 .section {
-  flex: 1 1 45%; /* Prend 30% de la largeur de l'écran */
+  flex: 1 1 40%; /* Prend 30% de la largeur de l'écran */
   padding: 1rem;
   background-color: #fff;
   border-radius: 8px;

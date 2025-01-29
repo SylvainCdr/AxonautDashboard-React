@@ -48,16 +48,13 @@
       padding: 10px;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-     display: flex;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      
       .section1Header {
         text-align: center;
-      }
-
-      .section1Content {
-    
       }
 
       p {
@@ -150,7 +147,7 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
       thead {
-        background-color: #0073e6;
+        background-color: #4520ff;
         color: #fff;
 
         th {
@@ -215,26 +212,25 @@
     margin-top: 20px;
     margin-bottom: 1rem;
 
-    .button {
+   a, .button {
       display: inline-block;
       padding: 10px 20px;
       font-size: 0.9rem;
       color: #fff;
-      background-color: #0073e6;
+      background-color: #4520ff;
       border: none;
       border-radius: 5px;
       text-decoration: none;
       text-align: center;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s;
+      cursor: pointer;
 
       &:hover {
-        background-color: #005bb5;
+        background-color:  #1d02a1;
       }
 
-      &:active {
-        background-color: #004494;
-      }
+   
     }
   }
 }
