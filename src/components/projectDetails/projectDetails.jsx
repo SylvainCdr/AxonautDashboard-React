@@ -39,7 +39,6 @@ export default function ProjectDetails() {
   const [showExpenses, setShowExpenses] = useState(false);
   const [showSupplierContracts, setShowSupplierContracts] = useState(false);
 
-
   useEffect(() => {
     const loadProjectData = async () => {
       try {
@@ -141,19 +140,18 @@ export default function ProjectDetails() {
   const chartData = [
     {
       name: "Total",
-      "Commande": project.estimated_revenue,
-      "Facturation": project.actual_revenue,
+      Commande: project.estimated_revenue,
+      Facturation: project.actual_revenue,
       "Dépenses/Commandes": project.actual_expenses_cost, // Dépenses réelles
       "Commandes à venir": supplierContractAmount, // Commandes à venir
       "Marge Nette Actuelle": difference,
     },
   ];
 
-
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={20} />
+        <GridLoader color="#4520ff" loading={loading} size={15} />
         <p>Chargement...</p>
       </div>
     );
@@ -220,232 +218,247 @@ export default function ProjectDetails() {
             <strong>Marge (%) </strong>
           </h3>
           <div className={styles.projectGauge}>
-          {project.actual_revenue && project.actual_expenses_cost ? (
-            <GaugeChart
-              id="margin-gauge"
-              nrOfLevels={5}
-              percent={
-                project.actual_revenue
-                  ? (
-                      (project.actual_revenue - project.actual_expenses_cost) /
-                      project.actual_revenue
-                    ).toFixed(3)
-                  : 0
-              }
-              arcsLength={[0.15, 0.13, 0.27, 0.45]}
-              arcWidth={0.3}
-              colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
-              textColor="#000"
-              needleColor="#6428fd5c"
-              arcPadding={0.02}
-              size={200}
+            {project.actual_revenue && project.actual_expenses_cost ? (
+              <GaugeChart
+                id="margin-gauge"
+                nrOfLevels={5}
+                percent={
+                  project.actual_revenue
+                    ? (
+                        (project.actual_revenue -
+                          project.actual_expenses_cost) /
+                        project.actual_revenue
+                      ).toFixed(3)
+                    : 0
+                }
+                arcsLength={[0.15, 0.13, 0.27, 0.45]}
+                arcWidth={0.3}
+                colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+                textColor="#000"
+                needleColor="#6428fd5c"
+                arcPadding={0.02}
+                size={200}
               />
-            )
-            : (
+            ) : (
               <p className={styles.noDataMessage}>
-              Pas assez de données pour afficher la jauge.
-            </p>
-          )}
+                Pas assez de données pour afficher la jauge.
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* /* Section Graphique */} 
-        <div className={styles.graphContainer}>
-          <h2>Graphique des coûts et revenus</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-          data={chartData}
-          margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
-            >
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="Commande" fill="#4a90e2" name="Commande HT" />
-          <Bar dataKey="Facturation" fill="#50e3c2" name="Facturé" />
-          <Bar
-            dataKey="Dépenses/Commandes"
-            stackId="expenses"
-            fill="#e94e77"
-            name="Dépenses payées"
-          />
-          <Bar
-            dataKey="Commandes à venir"
-            stackId="expenses"
-            fill="#f5a623"
-            name="Dépenses à venir"
-          />
-          <Bar dataKey="Marge Nette Actuelle" fill="#f8e71c" name="Marge Nette" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      {/* /* Section Graphique */}
+      <div className={styles.graphContainer}>
+        <h2>Graphique des coûts et revenus</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
+          >
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Commande" fill="#4a90e2" name="Commande HT" />
+            <Bar dataKey="Facturation" fill="#50e3c2" name="Facturé" />
+            <Bar
+              dataKey="Dépenses/Commandes"
+              stackId="expenses"
+              fill="#e94e77"
+              name="Dépenses payées"
+            />
+            <Bar
+              dataKey="Commandes à venir"
+              stackId="expenses"
+              fill="#f5a623"
+              name="Dépenses à venir"
+            />
+            <Bar
+              dataKey="Marge Nette Actuelle"
+              fill="#f8e71c"
+              name="Marge Nette"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-       {/* Section des dépenses */}
-<div className={styles.expenses}>
-  <h1>Dépenses</h1>
-  {/* Bouton de toggle pour afficher/masquer les dépenses */}
-  <button
-    className={styles.toggleButton}
-    onClick={() => setShowExpenses(!showExpenses)}
-  >
-    {showExpenses ? "Masquer les dépenses" : "Afficher les dépenses"}
-  </button>
+      {/* Section des dépenses */}
+      <div className={styles.expenses}>
+        <h1>Dépenses</h1>
+        {/* Bouton de toggle pour afficher/masquer les dépenses */}
+        <button
+          className={styles.toggleButton}
+          onClick={() => setShowExpenses(!showExpenses)}
+        >
+          {showExpenses ? "Masquer les dépenses" : "Afficher les dépenses"}
+        </button>
 
-  {showExpenses && ( // Affichage conditionnel des dépenses
-    <>
-      {loadingExpenses ? ( // Affichage du loader pour les dépenses
-        <div className={styles.loaderContainer}>
-          <BarLoader color="#4520ff" loading={loadingExpenses} width={200} />
-          <p>Chargement des dépenses...</p>
-        </div>
-      ) : expenses.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Titre</th>
-              <th>Date</th>
-              <th>Montant HT</th>
-              <th>Reste à payer TTC</th>
-              {/* <th>Nom comptable</th> */}
-              <th>Fournisseur</th>
-              {/* <th>Projet</th> */}
-              <th>Détails</th>
-            </tr>
-          </thead>
-          <tbody>
-            {expenses.map((expense) => (
-              <React.Fragment key={expense.id}>
-                <tr onClick={() => toggleExpense(expense.id)}>
-                  <td>{expense.id}</td>
-                  <td>
-                    <span>+</span>
-                    {expense.title}
-                  </td>
-                  <td>{new Date(expense.date).toLocaleDateString()}</td>
-                  <td>{expense.pre_tax_amount.toFixed(2)} €</td>
-                  <td>{expense.left_to_pay.toFixed(2)} €</td>
-                  {/* <td>{expense.accounting_code_name}</td> */}
-                  <td>{expense.supplier_name}</td>
-                  {/* <td>{expense.project_id}</td> */}
-                  <td>
-                    <a
-                      href={expense.public_path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Lien
-                    </a>
-                  </td>
-                </tr>
-                {expandedExpenses[expense.id] && (
+        {showExpenses && ( // Affichage conditionnel des dépenses
+          <>
+            {loadingExpenses ? ( // Affichage du loader pour les dépenses
+              <div className={styles.loaderContainer}>
+                <BarLoader
+                  color="#4520ff"
+                  loading={loadingExpenses}
+                  width={200}
+                />
+                <p>Chargement des dépenses...</p>
+              </div>
+            ) : expenses.length > 0 ? (
+              <table>
+                <thead>
                   <tr>
-                    <td colSpan="9">
-                      <table className={styles.expenseDetails}>
-                        <thead>
-                          <tr>
-                            <th>Article</th>
-                            <th>Quantité</th>
-                            <th>Total HT</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {expense.expense_lines.map((line, index) => (
-                            <tr key={index}>
-                              <td>{line.title}</td>
-                              <td>{line.quantity}</td>
-                              <td>
-                                {line.total_pre_tax_amount.toFixed(2)} €
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </td>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Date</th>
+                    <th>Montant HT</th>
+                    <th>Reste à payer TTC</th>
+                    {/* <th>Nom comptable</th> */}
+                    <th>Fournisseur</th>
+                    {/* <th>Projet</th> */}
+                    <th>Détails</th>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>Aucune dépense trouvée.</p>
-      )}
-    </>
-  )}
-</div>
+                </thead>
+                <tbody>
+                  {expenses.map((expense) => (
+                    <React.Fragment key={expense.id}>
+                      <tr onClick={() => toggleExpense(expense.id)}>
+                        <td>{expense.id}</td>
+                        <td>
+                          <span>+</span>
+                          {expense.title}
+                        </td>
+                        <td>{new Date(expense.date).toLocaleDateString()}</td>
+                        <td>{expense.pre_tax_amount.toFixed(2)} €</td>
+                        <td>{expense.left_to_pay.toFixed(2)} €</td>
+                        {/* <td>{expense.accounting_code_name}</td> */}
+                        <td>{expense.supplier_name}</td>
+                        {/* <td>{expense.project_id}</td> */}
+                        <td>
+                          <a
+                            href={expense.public_path}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Lien
+                          </a>
+                        </td>
+                      </tr>
+                      {expandedExpenses[expense.id] && (
+                        <tr>
+                          <td colSpan="9">
+                            <table className={styles.expenseDetails}>
+                              <thead>
+                                <tr>
+                                  <th>Article</th>
+                                  <th>Quantité</th>
+                                  <th>Total HT</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {expense.expense_lines.map((line, index) => (
+                                  <tr key={index}>
+                                    <td>{line.title}</td>
+                                    <td>{line.quantity}</td>
+                                    <td>
+                                      {line.total_pre_tax_amount.toFixed(2)} €
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>Aucune dépense trouvée.</p>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Section des contrats fournisseurs */}
       <div className={styles.supplierContracts}>
         <h1>Commandes fournisseurs</h1>
         <button
-    className={styles.toggleButton}
-    onClick={() => setShowSupplierContracts(!showSupplierContracts)}
-  >
-    {showSupplierContracts ? "Masquer les dépenses" : "Afficher les dépenses"}
-  </button>
+          className={styles.toggleButton}
+          onClick={() => setShowSupplierContracts(!showSupplierContracts)}
+        >
+          {showSupplierContracts
+            ? "Masquer les dépenses"
+            : "Afficher les dépenses"}
+        </button>
 
-  {showSupplierContracts && ( // Affichage conditionnel des contrats fournisseurs
-    loadingContracts ? ( // Affichage du loader pour les contrats fournisseurs
-      <div className={styles.loaderContainer}>
-        <BarLoader color="#4520ff" loading={loadingContracts} width={200} />
-        <p>Chargement des commandes fournisseurs...</p>
-      </div>
-    ) : supplierContracts.length > 0 ? (
-      <table>
-        <thead>
-          <tr>
-            <th>Titre</th>
-            <th>Date de début</th>
-            <th>Montant HT</th>
-            <th>Montant TTC</th>
-            <th>Fournisseur</th>
-            <th>Commentaire</th>
-            <th>expense ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          {supplierContracts.map((contract) => (
-            <tr
-              key={contract.id}
-              style={{
-                backgroundColor: contract.expenses.some((expense) =>
-                  linkedExpenseIds.has(expense.id)
-                )
-                  ? "lightgreen" // Surlignage en vert
-                  : "white", // Couleur par défaut
-              }}
-            >
-              <td>{contract.title}</td>
-              <td>{new Date(contract.start_date).toLocaleDateString()}</td>
-              <td>{contract.pre_tax_amount.toFixed(2)} €</td>
-              <td>{contract.total_amount.toFixed(2)} €</td>
-              <td>{contract.supplier.name}</td>
-              <td>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: contract.comments
-                      ? contract.comments.slice(0, 90) +
-                        (contract.comments.length > 90 ? "..." : "")
-                      : "Aucun commentaire",
-                  }}
-                ></div>
-              </td>
-              <td>
-                {contract.expenses.map((expense) => (
-                  <span key={expense.id}>{expense.id}, </span>
+        {showSupplierContracts && // Affichage conditionnel des contrats fournisseurs
+          (loadingContracts ? ( // Affichage du loader pour les contrats fournisseurs
+            <div className={styles.loaderContainer}>
+              <BarLoader
+                color="#4520ff"
+                loading={loadingContracts}
+                width={200}
+              />
+              <p>Chargement des commandes fournisseurs...</p>
+            </div>
+          ) : supplierContracts.length > 0 ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th>Date de début</th>
+                  <th>Montant HT</th>
+                  <th>Montant TTC</th>
+                  <th>Fournisseur</th>
+                  <th>Commentaire</th>
+                  <th>expense ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {supplierContracts.map((contract) => (
+                  <tr
+                    key={contract.id}
+                    style={{
+                      backgroundColor: contract.expenses.some((expense) =>
+                        linkedExpenseIds.has(expense.id)
+                      )
+                        ? "lightgreen" // Surlignage en vert
+                        : "white", // Couleur par défaut
+                    }}
+                  >
+                    <td>{contract.title}</td>
+                    <td>
+                      {new Date(contract.start_date).toLocaleDateString()}
+                    </td>
+                    <td>{contract.pre_tax_amount.toFixed(2)} €</td>
+                    <td>{contract.total_amount.toFixed(2)} €</td>
+                    <td>{contract.supplier.name}</td>
+                    <td>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: contract.comments
+                            ? contract.comments.slice(0, 90) +
+                              (contract.comments.length > 90 ? "..." : "")
+                            : "Aucun commentaire",
+                        }}
+                      ></div>
+                    </td>
+                    <td>
+                      {contract.expenses.map((expense) => (
+                        <span key={expense.id}>{expense.id}, </span>
+                      ))}
+                    </td>
+                  </tr>
                 ))}
-              </td>
-            </tr>
+              </tbody>
+            </table>
+          ) : (
+            <p>Aucune commande fournisseur trouvée.</p>
           ))}
-        </tbody>
-      </table>
-    ) : (
-      <p>Aucune commande fournisseur trouvée.</p>
-    )
-  )}
-</div>
+      </div>
     </div>
   );
 }

@@ -107,7 +107,7 @@ export default function QuotationDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={20} />
+        <GridLoader color="#4520ff" loading={loading} size={15} />
         <p>Chargement...</p>
       </div>
     );
@@ -163,7 +163,8 @@ export default function QuotationDetails() {
           <div className={styles.gauge}>
             <h3>Marge commerciale </h3>
             <p>
-              <strong>Marge prévisionnelle :</strong> {quotation.margin.toFixed(2)} €
+              <strong>Marge prévisionnelle :</strong>{" "}
+              {quotation.margin.toFixed(2)} €
             </p>
             <GaugeChart
               id="margin-gauge"
@@ -176,38 +177,37 @@ export default function QuotationDetails() {
               size={200}
             />
           </div>
-{/* // jauge avec les données du duplicateQuotation */}
-<h3>Marge réelle</h3>
-{isDuplicate && !isNaN(realMarginValue) && realMarginValue !== 0 ? (
-  <div className={styles.gauge}>
-    <p>
-      <strong> Marge réelle : </strong> {realMarginValue.toFixed(2)} €
-    </p>
-    <GaugeChart
-      id="margin-gauge"
-      arcsLength={[0.15, 0.13, 0.27, 0.45]}
-      arcWidth={0.3}
-      colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
-      percent={(realMarginPercent / 100).toFixed(3)}
-      textColor="#000"
-      needleColor="#4520ff"
-    />
-  </div>
-) : (
-  // Message si pas de duplicateQuotation ou si marge réelle indisponible
-  <div className={styles.emptyGauge}>
-    <p>Étude d'appro</p>
-    <span
-      role="img"
-      aria-label="hourglass"
-      style={{ color: "orange", marginLeft: "8px" }}
-    >
-      ⏳
-    </span>
-    <p>En attente</p>
-  </div>
-)}
-
+          {/* // jauge avec les données du duplicateQuotation */}
+          <h3>Marge réelle</h3>
+          {isDuplicate && !isNaN(realMarginValue) && realMarginValue !== 0 ? (
+            <div className={styles.gauge}>
+              <p>
+                <strong> Marge réelle : </strong> {realMarginValue.toFixed(2)} €
+              </p>
+              <GaugeChart
+                id="margin-gauge"
+                arcsLength={[0.15, 0.13, 0.27, 0.45]}
+                arcWidth={0.3}
+                colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+                percent={(realMarginPercent / 100).toFixed(3)}
+                textColor="#000"
+                needleColor="#4520ff"
+              />
+            </div>
+          ) : (
+            // Message si pas de duplicateQuotation ou si marge réelle indisponible
+            <div className={styles.emptyGauge}>
+              <p>Étude d'appro</p>
+              <span
+                role="img"
+                aria-label="hourglass"
+                style={{ color: "orange", marginLeft: "8px" }}
+              >
+                ⏳
+              </span>
+              <p>En attente</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -223,60 +223,60 @@ export default function QuotationDetails() {
         </button>
 
         {showDetails && (
-  <table>
-    <thead>
-      <tr>
-        <th>Référence</th>
-        <th>Désignation</th>
-        <th>Quantité</th>
-        <th>Prix unit HT</th>
-        <th>Montant total HT</th>
-        <th>PA unit</th>
-        <th>PA total</th>
-        <th>Marge total</th>
-        <th>Marge en %</th>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.entries(
-        quotation.quotation_lines.reduce((groups, line) => {
-          const chapter = line.chapter || "Autres"; // Regroupez par `chapter`, ou "Autres" si non défini
-          if (!groups[chapter]) groups[chapter] = [];
-          groups[chapter].push(line);
-          return groups;
-        }, {})
-      ).map(([chapter, lines], chapterIndex) => (
-        <React.Fragment key={chapterIndex}>
-          {/* Affichage du chapitre */}
-          <tr >
-            <td colSpan="9" className={styles.chapterRow} >
-            {decodeHtmlEntities(chapter)}
-            </td>
-          </tr>
-          {/* Affichage des lignes dans le chapitre */}
-          {lines.map((line) => (
-            <tr key={line.id}>
-              <td>{line?.product_code || ""}</td>
-              <td>{line.product_name}</td>
-              <td>{line.quantity}</td>
-              <td>{line.price} €</td>
-              <td>{line.pre_tax_amount} €</td>
-              <td>{line.unit_job_costing} €</td>
-              <td>{(line.unit_job_costing * line.quantity).toFixed(2)} €</td>
-              <td>{line.margin.toFixed(1)} €</td>
-              <td>
-                {(
-                  (line.margin / line.pre_tax_amount) *
-                  100
-                ).toFixed(1)} %
-              </td>
-            </tr>
-          ))}
-        </React.Fragment>
-      ))}
-    </tbody>
-  </table>
-)}
+          <table>
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Désignation</th>
+                <th>Quantité</th>
+                <th>Prix unit HT</th>
+                <th>Montant total HT</th>
+                <th>PA unit</th>
+                <th>PA total</th>
+                <th>Marge total</th>
+                <th>Marge en %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(
+                quotation.quotation_lines.reduce((groups, line) => {
+                  const chapter = line.chapter || "Autres"; // Regroupez par `chapter`, ou "Autres" si non défini
+                  if (!groups[chapter]) groups[chapter] = [];
+                  groups[chapter].push(line);
+                  return groups;
+                }, {})
+              ).map(([chapter, lines], chapterIndex) => (
+                <React.Fragment key={chapterIndex}>
+                  {/* Affichage du chapitre */}
+                  <tr>
+                    <td colSpan="9" className={styles.chapterRow}>
+                      {decodeHtmlEntities(chapter)}
+                    </td>
+                  </tr>
+                  {/* Affichage des lignes dans le chapitre */}
+                  {lines.map((line) => (
+                    <tr key={line.id}>
+                      <td>{line?.product_code || ""}</td>
+                      <td>{line.product_name}</td>
+                      <td>{line.quantity}</td>
+                      <td>{line.price} €</td>
+                      <td>{line.pre_tax_amount} €</td>
+                      <td>{line.unit_job_costing} €</td>
+                      <td>
+                        {(line.unit_job_costing * line.quantity).toFixed(2)} €
+                      </td>
+                      <td>{line.margin.toFixed(1)} €</td>
+                      <td>
+                        {((line.margin / line.pre_tax_amount) * 100).toFixed(1)}{" "}
+                        %
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        )}
 
         <div className={styles.totals}>
           <p>

@@ -75,9 +75,8 @@ export default function CompanyDetails() {
 
   console.log(company);
   console.log(quotations);
-  console.log('invoices', invoices);
+  console.log("invoices", invoices);
 
- 
   const statusColor = (status) => {
     if (status === "accepted") return "green";
     if (status === "pending") return "orange";
@@ -138,7 +137,7 @@ export default function CompanyDetails() {
         <h1>Commandes / Projets</h1>
         {loadingQuotations ? (
           <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingQuotations} size={20} />
+            <BarLoader color="#4520ff" loading={loadingQuotations} size={15} />
             <p>Chargement des commandes / projets </p>
           </div>
         ) : quotations.length > 0 ? (
@@ -189,7 +188,7 @@ export default function CompanyDetails() {
         <h1>Factures</h1>
         {loadingInvoices ? (
           <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingInvoices} size={20} />
+            <BarLoader color="#4520ff" loading={loadingInvoices} size={15} />
             <p>Chargement des factures...</p>
           </div>
         ) : invoices.length > 0 ? (

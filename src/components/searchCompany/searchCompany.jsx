@@ -64,7 +64,7 @@ export default function SearchCompany({ cachedCompanies = [] }) {
       <button onClick={handleSearchSubmit}>Rechercher</button>
       {loading && (
         <div className={styles.loaderContainer}>
-          <BarLoader color="#4520ff" loading={loading} size={20} />
+          <BarLoader color="#4520ff" loading={loading} size={15} />
           <p>Chargement des résultats...</p>
         </div>
       )}
@@ -84,10 +84,7 @@ export default function SearchCompany({ cachedCompanies = [] }) {
             </thead>
             <tbody>
               {companies.map((company) => (
-                <tr
-                  key={company.id}
-                  className={styles.projectRow}
-                >
+                <tr key={company.id} className={styles.projectRow}>
                   <td>{company.name}</td>
                   <td>
                     {company.address_street}, {company.address_city} (

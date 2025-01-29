@@ -67,7 +67,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
       <button onClick={handleSearchSubmit}>Rechercher</button>
       {loading && (
         <div className={styles.loaderContainer}>
-          <BarLoader color="#4520ff" loading={loading} size={20} />
+          <BarLoader color="#4520ff" loading={loading} size={15} />
           <p>Chargement des résultats...</p>
         </div>
       )}
