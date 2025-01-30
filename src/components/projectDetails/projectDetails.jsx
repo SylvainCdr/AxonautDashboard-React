@@ -148,6 +148,10 @@ export default function ProjectDetails() {
     },
   ];
 
+  const gaugeStyle = {
+    width: "250px",
+  };
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -181,19 +185,15 @@ export default function ProjectDetails() {
             <strong>Date de fin réelle : </strong>
             {new Date(project.actual_end).toLocaleDateString()}
           </p> */}
-          <p>
+          {/* <p>
             <strong>Entreprise :</strong>{" "}
             {company.name || "Entreprise inconnue"}
           </p>
           <p>
-            <strong>Adresse :</strong> {company.address_street}
-          </p>
-          <p>
-            <strong>Ville :</strong> {company.address_city} {company.zip_code} (
-            {company.address_country})
-          </p>
-        </div>
-        <div className={styles.section2}>
+            <strong>Adresse :</strong> {company.address_street ?? "N/A"}, {company.address_city ?? "N/A"} {company.zip_code ?? "N/A"} (
+              {company.address_country ?? "N/A"})
+          </p> */}
+      
           <h3>
             <strong>Montant total HT:</strong>{" "}
             {project.actual_revenue
@@ -206,6 +206,8 @@ export default function ProjectDetails() {
               ? `${project.actual_expenses_cost.toFixed(2)} €`
               : "Données insuffisantes"}
           </h3>
+        </div>
+        <div className={styles.section2}>
           <h3>
             <strong>Marge nette :</strong>{" "}
             {project.actual_revenue && project.actual_expenses_cost
@@ -237,7 +239,7 @@ export default function ProjectDetails() {
                 textColor="#000"
                 needleColor="#6428fd5c"
                 arcPadding={0.02}
-                size={200}
+                style={gaugeStyle}
               />
             ) : (
               <p className={styles.noDataMessage}>

@@ -28,27 +28,33 @@
   .section2,
   .section1 {
     width: 50%;
-
     background-color: #fff;
-    padding: 15px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  
+  
+
+
 
     p {
-      margin: 1rem 0;
+      margin: 0.3rem 0;
       font-size: 1rem;
       color: #495057;
 
       strong {
-        color: #343a40;
+        color: #0073e6;
       }
     }
 
     h3 {
-      font-size: 1.1rem;
-      color: #333;
-      margin-bottom: 10px;
-      font-weight: 500;
+      font-size: 1rem;
+      margin: 0.3rem 0;
+
+      font-weight: 400;
     }
     .noDataMessage {
       color: #ff4d4f; /* Rouge doux pour signaler une alerte */
