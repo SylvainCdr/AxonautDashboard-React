@@ -111,7 +111,7 @@ export default function QuotationDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={15} />
+        <GridLoader color="#C60F7B" loading={loading} size={15} /> 
         <p>Chargement...</p>
       </div>
     );

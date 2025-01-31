@@ -67,8 +67,7 @@ export default function ContractInvoicesDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={15} />
-        <p>Chargement...</p>
+<GridLoader color="#C60F7B" loading={loading} size={15} />        <p>Chargement...</p>
       </div>
     );
   }

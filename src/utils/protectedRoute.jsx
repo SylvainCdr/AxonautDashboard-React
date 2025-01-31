@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase/firebase";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { ClipLoader } from "react-spinners";
+import { GridLoader } from "react-spinners";
 
 const ProtectedRoute = ({ children }) => {
   const [user, loading, error] = useAuthState(auth);
@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>  
-        <ClipLoader color="#4520ff" loading={loading} size={50} />
+       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
       </div>
     ); // Affichez un loader pendant le chargement
   }

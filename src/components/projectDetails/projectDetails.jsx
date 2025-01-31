@@ -155,7 +155,7 @@ export default function ProjectDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#4520ff" loading={loading} size={15} />
+       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
         <p>Chargement...</p>
       </div>
     );
@@ -231,14 +231,7 @@ export default function ProjectDetails() {
               />
             ) : (
               /* 
-    --col1: #009fe3;
-    --col2: #C60F7B;
-    --col3: #FFBC42;
-    --col4:#F8F0FB;
-    --col5: #001427;
-    --col6: #91F5AD;
-    --col7: #E06C9F
-  
+
   }  */
               <p className={styles.noDataMessage}>
                 Pas assez de données pour afficher la jauge.
@@ -271,13 +264,22 @@ export default function ProjectDetails() {
             <Bar
               dataKey="Commandes à venir"
               stackId="expenses"
-              fill="#E06C9F"
+              fill="#B98389"
               name="Dépenses à venir"
             />
             <Bar
               dataKey="Marge Nette Actuelle"
               fill="#91F5AD"
               name="Marge Nette"
+
+              // --col1: #009fe3;
+              // --col2: #C60F7B;
+              // --col3: #FFBC42;
+              // --col4:#F8F0FB;
+              // --col5: #001427;
+              // --col6: #91F5AD;
+              // --col7: #D9DBF1;
+            
             />
           </BarChart>
         </ResponsiveContainer>

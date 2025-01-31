@@ -160,7 +160,18 @@ color: black;
 
 
 /* config 1 :  */
-:root {
+/* :root {
+    --col1: #009fe3;
+    --col2: #C60F7B;
+    --col3: #FFBC42;
+    --col4:#F8F0FB;
+    --col5: #001427;
+    --col6: #91F5AD;
+    --col7: #D9DBF1;
+  }  */
+
+  /* config 1 :  */
+  :root {
     --col1: #009fe3;
     --col2: #C60F7B;
     --col3: #FFBC42;
