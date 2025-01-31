@@ -144,7 +144,7 @@ export default function CompanyDetails() {
           <table>
             <thead>
               <tr>
-                <th>Number</th>
+                <th>Numéro</th>
                 <th>Nom</th>
                 <th>Date</th>
                 <th>Montant HT</th>
@@ -195,7 +195,7 @@ export default function CompanyDetails() {
           <table>
             <thead>
               <tr>
-                <th>Number</th>
+                <th>Numéro</th>
                 <th>Date d'émission</th>
                 <th>Date de paiement</th>
                 <th>Statut</th>

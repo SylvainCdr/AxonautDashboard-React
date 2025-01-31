@@ -22,7 +22,7 @@
     padding: 10px 15%;
     font-size: 0.9rem;
     color: #fff;
-    background-color: #109f00;
+    background-color: var(--col1);
     border: none;
     border-radius: 5px;
     text-decoration: none;
@@ -33,7 +33,7 @@
     cursor: pointer;
 
     &:hover {
-      background-color: #008b43;
+      background-color: #0170a8;
     }
   }
 
@@ -49,7 +49,7 @@
     }
 
     th {
-      background-color: #007bff;
+      background-color: var(--col5);
       color: #fff;
     }
 
@@ -58,7 +58,7 @@
     }
 
     button {
-      background-color: #007bff;
+      background-color: var(--col1);
       color: #fff;
       border: none;
       padding: 5px 10px;

@@ -223,7 +223,7 @@ export default function Quotations() {
               key={quotation.id}
               style={{
                 backgroundColor: hasPixProductCode(quotation)
-                  ? "#fff3cd" // Jaune clair pour les devis contenant "Pix_"
+                  ? "#F8F0FB" // Jaune clair pour les devis contenant "Pix_"
                   : "white", // Blanc pour les autres
               }}
             >
@@ -234,7 +234,7 @@ export default function Quotations() {
                 {decodeHtmlEntities(quotation.title)}
               </td>
               <td>{quotation.company_name || "Inconnue"}</td>
-              <td>{getQuotationUser(quotation)}</td>
+              <td>{getQuotationUser(quotation).split(' ')[0]}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
 
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>

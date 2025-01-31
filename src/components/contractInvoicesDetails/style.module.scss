@@ -52,13 +52,13 @@
     font-size: 1rem;
     line-height: 1.5;
     margin: 8px 0;
-    color :rgb(190, 1, 1)
+    color : var(--col2)
   }
   
   .popup button {
     margin-top: 15px;
     padding: 10px 15px;
-    background: #4520ff;
+    background: var(--col1);
     color: white;
     border: none;
     border-radius: 5px;
@@ -66,7 +66,7 @@
   }
   
   .popup button:hover {
-    background: #2a0db3;
+    background: #017ac0;
   }
 
 }
@@ -88,17 +88,17 @@
       margin: 8px 0;
 
       strong {
-        font-weight: bold;
-        color: #222;
+        color: var(--col3);
+        font-weight: 500;
       }
     }
     .comment {
       margin-top: 7px;
       margin-bottom: 20px;
       padding: 10px;
-      background-color: #fff4c5;
+      background-color: var(--col4);
       border-radius: 5px;
-      color: rgb(175, 3, 3);
+      color: var(--col1);
       font-weight: bold;
     }
   }
@@ -116,8 +116,9 @@
           padding: 10px;
           text-align: left;
           font-weight: bold;
-          color: #555;
+          color: white;
           border-bottom: 2px solid #ddd;
+          background-color: var(--col5);
         }
       }
     }
@@ -139,11 +140,14 @@
           color: #333;
 
           a {
-            color: #007bff;
+            color: white;
             text-decoration: none;
+            background-color: var(--col1);
+            padding: 5px 10px;
+            border-radius: 4px;
 
             &:hover {
-              text-decoration: underline;
+              background-color: #0065a8;
             }
           }
 
@@ -168,16 +172,28 @@
       height: 20px;
       margin: 0 auto;
 
-      background: linear-gradient(to right, red, orange, yellow, green);
+      background: linear-gradient(to right, #C60F7B, #FFBC42, #91F5AD, #009fe3);
 
       border-radius: 10px;
       margin-top: 10px;
       margin-bottom: 1rem;
     }
 
+
+    :root {
+      --col1: #009fe3;
+      --col2: #C60F7B;
+      --col3: #FFBC42;
+      --col4:#F8F0FB;
+      --col5: #001427;
+      --col6: #91F5AD;
+      --col7: #D9DBF1;
+    
+    } 
+
     .progress {
       height: 100%;
-      background-color: #00d207; /* Vert */
+      background-color: #a6fda9; /* Vert */
       border-radius: 10px;
     }
   }

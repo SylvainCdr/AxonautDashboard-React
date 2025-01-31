@@ -159,27 +159,32 @@ color: black;
 }
 
 
-
-
+/* config 1 :  */
 :root {
     --col1: #009fe3;
-    --col2: #0D0630;
-    --col3: #F0F2EF;
-    --col4: #5C5346;
-    --col5: #4F9D69;
-  
-  }
+    --col2: #C60F7B;
+    --col3: #FFBC42;
+    --col4:#F8F0FB;
+    --col5: #001427;
+    --col6: #91F5AD;
+    --col7: #D9DBF1;
+  } 
 
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     text-transform: uppercase;
     color: white ;
     font-weight: 500;
     margin-bottom: 20px;
     text-align: center;
-    background-color: var(--col4);
-    padding : 10px;
-    border-radius: 10px;
+    background-color: var(--col2);
+    /*background-image: linear-gradient(-225deg, #A445B2 0%, #D41872 52%, #FF0066 100%);
+    */padding: 7px;
+    border-radius: 5px;
     width: 98%;
-  }
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}

@@ -67,15 +67,16 @@
         color: black;
 
         strong {
-          color: #0073e6;
+          color: var(--col3);
+          font-weight: 500;
         }
       }
       h3 {
         font-size: 1.1rem;
-        color: #333;
+        color: #5d5d5d;
         margin-bottom: 10px;
-        font-weight: 600;
-        background-color: #12a1f325;
+        font-weight: 500;
+        background-color: var(--col4);
         padding: 8px 0px;
         border-radius: 8px;
       }
@@ -103,7 +104,7 @@
         justify-content: center;
         max-height: 300px;
         max-width: 350px;
-        background-color: #fffcea;
+        background-color: var(--col4);
         border-radius: 8px;
       }
     }
@@ -117,7 +118,7 @@
       padding: 10px 15%;
       font-size: 0.9rem;
       color: #fff;
-      background-color: #109f00;
+      background-color: var(--col1);
       border: none;
       border-radius: 5px;
       text-decoration: none;
@@ -128,7 +129,7 @@
       cursor: pointer;
 
       &:hover {
-        background-color: #008b43;
+        background-color: #0065a8;
       }
 
       &:active {
@@ -151,7 +152,7 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
       thead {
-        background-color: #4520ff;
+        background-color: var(--col5);
         color: #fff;
 
         th {
@@ -178,7 +179,7 @@
             color: #555;
           }
           .chapterRow {
-            background-color: #fdf1cc;
+            background-color: var(--col4);
             font-weight: bold;
             text-align: center;
           }
@@ -197,6 +198,7 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-top: 2rem;
+    background-color: var(--col4);
 
     p {
       margin: 5px 0;
@@ -204,7 +206,7 @@
       color: black;
 
       strong {
-        color: #0073e6;
+        color: var(--col1);
       }
     }
   }
@@ -221,7 +223,7 @@
       padding: 10px 20px;
       font-size: 0.9rem;
       color: #fff;
-      background-color: #4520ff;
+      background-color:  var(--col1);
       border: none;
       border-radius: 5px;
       text-decoration: none;
@@ -231,7 +233,7 @@
       cursor: pointer;
 
       &:hover {
-        background-color:  #1d02a1;
+        background-color:  #016aab;
       }
 
    

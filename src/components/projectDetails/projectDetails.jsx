@@ -181,44 +181,32 @@ export default function ProjectDetails() {
             <strong>Date de début réelle : </strong>
             {new Date(project.actual_start).toLocaleDateString()}
           </p>
-          {/* <p>
-            <strong>Date de fin réelle : </strong>
-            {new Date(project.actual_end).toLocaleDateString()}
-          </p> */}
-          {/* <p>
-            <strong>Entreprise :</strong>{" "}
-            {company.name || "Entreprise inconnue"}
-          </p>
+
           <p>
-            <strong>Adresse :</strong> {company.address_street ?? "N/A"}, {company.address_city ?? "N/A"} {company.zip_code ?? "N/A"} (
-              {company.address_country ?? "N/A"})
-          </p> */}
-      
-          <h3>
             <strong>Montant total HT:</strong>{" "}
             {project.actual_revenue
               ? `${project.actual_revenue.toFixed(2)} €`
               : "Données insuffisantes"}
-          </h3>
-          <h3>
+          </p>
+          <p>
             <strong>Total des dépenses :</strong>{" "}
             {project.actual_expenses_cost
               ? `${project.actual_expenses_cost.toFixed(2)} €`
               : "Données insuffisantes"}
-          </h3>
+          </p>
         </div>
         <div className={styles.section2}>
-          <h3>
+          <p>
             <strong>Marge nette :</strong>{" "}
             {project.actual_revenue && project.actual_expenses_cost
               ? `${(
                   project.actual_revenue - project.actual_expenses_cost
                 ).toFixed(2)} €`
               : "Données insuffisantes"}
-          </h3>
-          <h3>
+          </p>
+          <p>
             <strong>Marge (%) </strong>
-          </h3>
+          </p>
           <div className={styles.projectGauge}>
             {project.actual_revenue && project.actual_expenses_cost ? (
               <GaugeChart
@@ -235,13 +223,23 @@ export default function ProjectDetails() {
                 }
                 arcsLength={[0.15, 0.13, 0.27, 0.45]}
                 arcWidth={0.3}
-                colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+                colors={[" #C60F7B", "#FFBC42", "#91F5AD", "#009fe3"]}
                 textColor="#000"
                 needleColor="#6428fd5c"
                 arcPadding={0.02}
                 style={gaugeStyle}
               />
             ) : (
+              /* 
+    --col1: #009fe3;
+    --col2: #C60F7B;
+    --col3: #FFBC42;
+    --col4:#F8F0FB;
+    --col5: #001427;
+    --col6: #91F5AD;
+    --col7: #E06C9F
+  
+  }  */
               <p className={styles.noDataMessage}>
                 Pas assez de données pour afficher la jauge.
               </p>
@@ -262,23 +260,23 @@ export default function ProjectDetails() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="Commande" fill="#4a90e2" name="Commande HT" />
-            <Bar dataKey="Facturation" fill="#50e3c2" name="Facturé" />
+            <Bar dataKey="Commande" fill="#009fe3" name="Commande HT" />
+            <Bar dataKey="Facturation" fill="#FFBC42" name="Facturé" />
             <Bar
               dataKey="Dépenses/Commandes"
               stackId="expenses"
-              fill="#e94e77"
+              fill="#C60F7B"
               name="Dépenses payées"
             />
             <Bar
               dataKey="Commandes à venir"
               stackId="expenses"
-              fill="#f5a623"
+              fill="#E06C9F"
               name="Dépenses à venir"
             />
             <Bar
               dataKey="Marge Nette Actuelle"
-              fill="#f8e71c"
+              fill="#91F5AD"
               name="Marge Nette"
             />
           </BarChart>
@@ -427,7 +425,7 @@ export default function ProjectDetails() {
                       backgroundColor: contract.expenses.some((expense) =>
                         linkedExpenseIds.has(expense.id)
                       )
-                        ? "lightgreen" // Surlignage en vert
+                        ? "#F8F0FB" // Surlignage en vert
                         : "white", // Couleur par défaut
                     }}
                   >

@@ -106,7 +106,7 @@ export default function QuotationDetails() {
 
   const gaugeStyle = {
     width: 250,
-  }
+  };
 
   if (loading) {
     return (
@@ -126,47 +126,49 @@ export default function QuotationDetails() {
       {/* // ici un badge si le contract.end_date est différent de null */}
       {contract.end_date && (
         <div className={styles.badgeClosed}>
-          <p><i class="fa-solid fa-square-check"></i> {" "} {" "}Affaire cloturée sur Axonaut le {contract.end_date}</p>
+          <p>
+            <i class="fa-solid fa-square-check"></i> Affaire cloturée sur
+            Axonaut le {contract.end_date}
+          </p>
         </div>
       )}
 
       <div className={styles.header}>
         <div className={styles.section1}>
-        <div className={styles.section1Header}>
-
-          <img
-            src="https://img.icons8.com/?size=100&id=110478&format=png&color=000000"
-            alt="company illustration"
-          />
+          <div className={styles.section1Header}>
+            <img
+              src="https://img.icons8.com/?size=100&id=110478&format=png&color=000000"
+              alt="company illustration"
+            />
           </div>
 
           <div className={styles.section1Content}>
-          <p>
-            <strong>Titre :</strong> {decodeHtmlEntities(quotation.title)}
-          </p>
-          <p>
-            <strong>Entreprise :</strong> {quotation.company_name}
-          </p>
-          <p>
-            <strong>Date :</strong>{" "}
-            {new Date(quotation.date).toLocaleDateString()}
-          </p>
+            <p>
+              <strong>Titre :</strong> {decodeHtmlEntities(quotation.title)}
+            </p>
+            <p>
+              <strong>Entreprise :</strong> {quotation.company_name}
+            </p>
+            <p>
+              <strong>Date :</strong>{" "}
+              {new Date(quotation.date).toLocaleDateString()}
+            </p>
 
-          <p>
-            <strong>Commercial :</strong>{" "}
-            {company.business_manager?.name || "Inconnu"}
-          </p>
+            <p>
+              <strong>Commercial :</strong>{" "}
+              {company.business_manager?.name || "Inconnu"}
+            </p>
 
-          <p>
-            <strong>Commentaire(s):</strong> {quotation.comments}
-          </p>
-          <p>
-            <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
-          </p>
+            <p>
+              <strong>Commentaire(s):</strong> {quotation.comments}
+            </p>
+            <p>
+              <strong>Montant total HT:</strong> {quotation.pre_tax_amount}€
+            </p>
 
-          <p>
-            <strong> Remise :</strong> {quotation.global_discount_amount} €
-          </p>
+            <p>
+              <strong> Remise :</strong> {quotation.global_discount_amount} €
+            </p>
           </div>
         </div>
         <div className={styles.section2}>
@@ -180,7 +182,7 @@ export default function QuotationDetails() {
               id="margin-gauge"
               arcsLength={[0.15, 0.13, 0.27, 0.45]}
               arcWidth={0.2}
-              colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+              colors={[" #C60F7B", "#FFBC42", "#91F5AD", "#009fe3"]}
               percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
               textColor="#000"
               needleColor="#4909c069"
@@ -198,7 +200,7 @@ export default function QuotationDetails() {
                 id="margin-gauge"
                 arcsLength={[0.15, 0.13, 0.27, 0.45]}
                 arcWidth={0.3}
-                colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+                colors={[" #C60F7B", "#FFBC42", "#91F5AD", "#009fe3"]}
                 percent={(realMarginPercent / 100).toFixed(3)}
                 textColor="#000"
                 needleColor="#4909c069"

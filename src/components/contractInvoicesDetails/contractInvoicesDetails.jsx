@@ -114,7 +114,7 @@ export default function ContractInvoicesDetails() {
         {/* Jauge de progression */}
         <div className={styles.progressBarContainer}>
           <p>
-            <strong>Avancement du paiement :</strong>
+            Avancement du paiement :
           </p>
           <div className={styles.progressBar}>
             <div

@@ -56,7 +56,7 @@ export default function Companies() {
             <th>Nom</th>
             <th>Adresse</th>
             <th>Création</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
 
@@ -68,7 +68,7 @@ export default function Companies() {
                 {
                   `${company.address_street || "N/A"}, ${
                     company.address_city || "N/A"
-                  } (${company.address_zip_code || "N/A"})`.slice(0, 80).at
+                  } (${company.address_zip_code || "N/A"})`.slice(0, 80)
                 }
               </td>
               <td>{new Date(company.creation_date).toLocaleDateString()}</td>

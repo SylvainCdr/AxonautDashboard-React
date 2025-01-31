@@ -49,7 +49,7 @@
     }
 
     strong {
-      color: #4520ff;
+      color: var(--col3);
     }
   }
 
@@ -67,7 +67,7 @@
       margin-top: 15px;
 
       thead {
-        background-color: #4520ff;
+        background-color: var(--col5);
         color: white;
         font-size: 1rem;
       }
@@ -97,8 +97,8 @@
       }
     }
 
-    button {
-      background-color: #4520ff;
+    a, button {
+      background-color: var(--col1);
       color: white;
       border: none;
       padding: 8px 15px;
@@ -106,9 +106,10 @@
       cursor: pointer;
       font-size: 0.9rem;
       transition: background-color 0.3s ease;
+      
 
       &:hover {
-        background-color: #3018b5;
+        background-color: #0075a8;
       }
 
       &:focus {
@@ -117,13 +118,11 @@
     }
 
     a {
-      color: #4520ff;
+    
       text-decoration: none;
       transition: color 0.3s;
 
-      &:hover {
-        color: #3018b5;
-      }
+    
     }
   }
 
