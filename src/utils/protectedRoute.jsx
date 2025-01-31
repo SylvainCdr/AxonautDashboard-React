@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Si l'utilisateur est connecté, on affiche les enfants (la route protégée)
-  return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;

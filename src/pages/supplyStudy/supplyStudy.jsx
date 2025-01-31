@@ -555,7 +555,7 @@ export default function SupplyStudy() {
 
             <tfoot>
               <tr>
-                <td colSpan="7">Total</td>
+                <td colSpan="6">Total</td>
                 <td>
                   {/* Total prix vendu */}
                   {quotation.quotation_lines
@@ -563,6 +563,7 @@ export default function SupplyStudy() {
                     .toFixed(2)}{" "}
                   €
                 </td>
+                <td></td>
 
                 <td>
                   {/* Total coût de revient initial */}
