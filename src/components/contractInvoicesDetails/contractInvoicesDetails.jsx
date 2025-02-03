@@ -57,7 +57,7 @@ export default function ContractInvoicesDetails() {
   );
 
   const paymentPercentage =
-    totalInvoiceAmount === 0 ? 0 : (totalPaidAmount / totalInvoiceAmount) * 100;
+    totalInvoiceAmount === 0 ? 0 : (totalPaidAmount / contract.quotation.pre_tax_amount) * 100;
 
   const isPaidInvoice = (invoice) =>
     invoice.paid_date && new Date(invoice.paid_date) >= new Date(invoice.date)

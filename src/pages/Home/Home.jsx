@@ -32,6 +32,8 @@ function Homepage() {
       initial="hidden"
       animate="visible"
     >
+
+<div className={styles.logos}>
       {/* Animation spéciale pour l'image */}
       <motion.img
         src="assets/logo-clear.png"
@@ -57,6 +59,8 @@ function Homepage() {
           damping: 20,
         }}
       />
+
+</div>
 
       <motion.div className={styles.categories} variants={container}>
         <motion.div variants={item}>

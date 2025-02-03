@@ -18,6 +18,7 @@ export default function CompanyDetails() {
   const [invoices, setInvoices] = useState([]);
   const [loadingQuotations, setLoadingQuotations] = useState(true); // Pour le loader des quotations
   const [loadingInvoices, setLoadingInvoices] = useState(true); // Pour le loader des invoices
+  const [loadingTotals, setLoadingTotals] = useState(true); // Pour le loader des totaux
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -73,16 +74,50 @@ export default function CompanyDetails() {
     loadInvoices();
   }, [companyId]);
 
+  
+  // **Nouveau useEffect pour arrêter le chargement de la section finance**
+  useEffect(() => {
+    if (!loadingQuotations && !loadingInvoices) {
+      setLoadingTotals(false);
+    }
+  }, [loadingQuotations, loadingInvoices]);
+
   console.log(company);
   console.log(quotations);
   console.log("invoices", invoices);
+// Fonction pour regrouper les montants par année
+const groupByYear = (items, dateKey) => {
+  return items.reduce((acc, item) => {
+    const year = new Date(item[dateKey]).getFullYear();
+    if (!acc[year]) {
+      acc[year] = 0;
+    }
+    acc[year] += item.pre_tax_amount || 0;
+    return acc;
+  }, {});
+};
 
-  const statusColor = (status) => {
-    if (status === "accepted") return "green";
-    if (status === "pending") return "orange";
-    if (status === "refused") return "red";
-    return "black";
-  };
+// Regrouper les devis (CA prévisionnel) par année
+const quotationAmountsByYear = groupByYear(quotations, "date");
+
+// Regrouper les factures (CA réel) par année
+const invoiceAmountsByYear = groupByYear(invoices, "date");
+
+// Obtenir toutes les années uniques (triées)
+const allYears = [...new Set([...Object.keys(quotationAmountsByYear), ...Object.keys(invoiceAmountsByYear)])]
+  .map(Number)
+  .sort((a, b) => b - a); // Trier de la plus récente à la plus ancienne
+
+
+
+// Définition des couleurs selon les statuts
+const statusColor = (status) => {
+  if (status === "accepted") return "green";
+  if (status === "pending") return "orange";
+  if (status === "refused") return "red";
+  return "black";
+};
+
 
   return (
     <div className={styles.companyDetailsContainer}>
@@ -131,6 +166,36 @@ export default function CompanyDetails() {
             {company.documents?.length || "Aucun document disponible"}
           </p>
         </div>
+      </div>
+
+        {/* SECTION CA PRÉVISIONNEL ET RÉEL PAR ANNÉE */}
+        <div className={styles.sectionFinance}>
+        <h1>Chiffre d'affaires par année</h1>
+        {loadingTotals ? (
+          <div className={styles.loaderContainer}>
+            <BarLoader color="#4520ff" loading={loadingTotals} size={15} />
+            <p>Chargement du chiffre d'affaires...</p>
+          </div>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Année</th>
+                <th>Total commandes</th>
+                <th>Total facturé</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allYears.map((year) => (
+                <tr key={year}>
+                  <td>{year}</td>
+                  <td>{(quotationAmountsByYear[year] || 0).toFixed(2)} €</td>
+                  <td>{(invoiceAmountsByYear[year] || 0).toFixed(2)} €</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <div className={styles.section2}>

@@ -37,7 +37,7 @@ export default function Companies() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
         <p>Chargement des entreprises...</p>
       </div>
     );
@@ -46,7 +46,10 @@ export default function Companies() {
 
   return (
     <div className={styles.companiesContainer}>
-      <h1> <i class="fas fa-list"></i> {" "}Liste des entreprises</h1>
+      <h1>
+        {" "}
+        <i class="fas fa-list"></i> Liste des entreprises
+      </h1>
 
       <SearchCompany cachedCompanies={companies} />
 
@@ -63,18 +66,19 @@ export default function Companies() {
         <tbody>
           {companies.map((company) => (
             <tr key={company.id}>
-              <td> <i class="fa-regular fa-building"></i> {"  "} {company.name}</td>
               <td>
-                {
-                  `${company.address_street || "N/A"}, ${
-                    company.address_city || "N/A"
-                  } (${company.address_zip_code || "N/A"})`.slice(0, 80)
-                }
+                {" "}
+                <i class="fa-regular fa-building"></i> {"  "} {company.name}
+              </td>
+              <td>
+                {`${company.address_street || "N/A"}, ${
+                  company.address_city || "N/A"
+                } (${company.address_zip_code || "N/A"})`.slice(0, 80)}
               </td>
               <td>{new Date(company.creation_date).toLocaleDateString()}</td>
               <td>
                 <button
-                  onClick={() => navigate(`/companies/${company.id}`)}
+                  onClick={() => window.open(`/companies/${company.id}`)}
                   className={styles.actionButton}
                 >
                   Voir
