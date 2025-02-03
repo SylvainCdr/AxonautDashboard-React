@@ -182,7 +182,7 @@ export default function QuotationDetails() {
               id="margin-gauge"
               arcsLength={[0.15, 0.13, 0.27, 0.45]}
               arcWidth={0.2}
-              colors={[" #C60F7B", "#FFBC42", "#91F5AD", "#009fe3"]}
+              colors={[" #F07167", "#FFBC42", "#91F5AD", "#009fe3"]}
               percent={(quotation.margin / quotation.pre_tax_amount).toFixed(3)}
               textColor="#000"
               needleColor="#4909c069"

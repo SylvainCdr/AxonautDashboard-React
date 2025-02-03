@@ -223,7 +223,7 @@ export default function ProjectDetails() {
                 }
                 arcsLength={[0.15, 0.13, 0.27, 0.45]}
                 arcWidth={0.3}
-                colors={[" #C60F7B", "#FFBC42", "#91F5AD", "#009fe3"]}
+                colors={["  #F07167", "#FFBC42", "#91F5AD", "#009fe3"]}
                 textColor="#000"
                 needleColor="#6428fd5c"
                 arcPadding={0.02}
@@ -258,13 +258,13 @@ export default function ProjectDetails() {
             <Bar
               dataKey="Dépenses/Commandes"
               stackId="expenses"
-              fill="#C60F7B"
+              fill=" #F07167"
               name="Dépenses payées"
             />
             <Bar
               dataKey="Commandes à venir"
               stackId="expenses"
-              fill="#B98389"
+              fill="#6e4555"
               name="Dépenses à venir"
             />
             <Bar
