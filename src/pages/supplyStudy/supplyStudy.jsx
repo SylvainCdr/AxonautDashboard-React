@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styles from "./style.module.scss";
 import { useParams } from "react-router-dom";
-import { db } from "../../firebase/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db, auth } from "../../firebase/firebase";
+import { getDoc, updateDoc, doc, setDoc } from "firebase/firestore";
+import { getUserByUid } from "../../utils/getUserByUid";
 import { GridLoader } from "react-spinners";
 import {
   Tooltip,
@@ -22,6 +23,27 @@ export default function SupplyStudy() {
   const [quotation, setQuotation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
+
+  // on récupère le uid de l'utilisateur connecté
+  const user = auth.currentUser;
+
+  // fonction pour récupérer l email grace à l uid dans la collections users
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        const user = await getUserByUid(user.uid);
+        setUserEmail(user.email);
+      } catch (err) {
+        console.error("Erreur lors de la récupération de l'email :", err);
+        setUserEmail("Inconnu");
+      }
+    };
+
+    fetchUserEmail();
+  }, [user.uid]);
+
+
 
   // const totalLineAmountSold = (line) => line.quantity * line.price;
   const totalLineAmountReal = (line) => line.final_quantity * line.actual_cost;
@@ -85,7 +107,6 @@ export default function SupplyStudy() {
     toast.success(`Nouvelle ligne ajoutée au chapitre "${chapter}" !`);
   };
 
-  // Sauvegarde les modifications dans Firestore
   const saveChanges = async () => {
     try {
       const realCostTotal = quotation.quotation_lines.reduce(
@@ -107,15 +128,23 @@ export default function SupplyStudy() {
           ? (realMarginValue / quotation.pre_tax_amount) * 100
           : 0;
 
+      const comments = quotation.comments || "";
+
       const updatedQuotation = {
         ...quotation,
         real_margin_percent: parseFloat(realMarginPercent.toFixed(2)),
         real_margin_value: parseFloat(realMarginValue.toFixed(2)),
         real_cost_total: parseFloat(realCostTotal.toFixed(2)),
+        comments,
+        established_by: user.uid,
+        established_date: new Date().toISOString(),
       };
 
       const docRef = doc(db, "supplyStudy", duplicateQuotationId);
-      await updateDoc(docRef, updatedQuotation);
+
+      // Utilisation de `setDoc` avec `merge: true` pour créer ou mettre à jour
+      await setDoc(docRef, updatedQuotation, { merge: true });
+
       toast.success("Modifications enregistrées avec succès !");
     } catch (err) {
       console.error("Erreur lors de la sauvegarde des modifications :", err);
@@ -144,7 +173,7 @@ export default function SupplyStudy() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
         <p>Chargement...</p>
       </div>
     );
@@ -177,7 +206,7 @@ export default function SupplyStudy() {
   ];
 
   const gaugeStyle = {
-    width: "300px"
+    width: "300px",
   };
 
   // Préparation des données pour le graphique
@@ -233,7 +262,7 @@ export default function SupplyStudy() {
           className="fa-solid fa-file-alt"
           style={{ color: "#ffff", marginRight: "15px" }}
         ></i>
-        Etude de projet / appro - {quotation.number}
+        étude de projet / appro - {quotation.number}
       </h1>
 
       <div className={styles.section1}>
@@ -285,6 +314,26 @@ export default function SupplyStudy() {
         <div className={styles.section1Right}>
           {/* // Jauges avec les marges,  si 100% alors on affiche : etude d'appro nécessaire */}
 
+          {/* // affiché qui a fait l etude et la date de l etude  si les données sont présentes */}
+          <h2>
+            {" "}
+            {quotation.supply_study_finished
+              ? "étude terminée"
+              : "étude a réaliser / en cours"}
+          </h2>
+          <p>
+            {" "}
+            {quotation.established_by && quotation.established_date
+              ? `Réalisée par : ${user.email} le ${new Date(
+                  quotation.established_date
+                ).toLocaleDateString()}`
+              : ""}
+          </p>
+
+
+      
+   
+
           <div className={styles.gaugeChart}>
             {data.map(
               (entry, index) =>
@@ -293,11 +342,12 @@ export default function SupplyStudy() {
                     <h4>
                       {index === 0 ? "Marge commerciale" : "Marge réelle"}
                     </h4>
+
                     <GaugeChart
                       id={`gauge-chart-${index}`}
                       arcsLength={[0.15, 0.13, 0.27, 0.45]}
                       arcWidth={0.3}
-                      colors={["#EA4228", "#F5CD19", "#5BE12C", "#109f30"]}
+                      colors={[" #F07167", "#FFBC42", "#91F5AD", "#009fe3"]}
                       percent={entry.value / 100}
                       textColor="#000"
                       needleColor="#4909c069"
@@ -452,7 +502,7 @@ export default function SupplyStudy() {
                         <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
                         <td>
                           <input
-                          className={styles.numInput}
+                            className={styles.numInput}
                             type="number"
                             value={line.final_quantity || ""}
                             onChange={(e) =>
@@ -495,7 +545,7 @@ export default function SupplyStudy() {
                         </td>
                         <td>
                           <input
-                          className={styles.numInput}
+                            className={styles.numInput}
                             type="number"
                             value={line.actual_cost || ""}
                             onChange={(e) =>
@@ -634,6 +684,20 @@ export default function SupplyStudy() {
           <p>Aucune ligne de devis disponible.</p>
         )}
       </div>
+
+      <div className={styles.comments}>
+        <h2>Commentair(e)s :</h2>
+        <textarea
+          value={quotation.comments}
+          onChange={(e) =>
+            setQuotation((prev) => ({
+              ...prev,
+              comments: e.target.value,
+            }))
+          }
+        />
+      </div>
+
       <div className={styles.buttons}>
         <button onClick={saveChanges} className={styles.saveButton}>
           Enregistrer les modifications

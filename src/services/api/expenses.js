@@ -36,7 +36,7 @@ export const fetchExpensesByProject = async (startDate, endDate, projectId) => {
 
 export const postExpenseReport = async (expense) => {
   try {
-    const url = "${BASE_URL}/create-expense-report";
+    const url = `${BASE_URL}/create-expense-report`;
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
