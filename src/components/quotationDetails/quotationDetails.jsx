@@ -111,7 +111,7 @@ export default function QuotationDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
         <p>Chargement...</p>
       </div>
     );
@@ -191,6 +191,7 @@ export default function QuotationDetails() {
           </div>
           {/* // jauge avec les données du duplicateQuotation */}
           <h3>Marge réelle</h3>
+
           {isDuplicate && !isNaN(realMarginValue) && realMarginValue !== 0 ? (
             <div className={styles.gauge}>
               <p>
