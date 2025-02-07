@@ -4,9 +4,10 @@ import { doc, getDoc } from "firebase/firestore";
 
 
 export const getUserByUid = async (uid) => {
-    const user = await getDoc(doc(db, "users", uid));
-    return user.data();
-    }
+    if (!uid) return null; // Vérification avant d'exécuter la requête
+    const userDoc = await getDoc(doc(db, "users", uid));
+    return userDoc.exists() ? userDoc.data() : null;
+  };
 
 
 

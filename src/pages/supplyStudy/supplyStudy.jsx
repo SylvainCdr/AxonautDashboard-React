@@ -30,19 +30,19 @@ export default function SupplyStudy() {
 
   // fonction pour récupérer l email grace à l uid dans la collections users
   useEffect(() => {
-    const fetchUserEmail = async () => {
-      try {
-        const user = await getUserByUid(user.uid);
-        setUserEmail(user.email);
-      } catch (err) {
-        console.error("Erreur lors de la récupération de l'email :", err);
-        setUserEmail("Inconnu");
-      }
-    };
+    if (quotation.established_by) {
+      const fetchUserEmail = async () => {
+        try {
+          const user = await getUserByUid(quotation.established_by);
+          setUserEmail(user?.email || "Inconnu");
+        } catch (err) {
+          console.error("Erreur lors de la récupération de l'email :", err);
+        }
+      };
 
-    fetchUserEmail();
-  }, [user.uid]);
-
+      fetchUserEmail();
+    }
+  }, [quotation.established_by]); // Dépendance corrigée
 
 
   // const totalLineAmountSold = (line) => line.quantity * line.price;
@@ -324,7 +324,7 @@ export default function SupplyStudy() {
           <p>
             {" "}
             {quotation.established_by && quotation.established_date
-              ? `Réalisée par : ${user.email} le ${new Date(
+              ? `Réalisée par : ${userEmail} le ${new Date(
                   quotation.established_date
                 ).toLocaleDateString()}`
               : ""}
