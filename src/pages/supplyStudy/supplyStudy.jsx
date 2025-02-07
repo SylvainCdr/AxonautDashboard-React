@@ -28,23 +28,6 @@ export default function SupplyStudy() {
   // on récupère le uid de l'utilisateur connecté
   const user = auth.currentUser;
 
-  // fonction pour récupérer l email grace à l uid dans la collections users
-  useEffect(() => {
-    if (quotation.established_by) {
-      const fetchUserEmail = async () => {
-        try {
-          const user = await getUserByUid(quotation.established_by);
-          setUserEmail(user?.email || "Inconnu");
-        } catch (err) {
-          console.error("Erreur lors de la récupération de l'email :", err);
-        }
-      };
-
-      fetchUserEmail();
-    }
-  }, [quotation.established_by]); // Dépendance corrigée
-
-
   // const totalLineAmountSold = (line) => line.quantity * line.price;
   const totalLineAmountReal = (line) => line.final_quantity * line.actual_cost;
 
@@ -60,12 +43,10 @@ export default function SupplyStudy() {
           setQuotation(snapshot.data());
         } else {
           setError("Aucun devis dupliqué trouvé pour cet ID.");
+          setQuotation({ quotation_lines: [] }); // Éviter le null
         }
       } catch (err) {
-        console.error(
-          "Erreur lors de la récupération du devis dupliqué :",
-          err
-        );
+        console.error("Erreur lors de la récupération du devis :", err);
         setError("Impossible de charger les données du devis.");
       } finally {
         setLoading(false);
@@ -74,6 +55,21 @@ export default function SupplyStudy() {
 
     fetchDuplicateQuotation();
   }, [duplicateQuotationId]);
+
+  useEffect(() => {
+    if (quotation && quotation.established_by) {
+      const fetchUserEmail = async () => {
+        try {
+          const user = await getUserByUid(quotation.established_by);
+          setUserEmail(user?.email || "Inconnu");
+        } catch (err) {
+          console.error("Erreur lors de la récupération de l'email :", err);
+        }
+      };
+
+      fetchUserEmail();
+    }
+  }, [quotation]);
 
   // Met à jour les champs modifiables
   const handleChange = (originalIndex, field, value) => {
@@ -262,7 +258,7 @@ export default function SupplyStudy() {
           className="fa-solid fa-file-alt"
           style={{ color: "#ffff", marginRight: "15px" }}
         ></i>
-        étude de projet / appro - {quotation.number}
+        étude de projet / appro - {quotation.number} 
       </h1>
 
       <div className={styles.section1}>
@@ -324,15 +320,11 @@ export default function SupplyStudy() {
           <p>
             {" "}
             {quotation.established_by && quotation.established_date
-              ? `Réalisée par : ${userEmail} le ${new Date(
+              ? `Réalisée par ${userEmail} le ${new Date(
                   quotation.established_date
                 ).toLocaleDateString()}`
               : ""}
           </p>
-
-
-      
-   
 
           <div className={styles.gaugeChart}>
             {data.map(
