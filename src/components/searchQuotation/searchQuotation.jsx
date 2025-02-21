@@ -54,30 +54,43 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
   };
   
 
-  const fetchSupplyStudy = async (projectId) => {
-    const supplyStudyRef = doc(db, "supplyStudy", projectId);
-    const supplyStudyDoc = await getDoc(supplyStudyRef);
-    if (supplyStudyDoc.exists()) {
-      const supplyStudyData = supplyStudyDoc.data();
-      setSupplyStudy({
-        realMarginPercent: supplyStudyData.realMarginPercent,
-        supplyStudyFinished: supplyStudyData.supplyStudyFinished,
-      });
+// Fonction pour récupérer la marge réelle depuis supplyStudy
+  const fetchRealMarginPercent = async (quotationId) => {
+    try {
+      const docRef = doc(db, "supplyStudy", quotationId.toString());
+      const snapshot = await getDoc(docRef);
+
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        return {
+          realMarginPercent: data.real_margin_percent || null, // Null si non défini
+          supplyStudyFinished: data.supply_study_finished || false, // False si non défini
+        };
+      }
+      return { realMarginPercent: null, supplyStudyFinished: false }; // Valeurs par défaut
+    } catch (err) {
+      console.error(
+        `Erreur lors de la récupération de la marge réelle pour ${quotationId}:`,
+        err
+      );
+      return { realMarginPercent: null, supplyStudyFinished: false }; // Valeurs par défaut en cas d'erreur
     }
   };
-
-  useEffect(() => {
-    if (quotation && quotation.project) {
-      fetchSupplyStudy(quotation.project);
-    }
-  }, [quotation]);
-  
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearchSubmit();
     }
   };
+
+  useEffect(() => {
+    if (quotation) {
+      fetchRealMarginPercent(quotation.id).then((data) => {
+        setSupplyStudy(data);
+      });
+    }
+  }, [quotation]);
+  
 
  
 
