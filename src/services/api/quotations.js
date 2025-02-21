@@ -1,4 +1,6 @@
 import { BASE_URL } from "../../url";
+import { db } from "../../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export const fetchQuotations = async (page = 1) => {
   try {
@@ -68,3 +70,5 @@ export const searchQuotationByNumber = async (quotationNumber) => {
   }
   return response.json();
 };
+
+

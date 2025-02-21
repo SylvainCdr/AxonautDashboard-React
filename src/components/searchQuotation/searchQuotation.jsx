@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { searchQuotationByNumber } from "../../services/api/quotations";
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { toast } from "react-toastify";
+import { db } from "../../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function SearchQuotation({ cachedQuotations = [] }) {
   const [loading, setLoading] = useState(false);
@@ -12,15 +14,19 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
   const [search, setSearch] = useState("");
   const [quotation, setQuotation] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [supplyStudy, setSupplyStudy] = useState({
+    realMarginPercent: null,
+    supplyStudyFinished: false,
+  });
   const navigate = useNavigate();
 
   const handleSearchSubmit = async () => {
     if (!search.trim()) return;
     setError(null);
     setHasSearched(true);
-
+  
     const normalizedSearch = search.toLowerCase().replace(/^pix/, "");
-
+  
     // Recherche côté client
     const clientResult = cachedQuotations.find((quotation) => {
       const normalizedQuotationNumber = quotation.number
@@ -28,16 +34,17 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
         .replace(/^pix/, "");
       return normalizedQuotationNumber === normalizedSearch;
     });
-
+  
     if (clientResult) {
       setQuotation(clientResult);
       return;
     }
-
+  
     // Recherche côté serveur
     setLoading(true);
     try {
       const data = await searchQuotationByNumber(normalizedSearch);
+      console.log('Search result:', data); // Ajoutez ce log pour vérifier la structure
       setQuotation(data);
     } catch (err) {
       setError(err.message);
@@ -45,6 +52,26 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
       setLoading(false);
     }
   };
+  
+
+  const fetchSupplyStudy = async (projectId) => {
+    const supplyStudyRef = doc(db, "supplyStudy", projectId);
+    const supplyStudyDoc = await getDoc(supplyStudyRef);
+    if (supplyStudyDoc.exists()) {
+      const supplyStudyData = supplyStudyDoc.data();
+      setSupplyStudy({
+        realMarginPercent: supplyStudyData.realMarginPercent,
+        supplyStudyFinished: supplyStudyData.supplyStudyFinished,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (quotation && quotation.project) {
+      fetchSupplyStudy(quotation.project);
+    }
+  }, [quotation]);
+  
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -52,9 +79,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
     }
   };
 
-  const handleQuotationClick = (quotationId, projectId) => {
-    navigate(`/quotations/${quotationId}/project/${projectId}`);
-  };
+ 
 
   const statusColor = (marginPercent) => {
     if (marginPercent < 15) return "red";
@@ -112,16 +137,16 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
                   {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
                 </td>
                 <td>
-                  {quotation.realMarginPercent === null ? (
+                  {supplyStudy.realMarginPercent === null ? (
                     <span role="img" aria-label="cross mark" style={{ color: "red" }}>❌</span>
                   ) : (
                     <span style={{ color: "black" }}>
-                      {quotation.supplyStudyFinished ? (
+                      {supplyStudy.supplyStudyFinished ? (
                         <span role="img" aria-label="check mark" style={{ color: "green" }}>✅</span>
                       ) : (
                         <span role="img" aria-label="hourglass" style={{ color: "orange" }}>⏳</span>
                       )}
-                      {quotation.realMarginPercent.toFixed(1)}%
+                      {supplyStudy.realMarginPercent.toFixed(1)}%
                     </span>
                   )}
                 </td>
