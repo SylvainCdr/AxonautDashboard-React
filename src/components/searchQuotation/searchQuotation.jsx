@@ -18,6 +18,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
     realMarginPercent: null,
     supplyStudyFinished: false,
   });
+  const [abortController, setAbortController] = useState(null); // Pour gérer l'annulation de la recherche
   const navigate = useNavigate();
 
   const handleSearchSubmit = async () => {
@@ -41,20 +42,35 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
     }
   
     // Recherche côté serveur
+    const controller = new AbortController(); // Créez un AbortController pour annuler la recherche
+    setAbortController(controller); // Sauvegardez le controller dans l'état
     setLoading(true);
     try {
-      const data = await searchQuotationByNumber(normalizedSearch);
+      const data = await searchQuotationByNumber(normalizedSearch, { signal: controller.signal });
       console.log('Search result:', data); // Ajoutez ce log pour vérifier la structure
       setQuotation(data);
     } catch (err) {
-      setError(err.message);
+      if (err.name === "AbortError") {
+        console.log("Recherche annulée");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
   };
-  
 
-// Fonction pour récupérer la marge réelle depuis supplyStudy
+  // Fonction pour annuler la recherche en cours
+  const handleCancelSearch = () => {
+    if (abortController) {
+      abortController.abort(); // Annule la requête
+      setLoading(false); // Arrête l'indicateur de chargement
+      setHasSearched(false); // Réinitialise la recherche
+      setQuotation(null); // Réinitialise le résultat de la recherche
+    }
+  };
+
+  // Fonction pour récupérer la marge réelle depuis supplyStudy
   const fetchRealMarginPercent = async (quotationId) => {
     try {
       const docRef = doc(db, "supplyStudy", quotationId.toString());
@@ -92,8 +108,6 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
   }, [quotation]);
   
 
- 
-
   const statusColor = (marginPercent) => {
     if (marginPercent < 15) return "red";
     if (marginPercent < 28) return "orange";
@@ -119,6 +133,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
         <div className={styles.loaderContainer}>
           <BarLoader color="#4520ff" loading={loading} size={15} />
           <p>Chargement des résultats...</p>
+          <button onClick={handleCancelSearch} className={styles.cancelButton}>Annuler</button>
         </div>
       )}
 
