@@ -531,7 +531,7 @@ export default function SupplyStudy() {
   })}
   <tr>
     <td colSpan="13" className={styles.addLineRow}>
-      <button onClick={() => addNewChapter()} className={styles.addButton}>
+      <button onClick={() => addNewChapter()} className={styles.addChapterButton}>
         <i className="fa-solid fa-plus"></i> Ajouter un chapitre
       </button>
     </td>

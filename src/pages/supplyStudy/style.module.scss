@@ -327,6 +327,24 @@
     }
   }
 
+  .addChapterButton {
+    background-color: #ff7e2e;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-left: 1rem;
+    margin-bottom: 0.8rem;
+
+    &:hover {
+      background-color: #f55f01;
+    }
+  }
+   
+
   .saveButton {
     display: block;
     margin: 0 auto;
