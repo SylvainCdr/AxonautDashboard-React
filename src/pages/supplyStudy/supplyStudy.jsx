@@ -103,6 +103,31 @@ export default function SupplyStudy() {
     toast.success(`Nouvelle ligne ajoutée au chapitre "${chapter}" !`);
   };
 
+  const addNewChapter = () => {
+    const newChapter = prompt("Nom du nouveau chapitre :");
+
+    if (newChapter) {
+      const newLine = {
+        product_code: "",
+        product_name: "",
+        quantity: 0,
+        final_quantity: 0,
+        price: 0,
+        unit_job_costing: 0,
+        actual_cost: 0,
+        new_line: true,
+        chapter: newChapter, // Associer la nouvelle ligne à ce chapitre
+      };
+
+      setQuotation((prev) => ({
+        ...prev,
+        quotation_lines: [...prev.quotation_lines, newLine],
+      }));
+
+      toast.success(`Nouveau chapitre "${newChapter}" ajouté !`);
+    }
+  };
+
   const saveChanges = async () => {
     try {
       const realCostTotal = quotation.quotation_lines.reduce(
@@ -163,34 +188,6 @@ export default function SupplyStudy() {
     } catch (err) {
       console.error("Erreur lors de la finalisation de l'étude :", err);
       alert("Erreur lors de la finalisation de l'étude.");
-    }
-  };
-
-  const addNewChapter = () => {
-    const newChapter = prompt("Nom du nouveau chapitre :");
-
-    if (newChapter) {
-      const newLine = {
-        product_code: "",
-        product_name: "",
-        quantity: 0,
-        final_quantity: 0,
-        price: 0,
-        unit_job_costing: 0,
-        actual_cost: 0,
-        new_line: true,
-        chapter: newChapter,
-      };
-
-      setQuotation((prev) => ({
-        ...prev,
-        quotation_lines: [...prev.quotation_lines, newLine],
-      }));
-
-      toast.success(`Nouveau chapitre "${newChapter}" ajouté !`);
-
-      // Scroll jusqu'au bas de la page
-      window.scrollTo(0, document.body.scrollHeight);
     }
   };
 
@@ -444,100 +441,271 @@ export default function SupplyStudy() {
                 </tr>
               </thead>
               <tbody>
-  {Object.entries(
-    quotation.quotation_lines.reduce((groups, line, index) => {
-      const chapter = line.chapter || "Autres";
-      if (!groups[chapter]) {
-        groups[chapter] = [];
-      }
-      groups[chapter].push({ ...line, originalIndex: index });
-      return groups;
-    }, {})
-  ).map(([chapter, lines], chapterIndex) => {
-    // 🔹 Calcul des totaux et marges par chapitre
-    const totalHT = lines.reduce((acc, line) => acc + (line.pre_tax_amount || 0), 0);
-    const totalPA = lines.reduce((acc, line) => acc + (line.quantity || 0) * (line.unit_job_costing || 0), 0);
-    const totalRealCost = lines.reduce((acc, line) => acc + totalLineAmountReal(line), 0);
+                {Object.entries(
+                  quotation.quotation_lines.reduce((groups, line, index) => {
+                    const chapter = line.chapter || "Autres";
+                    if (!groups[chapter]) {
+                      groups[chapter] = [];
+                    }
+                    groups[chapter].push({ ...line, originalIndex: index });
+                    return groups;
+                  }, {})
+                ).map(([chapter, lines], chapterIndex) => {
+                  // 🔹 Calcul des totaux et marges par chapitre
+                  const totalHT = lines.reduce(
+                    (acc, line) => acc + (line.pre_tax_amount || 0),
+                    0
+                  );
+                  const totalPA = lines.reduce(
+                    (acc, line) =>
+                      acc + (line.quantity || 0) * (line.unit_job_costing || 0),
+                    0
+                  );
+                  const totalRealCost = lines.reduce(
+                    (acc, line) => acc + totalLineAmountReal(line),
+                    0
+                  );
 
-    const marginComm = totalHT > 0 ? ((totalHT - totalPA) / totalHT) * 100 : 0;
-    const marginReal = totalHT > 0 ? ((totalHT - totalRealCost) / totalHT) * 100 : 0;
+                  const marginComm =
+                    totalHT > 0 ? ((totalHT - totalPA) / totalHT) * 100 : 0;
+                  const marginReal =
+                    totalHT > 0
+                      ? ((totalHT - totalRealCost) / totalHT) * 100
+                      : 0;
 
-    return (
-      <React.Fragment key={chapterIndex}>
-        <tr className={styles.chapterRow}>
-          <td colSpan="13" className={styles.chapterHeader}>
-            <strong>{decodeHtmlEntities(chapter)}</strong>
-          </td>
-        </tr>
+                  return (
+                    <React.Fragment key={chapterIndex}>
+                      <tr className={styles.chapterRow}>
+                        <td colSpan="13" className={styles.chapterHeader}>
+                          <strong>{decodeHtmlEntities(chapter)}</strong>
+                        </td>
+                      </tr>
 
-        {lines.map((line, index) => {
-          const discountPercentage = line.pre_tax_amount > 0
-            ? ((line.pre_tax_amount - line.quantity * line.price) / line.pre_tax_amount) * 100
-            : 0;
+                      {lines.map((line, index) => {
+                        const discountPercentage =
+                          line.pre_tax_amount > 0
+                            ? ((line.pre_tax_amount -
+                                line.quantity * line.price) /
+                                line.pre_tax_amount) *
+                              100
+                            : 0;
 
-          const commercialMargin = line.pre_tax_amount > 0
-            ? ((line.pre_tax_amount - line.quantity * line.unit_job_costing) / line.pre_tax_amount) * 100
-            : 0;
+                        const commercialMargin =
+                          line.pre_tax_amount > 0
+                            ? ((line.pre_tax_amount -
+                                line.quantity * line.unit_job_costing) /
+                                line.pre_tax_amount) *
+                              100
+                            : 0;
 
-          const realMargin = line.pre_tax_amount > 0
-            ? ((line.pre_tax_amount - totalLineAmountReal(line)) / line.pre_tax_amount) * 100
-            : 0;
+                        const realMargin =
+                          line.pre_tax_amount > 0
+                            ? ((line.pre_tax_amount -
+                                totalLineAmountReal(line)) /
+                                line.pre_tax_amount) *
+                              100
+                            : 0;
 
-          return (
-            <tr key={index} className={`${line.new_line ? styles.newLine : ""} ${line.actual_cost < 0 ? styles.negativeCost : ""}`}>
-              <td>
-                <input type="text" value={line.product_code || ""} onChange={(e) => handleChange(line.originalIndex, "product_code", e.target.value)} />
-              </td>
-              <td>
-                <input type="text" value={line.product_name || ""} onChange={(e) => handleChange(line.originalIndex, "product_name", e.target.value)} />
-              </td>
-              <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
-              <td>
-                <input className={styles.numInput} type="number" value={line.final_quantity || ""} onChange={(e) => handleChange(line.originalIndex, "final_quantity", parseFloat(e.target.value) || 0)} />
-              </td>
-              <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
-              <td>{!isNaN(discountPercentage) ? discountPercentage.toFixed(1) : "0.0"} %</td>
-              <td>{line.pre_tax_amount > 0 ? `${line.pre_tax_amount.toFixed(2)} €` : "-"}</td>
-              <td>{line.unit_job_costing > 0 ? `${line.unit_job_costing.toFixed(2)} €` : "-"}</td>
-              <td>{line.quantity > 0 ? (line.quantity * line.unit_job_costing).toFixed(2) : "-"} €</td>
-              <td>{!isNaN(commercialMargin) ? commercialMargin.toFixed(1) : "0.0"} %</td>
-              <td>
-                <input className={styles.numInput} type="number" value={line.actual_cost || ""} onChange={(e) => handleChange(line.originalIndex, "actual_cost", parseFloat(e.target.value) || 0)} />
-              </td>
-              <td>{totalLineAmountReal(line) > 0 ? `${totalLineAmountReal(line).toFixed(2)} €` : "-"}</td>
-              <td className={realMargin > 50 ? styles.green : realMargin > 30 ? styles.blue : realMargin >= 15 ? styles.orange : realMargin < 0 ? styles.red : styles.red}>
-                {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %
-                <span>
-                  {realMargin > 50 && "🔥"}
-                  {realMargin > 30 && realMargin <= 50 && "✅"}
-                  {realMargin >= 15 && realMargin <= 30 && "⚠️"}
-                  {realMargin < 0 && "☠️"}
-                  {realMargin >= 0 && realMargin < 15 && "⬇️"}
-                </span>
-              </td>
-            </tr>
-          );
-        })}
+                        return (
+                          // <tr
+                          //   key={index}
+                          //   className={`${
+                          //     line.new_line ? styles.newLine : ""
+                          //   } ${
+                          //     line.actual_cost < 0 ? styles.negativeCost : ""
+                          //   }`}
+                          // >
+                          <tr
+  key={index}
+  className={`${
+    line.new_line ? styles.newLine : ""
+  } ${
+    realMargin === 100 ? styles.fullMargin : ""
+  }`}
+>
 
-        <tr>
-          <td colSpan="13" className={styles.addLineRow}>
-            <button onClick={() => addNewLineToChapter(chapter)} className={styles.addButton}>
-              <i className="fa-solid fa-plus"></i> Ajouter une ligne
-            </button>
-          </td>
-        </tr>
-      </React.Fragment>
-    );
-  })}
-  <tr>
-    <td colSpan="13" className={styles.addLineRow}>
-      <button onClick={() => addNewChapter()} className={styles.addChapterButton}>
-        <i className="fa-solid fa-plus"></i> Ajouter un chapitre
-      </button>
-    </td>
-  </tr>
-</tbody>
+                            <td>
+                              <input
+                                type="text"
+                                value={line.product_code || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "product_code",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                value={line.product_name || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "product_name",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
+                            <td>
+                              <input
+                                className={styles.numInput}
+                                type="number"
+                                value={line.final_quantity || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "final_quantity",
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
+                            <td>
+                              {!isNaN(discountPercentage)
+                                ? discountPercentage.toFixed(1)
+                                : "0.0"}{" "}
+                              %
+                            </td>
+                            <td>
+                              {line.pre_tax_amount > 0
+                                ? `${line.pre_tax_amount.toFixed(2)} €`
+                                : "-"}
+                            </td>
+                            <td>
+                              {line.unit_job_costing > 0
+                                ? `${line.unit_job_costing.toFixed(2)} €`
+                                : "-"}
+                            </td>
+                            <td>
+                              {line.quantity > 0
+                                ? (
+                                    line.quantity * line.unit_job_costing
+                                  ).toFixed(2)
+                                : "-"}{" "}
+                              €
+                            </td>
+                            <td>
+                              {!isNaN(commercialMargin)
+                                ? commercialMargin.toFixed(1)
+                                : "0.0"}{" "}
+                              %
+                            </td>
+                            <td>
+                              <input
+                                className={styles.numInput}
+                                type="number"
+                                value={line.actual_cost || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "actual_cost",
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              {totalLineAmountReal(line) > 0
+                                ? `${totalLineAmountReal(line).toFixed(2)} €`
+                                : "-"}
+                            </td>
+                            <td
+                              className={
+                                realMargin > 50
+                                  ? styles.green
+                                  : realMargin > 30
+                                  ? styles.blue
+                                  : realMargin >= 15
+                                  ? styles.orange
+                                  : realMargin < 0
+                                  ? styles.red
+                                  : styles.red
+                              }
+                            >
+                              {!isNaN(realMargin)
+                                ? realMargin.toFixed(1)
+                                : "0.0"}{" "}
+                              %
+                              <span>
+                                {realMargin > 50 && "🔥"}
+                                {realMargin > 30 && realMargin <= 50 && "✅"}
+                                {realMargin >= 15 && realMargin <= 30 && "⚠️"}
+                                {realMargin < 0 && "☠️"}
+                                {realMargin >= 0 && realMargin < 15 && "⬇️"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
 
+                      <tr className={styles.chapterTotals}>
+                        <td colSpan="8">
+                          <strong>Total {decodeHtmlEntities(chapter)} :</strong>
+                        </td>
+                      
+                        <td>
+                          <strong>{totalPA.toFixed(2)} €</strong>
+                        </td>
+                        <td>
+                          <strong>{marginComm.toFixed(1)} %</strong>
+                        </td>
+                        <td></td>
+                        <td>
+                          <strong>{totalRealCost.toFixed(2)} €</strong>
+                        </td>
+                        <td
+                          className={
+                            marginReal > 50
+                              ? styles.green
+                              : marginReal > 30
+                              ? styles.blue
+                              : marginReal >= 15
+                              ? styles.orange
+                              : marginReal < 0
+                              ? styles.red
+                              : styles.red
+                          }
+                        >
+                          <strong>{marginReal.toFixed(1)} %</strong>
+                          <span>
+                            {marginReal > 50 && "🔥"}
+                            {marginReal > 30 && marginReal <= 50 && "✅"}
+                            {marginReal >= 15 && marginReal <= 30 && "⚠️"}
+                            {marginReal < 0 && "☠️"}
+                            {marginReal >= 0 && marginReal < 15 && "⬇️"}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td colSpan="13" className={styles.addLineRow}>
+                          <button
+                            onClick={() => addNewLineToChapter(chapter)}
+                            className={styles.addButton}
+                          >
+                            <i className="fa-solid fa-plus"></i> Ajouter une
+                            ligne
+                          </button>
+                        </td>
+                      </tr>
+                 
+                    </React.Fragment>
+                  );
+                })}
+                <tr>
+                  <td colSpan="13" className={styles.addLineRow}>
+                    <button onClick={() => addNewChapter()} className={styles.addChapterButton}>
+                      <i className="fa-solid fa-plus"></i> Ajouter un chapitre
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
 
               <tfoot>
                 <tr>
@@ -618,6 +786,7 @@ export default function SupplyStudy() {
                     %
                   </td>
                 </tr>
+                
               </tfoot>
             </table>
           </div>

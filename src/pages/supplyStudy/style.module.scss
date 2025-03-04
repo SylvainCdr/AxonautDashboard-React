@@ -206,10 +206,18 @@
             }
           }
         }
-        .newLine {
-          background-color: rgba(67, 253, 175, 0.524);
-          font-weight: bold;
-        }
+       // 🌸 Surlignage rose pour les nouvelles lignes
+  .newLine {
+    background-color: rgba(255, 182, 193, 0.5); // Rose clair
+    font-weight: bold;
+  }
+
+  // ✅ Surlignage vert pour les lignes avec une marge réelle de 100%
+  .fullMargin {
+    background-color: rgba(144, 238, 144, 0.6); // Vert clair
+    font-weight: bold;
+  }
+
 
         .negativeCost {
           background-color: rgba(153, 76, 255, 0.599);
