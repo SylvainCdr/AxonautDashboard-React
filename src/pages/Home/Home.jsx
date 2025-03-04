@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import styles from "./style.module.scss";
 
+
 const container = {
   hidden: { opacity: 0, scale: 0 },
   visible: {

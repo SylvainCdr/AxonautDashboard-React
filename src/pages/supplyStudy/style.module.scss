@@ -17,19 +17,19 @@
 
 .duplicateQuotationContainer {
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1rem;
   background-color: #f3f4f6;
   border-radius: 10px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   padding-top: 5rem;
-  max-width: 1400px;
+  max-width: 1450px;
   margin: 0 auto;
 
   .section1 {
     display: flex;
     width: 95%;
     margin-bottom: 2rem;
-    padding: 1rem;
+    padding: 1rem 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
@@ -133,8 +133,9 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     h2 {
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       margin-bottom: 2rem;
+      padding-top: 2rem;
       color: #4520ff;
       text-align: center;
       text-transform: uppercase;
@@ -145,23 +146,36 @@
       font-weight: bold;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .tableContainer {
+      max-height:950px; // Ajuste cette valeur selon ton besoin
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
       margin-bottom: 2rem;
-
+      
       thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1); // Effet d'ombre pour distinguer
         tr {
           background-color: var(--col1);
           color: #fff;
-
+          
           th {
             text-transform: uppercase;
             padding: 0.4rem;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            padding: 5px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
           }
         }
       }
+    }
 
       input {
         padding: 0.3rem;
@@ -201,6 +215,17 @@
           background-color: rgba(153, 76, 255, 0.599);
           font-weight: bold;
         }
+        .chapterTotals {
+          background-color: #d3e9ff; // Fond légèrement gris
+          font-weight: bold;
+          color : orangered;
+        }
+        
+        .chapterTotals td {
+          padding: 10px;
+          border-top: 2px solid #ddd;
+        }
+        
       }
 
       .green {
@@ -221,6 +246,10 @@
       span {
         font-size: 1.3rem;
         margin-left: 0.5rem;
+        float : right;
+        display : flex;
+        align-items : center;
+      
       }
 
       tfoot {

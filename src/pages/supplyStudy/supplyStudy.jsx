@@ -258,7 +258,7 @@ export default function SupplyStudy() {
           className="fa-solid fa-file-alt"
           style={{ color: "#ffff", marginRight: "15px" }}
         ></i>
-        étude de projet / appro - {quotation.number} 
+        étude de projet / appro - {quotation.number}
       </h1>
 
       <div className={styles.section1}>
@@ -396,282 +396,357 @@ export default function SupplyStudy() {
           Lignes du devis
         </h2>
         {quotation.quotation_lines && quotation.quotation_lines.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Référence</th>
-                <th>Désignation</th>
-                <th>Qté initiale</th>
-                <th>Qté finale</th>
-                <th>PV</th>
-                <th>Remise</th>
-                <th>PV Total</th>
-                <th>PA unit</th>
-                <th>PA Total</th>
-                <th>Marge co %</th>
-                <th>Coût réel unit</th>
-                <th>Total réel</th>
-                <th>Total marge réelle %</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(
-                quotation.quotation_lines.reduce((groups, line, index) => {
-                  const chapter = line.chapter || "Autres";
-                  if (!groups[chapter]) {
-                    groups[chapter] = [];
-                  }
-                  // Ajout de l'index d'origine
-                  groups[chapter].push({ ...line, originalIndex: index });
-                  return groups;
-                }, {})
-              ).map(([chapter, lines], chapterIndex) => (
-                <React.Fragment key={chapterIndex}>
-                  {/* Ligne du chapitre */}
-                  <tr className={styles.chapterRow}>
-                    <td colSpan="13" className={styles.chapterHeader}>
-                      <strong>{decodeHtmlEntities(chapter)}</strong>
-                    </td>
-                  </tr>
+          <div className={styles.tableContainer}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Désignation</th>
+                  <th>Qté initiale</th>
+                  <th>Qté finale</th>
+                  <th>PV</th>
+                  <th>Remise</th>
+                  <th>PV Total</th>
+                  <th>PA unit</th>
+                  <th>PA Total</th>
+                  <th>Marge co %</th>
+                  <th>Coût réel unit</th>
+                  <th>Total réel</th>
+                  <th>Total marge réelle %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(
+                  quotation.quotation_lines.reduce((groups, line, index) => {
+                    const chapter = line.chapter || "Autres";
+                    if (!groups[chapter]) {
+                      groups[chapter] = [];
+                    }
+                    groups[chapter].push({ ...line, originalIndex: index });
+                    return groups;
+                  }, {})
+                ).map(([chapter, lines], chapterIndex) => {
+                  // 🔹 Calcul des totaux et marges par chapitre
+                  const totalHT = lines.reduce(
+                    (acc, line) => acc + (line.pre_tax_amount || 0),
+                    0
+                  );
+                  const totalPA = lines.reduce(
+                    (acc, line) =>
+                      acc + (line.quantity || 0) * (line.unit_job_costing || 0),
+                    0
+                  );
+                  const totalRealCost = lines.reduce(
+                    (acc, line) => acc + totalLineAmountReal(line),
+                    0
+                  );
 
-                  {/* Lignes des éléments dans le chapitre */}
-                  {lines.map((line, index) => {
-                    const discountPercentage =
-                      line.pre_tax_amount > 0
-                        ? ((line.pre_tax_amount - line.quantity * line.price) /
-                            line.pre_tax_amount) *
-                          100
-                        : 0;
+                  const marginComm =
+                    totalHT > 0 ? ((totalHT - totalPA) / totalHT) * 100 : 0;
+                  const marginReal =
+                    totalHT > 0
+                      ? ((totalHT - totalRealCost) / totalHT) * 100
+                      : 0;
 
-                    const commercialMargin =
-                      line.pre_tax_amount > 0
-                        ? ((line.pre_tax_amount -
-                            line.quantity * line.unit_job_costing) /
-                            line.pre_tax_amount) *
-                          100
-                        : 0;
+                  return (
+                    <React.Fragment key={chapterIndex}>
+                      <tr className={styles.chapterRow}>
+                        <td colSpan="13" className={styles.chapterHeader}>
+                          <strong>{decodeHtmlEntities(chapter)}</strong>
+                        </td>
+                      </tr>
 
-                    const realMargin =
-                      line.pre_tax_amount > 0
-                        ? ((line.pre_tax_amount - totalLineAmountReal(line)) /
-                            line.pre_tax_amount) *
-                          100
-                        : 0;
+                      {lines.map((line, index) => {
+                        const discountPercentage =
+                          line.pre_tax_amount > 0
+                            ? ((line.pre_tax_amount -
+                                line.quantity * line.price) /
+                                line.pre_tax_amount) *
+                              100
+                            : 0;
 
-                    return (
-                      <tr
-                        key={index}
-                        className={`${line.new_line ? styles.newLine : ""} ${
-                          line.actual_cost < 0 ? styles.negativeCost : ""
-                        }`} // Ajoute une classe spécifique si le coût réel est négatif
-                      >
+                        const commercialMargin =
+                          line.pre_tax_amount > 0
+                            ? ((line.pre_tax_amount -
+                                line.quantity * line.unit_job_costing) /
+                                line.pre_tax_amount) *
+                              100
+                            : 0;
+
+                        const realMargin =
+                          line.pre_tax_amount > 0
+                            ? ((line.pre_tax_amount -
+                                totalLineAmountReal(line)) /
+                                line.pre_tax_amount) *
+                              100
+                            : 0;
+
+                        return (
+                          <tr
+                            key={index}
+                            className={`${
+                              line.new_line ? styles.newLine : ""
+                            } ${
+                              line.actual_cost < 0 ? styles.negativeCost : ""
+                            }`}
+                          >
+                            <td>
+                              <input
+                                type="text"
+                                value={line.product_code || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "product_code",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                value={line.product_name || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "product_name",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
+                            <td>
+                              <input
+                                className={styles.numInput}
+                                type="number"
+                                value={line.final_quantity || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "final_quantity",
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
+                            <td>
+                              {!isNaN(discountPercentage)
+                                ? discountPercentage.toFixed(1)
+                                : "0.0"}{" "}
+                              %
+                            </td>
+                            <td>
+                              {line.pre_tax_amount > 0
+                                ? `${line.pre_tax_amount.toFixed(2)} €`
+                                : "-"}
+                            </td>
+                            <td>
+                              {line.unit_job_costing > 0
+                                ? `${line.unit_job_costing.toFixed(2)} €`
+                                : "-"}
+                            </td>
+                            <td>
+                              {line.quantity > 0
+                                ? (
+                                    line.quantity * line.unit_job_costing
+                                  ).toFixed(2)
+                                : "-"}{" "}
+                              €
+                            </td>
+                            <td>
+                              {!isNaN(commercialMargin)
+                                ? commercialMargin.toFixed(1)
+                                : "0.0"}{" "}
+                              %
+                            </td>
+                            <td>
+                              <input
+                                className={styles.numInput}
+                                type="number"
+                                value={line.actual_cost || ""}
+                                onChange={(e) =>
+                                  handleChange(
+                                    line.originalIndex,
+                                    "actual_cost",
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              {totalLineAmountReal(line) > 0
+                                ? `${totalLineAmountReal(line).toFixed(2)} €`
+                                : "-"}
+                            </td>
+                            <td
+                              className={
+                                realMargin > 50
+                                  ? styles.green
+                                  : realMargin > 30
+                                  ? styles.blue
+                                  : realMargin >= 15
+                                  ? styles.orange
+                                  : realMargin < 0
+                                  ? styles.red
+                                  : styles.red
+                              }
+                            >
+                              {!isNaN(realMargin)
+                                ? realMargin.toFixed(1)
+                                : "0.0"}{" "}
+                              %
+                              <span>
+                                {realMargin > 50 && "🔥"}
+                                {realMargin > 30 && realMargin <= 50 && "✅"}
+                                {realMargin >= 15 && realMargin <= 30 && "⚠️"}
+                                {realMargin < 0 && "☠️"}
+                                {realMargin >= 0 && realMargin < 15 && "⬇️"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+
+                      <tr className={styles.chapterTotals}>
+                        <td colSpan="8">
+                          <strong>Total {decodeHtmlEntities(chapter)} :</strong>
+                        </td>
+                      
                         <td>
-                          <input
-                            type="text"
-                            value={line.product_code || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                line.originalIndex,
-                                "product_code",
-                                e.target.value
-                              )
-                            }
-                          />
+                          <strong>{totalPA.toFixed(2)} €</strong>
                         </td>
                         <td>
-                          <input
-                            type="text"
-                            value={line.product_name || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                line.originalIndex,
-                                "product_name",
-                                e.target.value
-                              )
-                            }
-                          />
+                          <strong>{marginComm.toFixed(1)} %</strong>
                         </td>
-                        <td>{line.quantity > 0 ? line.quantity : "N/A"}</td>
+                        <td></td>
                         <td>
-                          <input
-                            className={styles.numInput}
-                            type="number"
-                            value={line.final_quantity || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                line.originalIndex,
-                                "final_quantity",
-                                parseFloat(e.target.value) || 0
-                              )
-                            }
-                          />
-                        </td>
-                        <td>{line.price > 0 ? `${line.price} €` : "-"}</td>
-                        <td>
-                          {!isNaN(discountPercentage)
-                            ? discountPercentage.toFixed(1)
-                            : "0.0"}{" "}
-                          %
-                        </td>
-                        <td>
-                          {line.pre_tax_amount > 0
-                            ? `${line.pre_tax_amount.toFixed(2)} €`
-                            : "-"}
-                        </td>
-                        <td>
-                          {line.unit_job_costing > 0
-                            ? `${line.unit_job_costing.toFixed(2)} €`
-                            : "-"}
-                        </td>
-                        <td>
-                          {line.quantity > 0
-                            ? (line.quantity * line.unit_job_costing).toFixed(2)
-                            : "-"}{" "}
-                          €
-                        </td>
-                        <td>
-                          {!isNaN(commercialMargin)
-                            ? commercialMargin.toFixed(1)
-                            : "0.0"}{" "}
-                          %
-                        </td>
-                        <td>
-                          <input
-                            className={styles.numInput}
-                            type="number"
-                            value={line.actual_cost || ""}
-                            onChange={(e) =>
-                              handleChange(
-                                line.originalIndex,
-                                "actual_cost",
-                                parseFloat(e.target.value) || 0
-                              )
-                            }
-                          />
-                        </td>
-                        <td>
-                          {totalLineAmountReal(line) > 0
-                            ? `${totalLineAmountReal(line).toFixed(2)} €`
-                            : "-"}
+                          <strong>{totalRealCost.toFixed(2)} €</strong>
                         </td>
                         <td
                           className={
-                            realMargin > 50
+                            marginReal > 50
                               ? styles.green
-                              : realMargin > 30
+                              : marginReal > 30
                               ? styles.blue
-                              : realMargin >= 15
+                              : marginReal >= 15
                               ? styles.orange
-                              : realMargin < 0
+                              : marginReal < 0
                               ? styles.red
                               : styles.red
                           }
                         >
-                          {!isNaN(realMargin) ? realMargin.toFixed(1) : "0.0"} %
+                          <strong>{marginReal.toFixed(1)} %</strong>
                           <span>
-                            {realMargin > 50 && "🔥"}
-                            {realMargin > 30 && realMargin <= 50 && "✅"}
-                            {realMargin >= 15 && realMargin <= 30 && "⚠️"}
-                            {realMargin < 0 && "☠️"}
-                            {realMargin >= 0 && realMargin < 15 && "⬇️"}
+                            {marginReal > 50 && "🔥"}
+                            {marginReal > 30 && marginReal <= 50 && "✅"}
+                            {marginReal >= 15 && marginReal <= 30 && "⚠️"}
+                            {marginReal < 0 && "☠️"}
+                            {marginReal >= 0 && marginReal < 15 && "⬇️"}
                           </span>
                         </td>
                       </tr>
-                    );
-                  })}
 
-                  {/* Bouton pour ajouter une nouvelle ligne dans ce chapitre */}
-                  <tr>
-                    <td colSpan="13" className={styles.addLineRow}>
-                      <button
-                        onClick={() => addNewLineToChapter(chapter)}
-                        className={styles.addButton}
-                      >
-                        <i className="fa-solid fa-plus"></i> Ajouter une ligne
-                      </button>
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))}
-            </tbody>
+                      <tr>
+                        <td colSpan="13" className={styles.addLineRow}>
+                          <button
+                            onClick={() => addNewLineToChapter(chapter)}
+                            className={styles.addButton}
+                          >
+                            <i className="fa-solid fa-plus"></i> Ajouter une
+                            ligne
+                          </button>
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
 
-            <tfoot>
-              <tr>
-                <td colSpan="6">Total</td>
-                <td>
-                  {/* Total prix vendu */}
-                  {quotation.quotation_lines
-                    .reduce((acc, line) => acc + (line.pre_tax_amount || 0), 0)
-                    .toFixed(2)}{" "}
-                  €
-                </td>
-                <td></td>
+              <tfoot>
+                <tr>
+                  <td colSpan="6">Total</td>
+                  <td>
+                    {/* Total prix vendu */}
+                    {quotation.quotation_lines
+                      .reduce(
+                        (acc, line) => acc + (line.pre_tax_amount || 0),
+                        0
+                      )
+                      .toFixed(2)}{" "}
+                    €
+                  </td>
+                  <td></td>
 
-                <td>
-                  {/* Total coût de revient initial */}
-                  {quotation.quotation_lines
-                    .reduce(
-                      (acc, line) =>
-                        acc +
-                        (line.quantity || 0) * (line.unit_job_costing || 0),
-                      0
-                    )
-                    .toFixed(2)}{" "}
-                  €
-                </td>
-                <td>
-                  {/* Total marge commerciale en %*/}
-                  {quotation.pre_tax_amount > 0
-                    ? (
-                        (quotation.quotation_lines.reduce(
-                          (acc, line) =>
-                            acc +
-                            (line.pre_tax_amount || 0) -
-                            (line.quantity || 0) * (line.unit_job_costing || 0),
-                          0
-                        ) /
-                          quotation.pre_tax_amount) *
-                        100
-                      ).toFixed(1)
-                    : "0"}{" "}
-                  %
-                </td>
+                  <td>
+                    {/* Total coût de revient initial */}
+                    {quotation.quotation_lines
+                      .reduce(
+                        (acc, line) =>
+                          acc +
+                          (line.quantity || 0) * (line.unit_job_costing || 0),
+                        0
+                      )
+                      .toFixed(2)}{" "}
+                    €
+                  </td>
+                  <td>
+                    {/* Total marge commerciale en %*/}
+                    {quotation.pre_tax_amount > 0
+                      ? (
+                          (quotation.quotation_lines.reduce(
+                            (acc, line) =>
+                              acc +
+                              (line.pre_tax_amount || 0) -
+                              (line.quantity || 0) *
+                                (line.unit_job_costing || 0),
+                            0
+                          ) /
+                            quotation.pre_tax_amount) *
+                          100
+                        ).toFixed(1)
+                      : "0"}{" "}
+                    %
+                  </td>
 
-                <td></td>
+                  <td></td>
 
-                {/* total des coûts */}
-                <td>
-                  {quotation.quotation_lines
-                    .reduce(
-                      (acc, line) =>
-                        acc +
-                        (line.final_quantity || 0) * (line.actual_cost || 0),
-                      0
-                    )
-                    .toFixed(2)}{" "}
-                  €
-                </td>
-                <td>
-                  {/* Marge réelle totale */}
-                  {quotation.pre_tax_amount > 0
-                    ? (
-                        (quotation.quotation_lines.reduce(
-                          (acc, line) =>
-                            acc +
-                            (line.pre_tax_amount || 0) -
-                            (line.final_quantity || 0) *
-                              (line.actual_cost || 0),
-                          0
-                        ) /
-                          quotation.pre_tax_amount) *
-                        100
-                      ).toFixed(1)
-                    : "0"}{" "}
-                  %
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+                  {/* total des coûts */}
+                  <td>
+                    {quotation.quotation_lines
+                      .reduce(
+                        (acc, line) =>
+                          acc +
+                          (line.final_quantity || 0) * (line.actual_cost || 0),
+                        0
+                      )
+                      .toFixed(2)}{" "}
+                    €
+                  </td>
+                  <td>
+                    {/* Marge réelle totale */}
+                    {quotation.pre_tax_amount > 0
+                      ? (
+                          (quotation.quotation_lines.reduce(
+                            (acc, line) =>
+                              acc +
+                              (line.pre_tax_amount || 0) -
+                              (line.final_quantity || 0) *
+                                (line.actual_cost || 0),
+                            0
+                          ) /
+                            quotation.pre_tax_amount) *
+                          100
+                        ).toFixed(1)
+                      : "0"}{" "}
+                    %
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         ) : (
           <p>Aucune ligne de devis disponible.</p>
         )}
