@@ -128,6 +128,16 @@ export default function SupplyStudy() {
     }
   };
 
+  const removeNewLine = (originalIndex) => {
+    setQuotation((prev) => ({
+      ...prev,
+      quotation_lines: prev.quotation_lines.filter(
+        (_, i) => i !== originalIndex
+      ),
+    }));
+    toast.success("Ligne supprimée !");
+  };
+
   const saveChanges = async () => {
     try {
       const realCostTotal = quotation.quotation_lines.reduce(
@@ -438,6 +448,7 @@ export default function SupplyStudy() {
                   <th>Coût réel unit</th>
                   <th>Total réel</th>
                   <th>Total marge réelle %</th>
+                  <th>X</th>
                 </tr>
               </thead>
               <tbody>
@@ -507,23 +518,12 @@ export default function SupplyStudy() {
                             : 0;
 
                         return (
-                          // <tr
-                          //   key={index}
-                          //   className={`${
-                          //     line.new_line ? styles.newLine : ""
-                          //   } ${
-                          //     line.actual_cost < 0 ? styles.negativeCost : ""
-                          //   }`}
-                          // >
                           <tr
-  key={index}
-  className={`${
-    line.new_line ? styles.newLine : ""
-  } ${
-    realMargin === 100 ? styles.fullMargin : ""
-  }`}
->
-
+                            key={index}
+                            className={`${
+                              line.new_line ? styles.newLine : ""
+                            } ${realMargin === 100 ? styles.fullMargin : ""}`}
+                          >
                             <td>
                               <input
                                 type="text"
@@ -640,6 +640,19 @@ export default function SupplyStudy() {
                                 {realMargin >= 0 && realMargin < 15 && "⬇️"}
                               </span>
                             </td>
+                            {/* Bouton de suppression */}
+                            {line.new_line && (
+                              <td>
+                                <button
+                                  className={styles.deleteButton}
+                                  onClick={() =>
+                                    removeNewLine(line.originalIndex)
+                                  }
+                                >
+                                  <i className="fa-solid fa-trash"></i>
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         );
                       })}
@@ -648,7 +661,7 @@ export default function SupplyStudy() {
                         <td colSpan="8">
                           <strong>Total {decodeHtmlEntities(chapter)} :</strong>
                         </td>
-                      
+
                         <td>
                           <strong>{totalPA.toFixed(2)} €</strong>
                         </td>
@@ -694,13 +707,15 @@ export default function SupplyStudy() {
                           </button>
                         </td>
                       </tr>
-                 
                     </React.Fragment>
                   );
                 })}
                 <tr>
                   <td colSpan="13" className={styles.addLineRow}>
-                    <button onClick={() => addNewChapter()} className={styles.addChapterButton}>
+                    <button
+                      onClick={() => addNewChapter()}
+                      className={styles.addChapterButton}
+                    >
                       <i className="fa-solid fa-plus"></i> Ajouter un chapitre
                     </button>
                   </td>
@@ -786,7 +801,6 @@ export default function SupplyStudy() {
                     %
                   </td>
                 </tr>
-                
               </tfoot>
             </table>
           </div>
