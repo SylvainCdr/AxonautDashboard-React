@@ -1,70 +1,70 @@
-# Getting Started with Create React App
+## Pix x Axo - Application de Gestion des Devis et Marges connecté à Axonaut
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Cette application web est conçue pour optimiser la gestion des devis, commandes et marges commerciales en intégrant les données de l'API Axonaut. Elle permet d'automatiser l'analyse des projets, de suivre les dépenses réelles et à venir, et d'optimiser la gestion des marges commerciales et réelles.
 
-## Available Scripts
+## Table des matières
 
-In the project directory, you can run:
+- [Fonctionnalités](#fonctionnalités)
+- [Connexion avec Axonaut](#connexion-à-axonaut)
+- [Technologies utilisées](#technologies-utilisées)
+- [Screenshots](#screenshots)
 
-### `npm start`
+## Fonctionnalités
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+L'application offre les fonctionnalités suivantes :
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Connexion à une API Node.js pour récupérer en temps réel les données de l'API Axonaut.
+- Suivi des dépenses réelles et prévisionnelles associées aux projets.
+- Calcul des marges commerciales et réelles afin d'optimiser la rentabilité des commandes.
+- Duplication des devis Axonaut pour étudier l'approvisionnement et la gestion de projet.
+- Visualisation graphique des données à l'aide de tableaux de bord et graphiques interactifs.
+- Gestion des chapitres et articles d'un devis avec calcul automatique des sous-totaux et marges par section.
+- Système de commentaires et suivi pour chaque projet afin d'assurer une meilleure gestion collaborative.
+- Exportation et sauvegarde des études pour archivage et partage facile.
 
-### `npm test`
+## Connexion avec Axonaut
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+L'application ne se connecte pas directement à Axonaut, mais utilise une API intermédiaire basée sur Express et Node.js. Cette API :
 
-### `npm run build`
+- Gère les requêtes et l'authentification avec Axonaut
+- Permet d'importer en temps réel les devis, commandes, dépenses et clients.
+- Récupère les informations financières et historiques des projets.
+- Synchronise les marges commerciales et dépenses avec les données Axonaut.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Technologies utilisées
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+L'application repose sur les technologies suivantes :
 
-### `npm run eject`
+**Frontend :**
+- **React.js** avec Hooks et Context API
+- **SCSS** pour le style et la mise en page responsive
+- **Recharts** pour la visualisation des données sous forme de graphiques
+- **React-toastify** pour les notifications
+- **React-spinners** pour l'affichage du chargement
+- **SweetAlert2** pour les pop-ups interactifs
+- **Framer Motion** pour les animations
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**Backend & Base de données :**
+- **Firebase Firestore** pour la gestion des données et documents
+- **Firebase Auth** pour l'authentification des utilisateurs
+- **Firebase Storage** pour le stockage des fichiers
+- **API Axonaut** pour la synchronisation des devis et commandes
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Screenshots
 
-## Learn More
+![alt text](public/assets/screenshots/pix1.png) 
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+![alt text](public/assets/screenshots/pix2.png)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![alt text](public/assets/screenshots/pix3.png)
 
-### Code Splitting
+![alt text](public/assets/screenshots/pix4.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+![alt text](public/assets/screenshots/pix5.png)
 
-### Analyzing the Bundle Size
+![alt text](public/assets/screenshots/pix6.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
