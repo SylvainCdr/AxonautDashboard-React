@@ -44,30 +44,32 @@ export default function QuotationDetails() {
         collection(db, "supplyStudy"),
         where("quotation_id", "==", quotationId)
       );
-  
+
       const querySnapshot = await getDocs(duplicateQuotationQuery);
-  
+
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
         setIsDuplicate(true);
         setDuplicateQuotationId(doc.id);
-  
+
         const data = doc.data();
         setRealCostTotal(data.real_cost_total);
         setRealMarginPercent(data.real_margin_percent);
         setRealMarginValue(data.real_margin_value);
         setEstablishedBy(data.established_by);
-  
+
         // Récupérer les informations complètes de l'utilisateur
         const userData = await getUserByUid(data.established_by);
         setUserStudy(userData);
         setEstablishedDate(data.established_date);
       }
     } catch (error) {
-      console.error("Erreur lors de la vérification du devis dupliqué :", error);
+      console.error(
+        "Erreur lors de la vérification du devis dupliqué :",
+        error
+      );
     }
   };
-  
 
   const duplicateQuotation = async () => {
     try {
@@ -90,6 +92,45 @@ export default function QuotationDetails() {
     }
   };
 
+  const [deliveredLines, setDeliveredLines] = useState({});
+
+  // Récupère les lignes livrées au chargement
+  const fetchDeliveredLines = async () => {
+    const q = query(
+      collection(db, "quotation_lines_delivered"),
+      where("quotation_id", "==", quotationId)
+    );
+    const snapshot = await getDocs(q);
+    const data = {};
+    snapshot.forEach((doc) => {
+      const d = doc.data();
+      // Ici line_id est l'index sous forme de string ou nombre
+      data[d.line_id] = d.delivered;
+    });
+    setDeliveredLines(data);
+  };
+
+  // Met à jour Firestore et le state local
+  const handleDeliveryToggle = async (lineId, newDelivered) => {
+    const docRef = doc(
+      db,
+      "quotation_lines_delivered",
+      `${quotationId}_${lineId}`
+    );
+
+    // Tu peux aussi sauvegarder la ligne complète si besoin, sinon juste ce qui est nécessaire
+    await setDoc(docRef, {
+      quotation_id: quotationId,
+      line_id: lineId,
+      delivered: newDelivered,
+    });
+
+    setDeliveredLines((prev) => ({
+      ...prev,
+      [lineId]: newDelivered,
+    }));
+  };
+
   useEffect(() => {
     const loadQuotationData = async () => {
       try {
@@ -102,6 +143,7 @@ export default function QuotationDetails() {
         setCompany(companyData);
         setContract(contractData);
         await checkDuplicateQuotation(); // Vérifie la duplication
+        await fetchDeliveredLines(); // Récupère les lignes livrées
       } catch (err) {
         setError("Impossible de charger les données du devis.");
       } finally {
@@ -216,9 +258,11 @@ export default function QuotationDetails() {
                 needleColor="#4909c069"
                 style={gaugeStyle}
               />
-             <p>Étude réalisée par <br />{userStudy?.email} <br />le {new Date(establishedDate).toLocaleDateString()} </p>
-
-
+              <p>
+                Étude réalisée par <br />
+                {userStudy?.email} <br />
+                le {new Date(establishedDate).toLocaleDateString()}{" "}
+              </p>
             </div>
           ) : (
             // Message si pas de duplicateQuotation ou si marge réelle indisponible
@@ -261,6 +305,7 @@ export default function QuotationDetails() {
                 <th>PA total</th>
                 <th>Marge total</th>
                 <th>Marge en %</th>
+                <th>Reçu </th>
               </tr>
             </thead>
             <tbody>
@@ -275,13 +320,13 @@ export default function QuotationDetails() {
                 <React.Fragment key={chapterIndex}>
                   {/* Affichage du chapitre */}
                   <tr>
-                    <td colSpan="9" className={styles.chapterRow}>
+                    <td colSpan="10" className={styles.chapterRow}>
                       {decodeHtmlEntities(chapter)}
                     </td>
                   </tr>
                   {/* Affichage des lignes dans le chapitre */}
-                  {lines.map((line) => (
-                    <tr key={line.id}>
+                  {lines.map((line, index) => (
+                    <tr key={index}>
                       <td>{line?.product_code || ""}</td>
                       <td>{line.product_name}</td>
                       <td>{line.quantity}</td>
@@ -295,6 +340,16 @@ export default function QuotationDetails() {
                       <td>
                         {((line.margin / line.pre_tax_amount) * 100).toFixed(1)}{" "}
                         %
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={deliveredLines[index] || false}
+                          onChange={async (e) => {
+                            const newDelivered = e.target.checked;
+                            await handleDeliveryToggle(index, newDelivered);
+                          }}
+                        />
                       </td>
                     </tr>
                   ))}
