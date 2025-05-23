@@ -71,7 +71,7 @@ function Homepage() {
           <Link to="/quotations">Commmandes <br />& <br />Projets</Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/expense-report">Facturation</Link>
+          <Link to="/billing">Facturation</Link>
         </motion.div>
         <motion.div variants={item}>
           <Link to="/">*</Link>

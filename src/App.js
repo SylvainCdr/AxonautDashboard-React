@@ -8,8 +8,11 @@ import Quotations from "./pages/quotations/quotations";
 import Employees from "./pages/employees/employees";
 import CompanyDetails from "./pages/companyDetails/companyDetails";
 import QuotationAndProjectDetails from "./pages/quotationAndProjectDetails/quotationAndProjectDetails";
-import ExpenseReport from "./pages/expenseReport/expenseReport";
+import Billing from "./pages/billing/billing";
 import SupplyStudy from "./pages/supplyStudy/supplyStudy";
+
+import BillingPlan from "./pages/billingPlan/billingPlan";
+
 import ProtectedRoute from "./utils/protectedRoute";
 import { ToastContainer } from "react-toastify";
 
@@ -38,10 +41,14 @@ function App() {
             path="/quotations/:quotationId/project/:projectId"
             element={<QuotationAndProjectDetails />}
           />
-          <Route path="/expense-report" element={<ExpenseReport />} />
           <Route
             path="/supply-study/:duplicateQuotationId"
             element={<SupplyStudy />}
+          />
+          <Route path="/billing" element={<Billing />} />
+          <Route
+            path="/quotation/:quotationId/billing-plan"
+            element={<BillingPlan />}
           />
         </Route>
       </Routes>

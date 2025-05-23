@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchContractById } from "../../services/api/contracts";
 import { fetchInvoiceById } from "../../services/api/invoices";
 import { GridLoader } from "react-spinners";
 import styles from "./style.module.scss";
+import { db, auth } from "../../firebase/firebase";
+import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
+import { getUserByUid } from "../../utils/getUserByUid";
 
 export default function ContractInvoicesDetails() {
   const { quotationId } = useParams();
@@ -12,7 +15,13 @@ export default function ContractInvoicesDetails() {
   const [contract, setContract] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showPopup, setShowPopup] = useState(false); // État pour le pop-up
+  const [showPopup, setShowPopup] = useState(false);
+  const [quotation, setQuotation] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [showBillingModal, setShowBillingModal] = useState(false);
+  const user = auth.currentUser;
+  const [hasBillingPlan, setHasBillingPlan] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadQuotationData = async () => {
@@ -25,25 +34,47 @@ export default function ContractInvoicesDetails() {
         );
         const invoicesData = await Promise.all(invoicePromises);
 
+        setQuotation(data);
         setContract(contractData);
         setInvoices(invoicesData);
 
-        // Vérifier si un commentaire est présent et afficher le pop-up
         if (contractData.comments && contractData.comments.trim() !== "") {
           setShowPopup(true);
         }
+
+        // Vérifie si un plan existe
+        const planRef = doc(db, "billingPlans", data.id.toString());
+        const planSnapshot = await getDoc(planRef);
+        setHasBillingPlan(planSnapshot.exists());
+
+        await getUserByUid(data.created_by);
       } catch (err) {
+        console.error(err);
         setError("Impossible de charger les données du projet.");
       } finally {
         setLoading(false);
       }
     };
+
     loadQuotationData();
   }, [quotationId]);
 
-  console.log("contract", contract);
+  const isPaidInvoice = (invoice) =>
+    invoice.paid_date && new Date(invoice.paid_date) >= new Date(invoice.date)
+      ? "green"
+      : "red";
 
-  // Calculer le montant total payé
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "2rem" }}>
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <p>Chargement...</p>
+      </div>
+    );
+  }
+
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
   const totalPaidAmount = invoices.reduce((acc, invoice) => {
     if (invoice.paid_date) {
       return acc + invoice.pre_tax_amount;
@@ -57,38 +88,42 @@ export default function ContractInvoicesDetails() {
   );
 
   const paymentPercentage =
-    totalInvoiceAmount === 0 ? 0 : (totalPaidAmount / contract.quotation.pre_tax_amount) * 100;
-
-  const isPaidInvoice = (invoice) =>
-    invoice.paid_date && new Date(invoice.paid_date) >= new Date(invoice.date)
-      ? "green"
-      : "red";
-
-  if (loading) {
-    return (
-      <div className={styles.loaderContainer}>
-<GridLoader color="#C60F7B" loading={loading} size={15} />        <p>Chargement...</p>
-      </div>
-    );
-  }
-
-  if (error) return <p className={styles.error}>{error}</p>;
+    totalInvoiceAmount === 0
+      ? 0
+      : (totalPaidAmount / quotation.pre_tax_amount) * 100;
 
   return (
     <div className={styles.contractInvoicesDetailsContainer}>
-      {/* 🔔 Pop-up si un commentaire est présent */}
+      {/* Pop-up si commentaire */}
       {showPopup && (
         <div className={styles.overlay}>
           <div className={styles.popup}>
             <h2>🔔 Information importante</h2>
-            <h3>Veuillez prendre note de ce commentaire ajouté à l'affaire </h3>
+            <h3>Veuillez prendre note de ce commentaire ajouté à l'affaire</h3>
             <p dangerouslySetInnerHTML={{ __html: contract.comments }}></p>
             <button onClick={() => setShowPopup(false)}>Fermer</button>
           </div>
         </div>
       )}
 
-      <h1> Détails de la facturation </h1>
+      <h1>Détails de la facturation</h1>
+
+     <div style={{ marginTop: "1rem" }}>
+  {hasBillingPlan ? (
+    <button
+      onClick={() => navigate(`/quotation/${quotation.id}/billing-plan`)}
+    >
+      Voir le plan de facturation
+    </button>
+  ) : (
+    <button
+      onClick={() => navigate(`/quotation/${quotation.id}/billing-plan`)}
+    >
+      Créer un plan de facturation
+    </button>
+  )}
+</div>
+
 
       <div className={styles.contractDetails}>
         <p>
@@ -107,14 +142,11 @@ export default function ContractInvoicesDetails() {
 
         <p>
           <strong>Montant total HT du devis :</strong>{" "}
-          {contract.quotation.pre_tax_amount.toFixed(2)} €
+          {quotation.pre_tax_amount?.toFixed(2)} €
         </p>
 
-        {/* Jauge de progression */}
         <div className={styles.progressBarContainer}>
-          <p>
-            Avancement du paiement :
-          </p>
+          <p>Avancement du paiement :</p>
           <div className={styles.progressBar}>
             <div
               className={styles.progress}
@@ -128,7 +160,7 @@ export default function ContractInvoicesDetails() {
         <table>
           <thead>
             <tr>
-              <th>Numéro facture </th>
+              <th>Numéro facture</th>
               <th>Montant HT</th>
               <th>Date de création</th>
               <th>Date de Paiement</th>
@@ -168,6 +200,7 @@ export default function ContractInvoicesDetails() {
           </tbody>
         </table>
       </div>
+ 
     </div>
   );
 }

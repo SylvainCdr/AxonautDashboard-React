@@ -1,0 +1,251 @@
+// src/components/BillingPlanModal.js
+import { useEffect, useState } from "react";
+import styles from "./style.module.scss";
+import { fetchQuotationById } from "../../services/api/quotations";
+import { useParams } from "react-router-dom";
+import { db, auth } from "../../firebase/firebase";
+import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { decodeHtmlEntities } from "../../utils/htmlDecoder";
+import { GridLoader } from "react-spinners";
+
+export default function BillingPlan({ onClose }) {
+  const { quotationId } = useParams();
+  const [quotation, setQuotation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const user = auth.currentUser;
+
+  const navigate = useNavigate();
+
+  const [steps, setSteps] = useState([
+    { amount: "", date: "", stepsComment: "" },
+  ]);
+  const [mainComment, setMainComment] = useState("");
+  const [generating, setGenerating] = useState(false);
+
+  const [existingPlan, setExistingPlan] = useState(null);
+  const [isEditable, setIsEditable] = useState(true); // par défaut editable
+
+  useEffect(() => {
+    if (existingPlan) {
+      setIsEditable(false); // devient non éditable si un plan existe
+    }
+  }, [existingPlan]);
+
+  useEffect(() => {
+    async function loadQuotationData() {
+      try {
+        setLoading(true);
+        const data = await fetchQuotationById(quotationId);
+        setQuotation(data);
+
+        const planRef = doc(db, "billingPlans", data.id.toString());
+        const planSnap = await getDoc(planRef);
+        if (planSnap.exists()) {
+          setExistingPlan(planSnap.data());
+          setSteps(planSnap.data().steps || []);
+          setMainComment(planSnap.data().mainComment || "");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Impossible de charger les données du devis.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadQuotationData();
+  }, [quotationId]);
+
+  const addStep = () => {
+    setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
+  };
+
+  const updateStep = (index, field, value) => {
+    const updatedSteps = [...steps];
+    updatedSteps[index][field] = value;
+    setSteps(updatedSteps);
+  };
+
+  const handleManualBillingPlanSave = async (steps, mainComment) => {
+    setGenerating(true);
+    try {
+      const planRef = doc(db, "billingPlans", quotation.id.toString());
+
+      const totalStepAmount = steps.reduce(
+        (sum, step) => sum + parseFloat(step.amount),
+        0
+      );
+      if (totalStepAmount !== quotation.total_amount) {
+        alert(
+          `Le total des paliers (${totalStepAmount} €) ne correspond pas au montant HT du devis (${quotation.total_amount} €).`
+        );
+        setGenerating(false);
+        return;
+      }
+
+      const billingPlan = {
+        projectId: quotation.project_id,
+        quotationId: quotation.id,
+        projectTitle: quotation.title || "Sans titre",
+        createdAt: existingPlan ? existingPlan.createdAt : Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        generatedBy: user?.email || "inconnu",
+        status: existingPlan ? existingPlan.status : "brouillon",
+        mainComment: mainComment || "",
+        steps: steps.map((step) => ({
+          amount: parseFloat(step.amount),
+          date: new Date(step.date).toISOString(),
+          stepsComment: step.stepsComment || "",
+        })),
+        quotation: {
+          id: quotation.id,
+          pre_tax_amount: quotation.pre_tax_amount || 0,
+          tax_amount: quotation.tax_amount || 0,
+          total_amount: quotation.total_amount || 0,
+          status: quotation.status || "inconnu",
+          date: quotation.date || new Date().toISOString(),
+        },
+      };
+
+      await setDoc(planRef, billingPlan); // setDoc met à jour ou crée
+      alert(existingPlan ? "Plan mis à jour !" : "Plan enregistré !");
+      navigate("/billing");
+      onClose();
+    } catch (err) {
+      console.error("Erreur enregistrement plan :", err);
+      alert("Erreur lors de l'enregistrement.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const valid = steps.every((step) => step.amount && step.date);
+    if (!valid) return alert("Veuillez remplir tous les champs.");
+    handleManualBillingPlanSave(steps, mainComment);
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <p>Chargement...</p>
+      </div>
+    );
+  }
+  if (error) return <div style={{ color: "red" }}>{error}</div>;
+
+  return (
+    <div className={styles.billingPlanContainer}>
+      <div className={styles.billingPlan}>
+        <h1>
+          {existingPlan
+            ? "Modifier le plan de facturation"
+            : "Créer un plan de facturation"}
+        </h1>
+
+        {quotation && (
+          <>
+            <h2>
+              <i className="fa-solid fa-folder"></i>{" "}
+              {decodeHtmlEntities(quotation.title)}
+            </h2>
+            <p>Montant total HT du devis : {quotation.pre_tax_amount} €</p>
+            <p>Montant total TTC du devis : {quotation.total_amount} €</p>
+            <p>Montant total de la TVA : {quotation.tax_amount} €</p>
+          </>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <label>
+            Commentaire principal
+            <input
+              type="text"
+              id="mainComment"
+              value={mainComment}
+              onChange={(e) => setMainComment(e.target.value)}
+              disabled={!isEditable}
+            />
+          </label>
+
+          {steps.map((step, index) => (
+            <div key={index} className={styles.step}>
+              <label>
+                Montant (€)
+                <input
+                  type="number"
+                  value={step.amount}
+                  placeholder={
+                    isEditable
+                      ? `Reste : ${(
+                          quotation.total_amount -
+                          steps
+                            .slice(0, index)
+                            .reduce(
+                              (sum, s) => sum + (parseFloat(s.amount) || 0),
+                              0
+                            )
+                        ).toFixed(2)} €`
+                      : ""
+                  }
+                  onChange={(e) => updateStep(index, "amount", e.target.value)}
+                  required
+                  disabled={!isEditable}
+                />
+              </label>
+              <label>
+                Date
+                <input
+                  type="date"
+                  value={step.date ? step.date.substring(0, 10) : ""}
+                  onChange={(e) => updateStep(index, "date", e.target.value)}
+                  required
+                  disabled={!isEditable}
+                />
+              </label>
+              <label>
+                Commentaire(s)
+                <input
+                  type="text"
+                  value={step.stepsComment}
+                  onChange={(e) =>
+                    updateStep(index, "stepsComment", e.target.value)
+                  }
+                  disabled={!isEditable}
+                />
+              </label>
+            </div>
+          ))}
+
+          {isEditable && (
+            <button type="button" onClick={addStep}>
+              Ajouter un palier
+            </button>
+          )}
+
+          <div className={styles.actions}>
+            {existingPlan && !isEditable && (
+              <button onClick={() => setIsEditable(true)}>Modifier</button>
+            )}
+            {isEditable && (
+              <div className={styles.actions}>
+                <button type="submit" disabled={generating}>
+                  {generating ? "Enregistrement..." : "Enregistrer"}
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              disabled={generating}
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

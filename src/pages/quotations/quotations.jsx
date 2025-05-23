@@ -67,12 +67,19 @@ export default function Quotations() {
         const { realMarginPercent, supplyStudyFinished } =
           await fetchRealMarginPercent(quotation.id);
 
-        return {
-          ...quotation,
-          isClosed,
-          realMarginPercent,
-          supplyStudyFinished,
-        };
+       // Vérification si un plan de facturation existe
+const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
+const billingPlanSnap = await getDoc(billingPlanRef);
+const hasBillingPlan = billingPlanSnap.exists();
+
+return {
+  ...quotation,
+  isClosed,
+  realMarginPercent,
+  supplyStudyFinished,
+  hasBillingPlan,
+};
+
       })
     );
     setQuotations(updatedQuotations);
@@ -213,6 +220,7 @@ export default function Quotations() {
             <th>Marge co (€)</th>
             <th>Marge co (%)</th>
             <th>Marge réelle (%) </th>
+            <th>Factu</th> {/* Nouvelle colonne */}
             <th>Fermer</th>
             <th>Action</th>
           </tr>
@@ -305,6 +313,16 @@ export default function Quotations() {
                   </span>
                 )}
               </td>
+              {/* Plan de factu  */}
+               <td className={styles.actionCell}>
+          {quotation.hasBillingPlan ? (
+            <button onClick={() => window.open(`/quotation/${quotation.id}/billing-plan`, "_blank")}>
+              Voir
+            </button>
+          ) : (
+            <span style={{ color: "#888" }}>–</span>
+          )}
+        </td>
               <td>
                 <input
                   type="checkbox"
@@ -327,13 +345,7 @@ export default function Quotations() {
                   Voir
                 </button>
 
-                {/* <button
-                  onClick={() =>
-                    handleClickProject(quotation.id, quotation.project_id)
-                  }
-                >
-                  Voir
-                </button> */}
+             
               </td>
             </tr>
           ))}

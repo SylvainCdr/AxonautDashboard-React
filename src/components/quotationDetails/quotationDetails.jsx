@@ -14,6 +14,7 @@ import {
   getDocs,
   doc,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
@@ -34,10 +35,14 @@ export default function QuotationDetails() {
   const [establishedBy, setEstablishedBy] = useState("");
   const [userStudy, setUserStudy] = useState({});
   const [establishedDate, setEstablishedDate] = useState("");
+  
   const [contract, setContract] = useState({});
-
+  const [deliveredLines, setDeliveredLines] = useState({});
+  const [deliveryInfoLines, setDeliveryInfoLines] = useState({});
+  
   const navigate = useNavigate();
 
+  //Fonction pour vérifier si le devis a été dupliqué
   const checkDuplicateQuotation = async () => {
     try {
       const duplicateQuotationQuery = query(
@@ -71,6 +76,7 @@ export default function QuotationDetails() {
     }
   };
 
+  // Fonction pour dupliquer le devis
   const duplicateQuotation = async () => {
     try {
       // Utiliser le même ID que le devis original pour le nouvel objet
@@ -92,44 +98,79 @@ export default function QuotationDetails() {
     }
   };
 
-  const [deliveredLines, setDeliveredLines] = useState({});
-
   // Récupère les lignes livrées au chargement
-  const fetchDeliveredLines = async () => {
-    const q = query(
-      collection(db, "quotation_lines_delivered"),
-      where("quotation_id", "==", quotationId)
-    );
-    const snapshot = await getDocs(q);
-    const data = {};
-    snapshot.forEach((doc) => {
-      const d = doc.data();
-      // Ici line_id est l'index sous forme de string ou nombre
-      data[d.line_id] = d.delivered;
+const fetchDeliveredLines = async () => {
+  const docRef = doc(db, "addInfosQuotation", quotationId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    const lines = data.lines || {};
+
+    const deliveredData = {};
+    const deliveryInfoData = {};
+
+    Object.entries(lines).forEach(([lineId, lineData]) => {
+      deliveredData[lineId] = lineData.delivered;
+      deliveryInfoData[lineId] = lineData.deliveryInfo;
     });
-    setDeliveredLines(data);
-  };
+
+    setDeliveredLines(deliveredData);
+    setDeliveryInfoLines(deliveryInfoData);
+  }
+};
+
 
   // Met à jour Firestore et le state local
-  const handleDeliveryToggle = async (lineId, newDelivered) => {
-    const docRef = doc(
-      db,
-      "quotation_lines_delivered",
-      `${quotationId}_${lineId}`
-    );
+const handleDeliveryToggle = async (lineId, newDelivered, newDeliveryInfo) => {
+  const docRef = doc(db, "addInfosQuotation", quotationId);
 
-    // Tu peux aussi sauvegarder la ligne complète si besoin, sinon juste ce qui est nécessaire
-    await setDoc(docRef, {
+  await setDoc(
+    docRef,
+    {
       quotation_id: quotationId,
-      line_id: lineId,
-      delivered: newDelivered,
-    });
+      lines: {
+        [lineId]: {
+          delivered: newDelivered,
+          deliveryInfo: newDeliveryInfo,
+        },
+      },
+    },
+    { merge: true }
+  );
 
-    setDeliveredLines((prev) => ({
-      ...prev,
-      [lineId]: newDelivered,
-    }));
-  };
+  setDeliveredLines((prev) => ({
+    ...prev,
+    [lineId]: newDelivered,
+  }));
+
+  setDeliveryInfoLines((prev) => ({
+    ...prev,
+    [lineId]: newDeliveryInfo,
+  }));
+};
+
+const [typingTimeout, setTypingTimeout] = useState(null);
+
+const handleDeliveryInfoChange = (lineId, newDeliveryInfo) => {
+  // Mise à jour immédiate du state local pour avoir un affichage réactif
+  setDeliveryInfoLines(prev => ({
+    ...prev,
+    [lineId]: newDeliveryInfo,
+  }));
+
+  // On nettoie le précédent timer si l'utilisateur tape encore
+  if (typingTimeout) clearTimeout(typingTimeout);
+
+  // On crée un nouveau timer qui déclenchera la sauvegarde 500ms après la dernière frappe
+  setTypingTimeout(
+    setTimeout(() => {
+      // On envoie la mise à jour en BDD, en gardant la valeur de "delivered" actuelle (ou false)
+      handleDeliveryToggle(lineId, deliveredLines[lineId] || false, newDeliveryInfo);
+    }, 500)
+  );
+};
+
 
   useEffect(() => {
     const loadQuotationData = async () => {
@@ -306,6 +347,8 @@ export default function QuotationDetails() {
                 <th>Marge total</th>
                 <th>Marge en %</th>
                 <th>Reçu </th>
+                <th>Délai</th>
+
               </tr>
             </thead>
             <tbody>
@@ -320,7 +363,7 @@ export default function QuotationDetails() {
                 <React.Fragment key={chapterIndex}>
                   {/* Affichage du chapitre */}
                   <tr>
-                    <td colSpan="10" className={styles.chapterRow}>
+                    <td colSpan="11" className={styles.chapterRow}>
                       {decodeHtmlEntities(chapter)}
                     </td>
                   </tr>
@@ -341,16 +384,26 @@ export default function QuotationDetails() {
                         {((line.margin / line.pre_tax_amount) * 100).toFixed(1)}{" "}
                         %
                       </td>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={deliveredLines[index] || false}
-                          onChange={async (e) => {
-                            const newDelivered = e.target.checked;
-                            await handleDeliveryToggle(index, newDelivered);
-                          }}
-                        />
-                      </td>
+                     <td>
+  <input
+    type="checkbox"
+    checked={deliveredLines[index] || false}
+    onChange={async (e) => {
+      const newDelivered = e.target.checked;
+      const newDeliveryInfo = deliveryInfoLines[index] || "";
+      await handleDeliveryToggle(index, newDelivered, newDeliveryInfo);
+    }}
+  />
+</td>
+<td>
+  <input
+  type="text"
+  value={deliveryInfoLines[index] || ""}
+  onChange={(e) => handleDeliveryInfoChange(index, e.target.value)}
+/>
+
+</td>
+
                     </tr>
                   ))}
                 </React.Fragment>

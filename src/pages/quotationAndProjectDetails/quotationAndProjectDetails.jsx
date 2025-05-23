@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import QuotationDetails from "../../components/quotationDetails/quotationDetails";
@@ -33,7 +33,7 @@ export default function QuotationAndProjectDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
         <p>Chargement...</p>
       </div>
     );
