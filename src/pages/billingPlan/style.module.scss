@@ -36,6 +36,78 @@ p {
   margin-bottom: 0.5rem;
 }
 
+.quotationLines {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #fafafa;
+}
+
+.toggleButton {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  background-color: #0056b3;
+}
+
+.quotationLines table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.quotationLines th,
+.quotationLines td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.quotationLines th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+}
+
+.chapterRow {
+  background-color: #e9ecef;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1rem;
+  padding: 10px;
+}
+
+.quotationLines input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+.quotationLines input[type="text"] {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.totals {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #f1f1f1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+
 form {
   display: flex;
   flex-direction: column;

@@ -1,5 +1,5 @@
 // src/components/BillingPlanModal.js
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./style.module.scss";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { useParams } from "react-router-dom";
@@ -27,11 +27,45 @@ export default function BillingPlan({ onClose }) {
   const [existingPlan, setExistingPlan] = useState(null);
   const [isEditable, setIsEditable] = useState(true); // par défaut editable
 
+  const [deliveredLines, setDeliveredLines] = useState([]);
+  const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
+  const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
+  const [totalPixProductCode, setTotalPixProductCode] = useState(0);
+
   useEffect(() => {
     if (existingPlan) {
       setIsEditable(false); // devient non éditable si un plan existe
     }
   }, [existingPlan]);
+
+  // Récupère les lignes livrées au chargement
+  const fetchDeliveredLines = async () => {
+    const docRef = doc(db, "addInfosQuotation", quotationId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const lines = data.lines || {};
+
+      const deliveredData = {};
+      const deliveryInfoData = {};
+
+      Object.entries(lines).forEach(([lineId, lineData]) => {
+        deliveredData[lineId] = lineData.delivered;
+        deliveryInfoData[lineId] = lineData.deliveryInfo;
+      });
+
+      setDeliveredLines(deliveredData);
+      setDeliveryInfoLines(deliveryInfoData);
+    }
+  };
+  const hasDeliveryData =
+    Object.values(deliveredLines).some((val) => val === true) ||
+    Object.values(deliveryInfoLines).some((val) => val && val.trim() !== "");
+
+  useEffect(() => {
+    fetchDeliveredLines();
+  }, [quotationId]);
 
   useEffect(() => {
     async function loadQuotationData() {
@@ -155,6 +189,102 @@ export default function BillingPlan({ onClose }) {
             <p>Montant total HT du devis : {quotation.pre_tax_amount} €</p>
             <p>Montant total TTC du devis : {quotation.total_amount} €</p>
             <p>Montant total de la TVA : {quotation.tax_amount} €</p>
+
+            <div className={styles.quotationLines}>
+              <button
+                onClick={() => setShowDetails(!showDetails)} // Toggle visibility on click
+                className={styles.toggleButton}
+              >
+                <i className="fa-solid fa-bars"></i>
+                {showDetails
+                  ? "  Cacher les détails du devis"
+                  : "  Voir les détails du devis"}
+              </button>
+
+              {showDetails && (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Référence</th>
+                      <th>Désignation</th>
+                      <th>Quantité</th>
+                      <th>Prix unit HT</th>
+                      <th>Montant total HT</th>
+                      <th>PA unit</th>
+                      <th>PA total</th>
+                      <th>Marge total</th>
+                      <th>Marge en %</th>
+                      <th>Reçu </th>
+                      <th>Délai</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(
+                      quotation.quotation_lines.reduce((groups, line) => {
+                        const chapter = line.chapter || "Autres";
+                        if (!groups[chapter]) groups[chapter] = [];
+                        groups[chapter].push(line);
+                        return groups;
+                      }, {})
+                    ).map(([chapter, lines], chapterIndex) => (
+                      <React.Fragment key={chapterIndex}>
+                        <tr>
+                          <td colSpan="11" className={styles.chapterRow}>
+                            {decodeHtmlEntities(chapter)}
+                          </td>
+                        </tr>
+                        {lines.map((line, index) => (
+                          <tr key={index}>
+                            <td>{line?.product_code || ""}</td>
+                            <td>{line.product_name}</td>
+                            <td>{line.quantity}</td>
+                            <td>{line.price} €</td>
+                            <td>{line.pre_tax_amount} €</td>
+                            <td>{line.unit_job_costing} €</td>
+                            <td>
+                              {(line.unit_job_costing * line.quantity).toFixed(
+                                2
+                              )}{" "}
+                              €
+                            </td>
+                            <td>{line.margin.toFixed(1)} €</td>
+                            <td>
+                              {(
+                                (line.margin / line.pre_tax_amount) *
+                                100
+                              ).toFixed(1)}{" "}
+                              %
+                            </td>
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={deliveredLines[index] || false}
+                                onChange={async (e) => {
+                                  const newDelivered = e.target.checked;
+                                  const newDeliveryInfo =
+                                    deliveryInfoLines[index] || "";
+                                  // ici tu pourrais ajouter une logique de mise à jour si besoin
+                                }}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                value={deliveryInfoLines[index] || ""}
+                                readOnly= {!isEditable}
+                                // idem ici si tu veux mettre à jour le Firestore plus tard
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              
+            </div>
           </>
         )}
 
