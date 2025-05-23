@@ -67,19 +67,18 @@ export default function Quotations() {
         const { realMarginPercent, supplyStudyFinished } =
           await fetchRealMarginPercent(quotation.id);
 
-       // Vérification si un plan de facturation existe
-const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
-const billingPlanSnap = await getDoc(billingPlanRef);
-const hasBillingPlan = billingPlanSnap.exists();
+        // Vérification si un plan de facturation existe
+        const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
+        const billingPlanSnap = await getDoc(billingPlanRef);
+        const hasBillingPlan = billingPlanSnap.exists();
 
-return {
-  ...quotation,
-  isClosed,
-  realMarginPercent,
-  supplyStudyFinished,
-  hasBillingPlan,
-};
-
+        return {
+          ...quotation,
+          isClosed,
+          realMarginPercent,
+          supplyStudyFinished,
+          hasBillingPlan,
+        };
       })
     );
     setQuotations(updatedQuotations);
@@ -168,7 +167,7 @@ return {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-     <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
         <p>Chargement des commandes...</p>
       </div>
     );
@@ -242,7 +241,7 @@ return {
                 {decodeHtmlEntities(quotation.title)}
               </td>
               <td>{quotation.company_name || "Inconnue"}</td>
-              <td>{getQuotationUser(quotation).split(' ')[0]}</td>
+              <td>{getQuotationUser(quotation).split(" ")[0]}</td>
               <td>{new Date(quotation.date).toLocaleDateString()}</td>
 
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
@@ -314,15 +313,22 @@ return {
                 )}
               </td>
               {/* Plan de factu  */}
-               <td className={styles.actionCell}>
-          {quotation.hasBillingPlan ? (
-            <button onClick={() => window.open(`/quotation/${quotation.id}/billing-plan`, "_blank")}>
-              Voir
-            </button>
-          ) : (
-            <span style={{ color: "#888" }}>–</span>
-          )}
-        </td>
+              <td className={styles.actionCell}>
+                {quotation.hasBillingPlan ? (
+                  <button
+                    onClick={() =>
+                      window.open(
+                        `/quotation/${quotation.id}/billing-plan`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    Voir
+                  </button>
+                ) : (
+                  <span style={{ color: "#888" }}>–</span>
+                )}
+              </td>
               <td>
                 <input
                   type="checkbox"
@@ -344,8 +350,6 @@ return {
                 >
                   Voir
                 </button>
-
-             
               </td>
             </tr>
           ))}

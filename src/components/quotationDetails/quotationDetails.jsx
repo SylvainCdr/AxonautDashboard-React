@@ -35,11 +35,11 @@ export default function QuotationDetails() {
   const [establishedBy, setEstablishedBy] = useState("");
   const [userStudy, setUserStudy] = useState({});
   const [establishedDate, setEstablishedDate] = useState("");
-  
+
   const [contract, setContract] = useState({});
   const [deliveredLines, setDeliveredLines] = useState({});
   const [deliveryInfoLines, setDeliveryInfoLines] = useState({});
-  
+
   const navigate = useNavigate();
 
   //Fonction pour vérifier si le devis a été dupliqué
@@ -99,78 +99,84 @@ export default function QuotationDetails() {
   };
 
   // Récupère les lignes livrées au chargement
-const fetchDeliveredLines = async () => {
-  const docRef = doc(db, "addInfosQuotation", quotationId);
-  const docSnap = await getDoc(docRef);
+  const fetchDeliveredLines = async () => {
+    const docRef = doc(db, "addInfosQuotation", quotationId);
+    const docSnap = await getDoc(docRef);
 
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    const lines = data.lines || {};
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const lines = data.lines || {};
 
-    const deliveredData = {};
-    const deliveryInfoData = {};
+      const deliveredData = {};
+      const deliveryInfoData = {};
 
-    Object.entries(lines).forEach(([lineId, lineData]) => {
-      deliveredData[lineId] = lineData.delivered;
-      deliveryInfoData[lineId] = lineData.deliveryInfo;
-    });
+      Object.entries(lines).forEach(([lineId, lineData]) => {
+        deliveredData[lineId] = lineData.delivered;
+        deliveryInfoData[lineId] = lineData.deliveryInfo;
+      });
 
-    setDeliveredLines(deliveredData);
-    setDeliveryInfoLines(deliveryInfoData);
-  }
-};
-
+      setDeliveredLines(deliveredData);
+      setDeliveryInfoLines(deliveryInfoData);
+    }
+  };
 
   // Met à jour Firestore et le state local
-const handleDeliveryToggle = async (lineId, newDelivered, newDeliveryInfo) => {
-  const docRef = doc(db, "addInfosQuotation", quotationId);
+  const handleDeliveryToggle = async (
+    lineId,
+    newDelivered,
+    newDeliveryInfo
+  ) => {
+    const docRef = doc(db, "addInfosQuotation", quotationId);
 
-  await setDoc(
-    docRef,
-    {
-      quotation_id: quotationId,
-      lines: {
-        [lineId]: {
-          delivered: newDelivered,
-          deliveryInfo: newDeliveryInfo,
+    await setDoc(
+      docRef,
+      {
+        quotation_id: quotationId,
+        lines: {
+          [lineId]: {
+            delivered: newDelivered,
+            deliveryInfo: newDeliveryInfo,
+          },
         },
       },
-    },
-    { merge: true }
-  );
+      { merge: true }
+    );
 
-  setDeliveredLines((prev) => ({
-    ...prev,
-    [lineId]: newDelivered,
-  }));
+    setDeliveredLines((prev) => ({
+      ...prev,
+      [lineId]: newDelivered,
+    }));
 
-  setDeliveryInfoLines((prev) => ({
-    ...prev,
-    [lineId]: newDeliveryInfo,
-  }));
-};
+    setDeliveryInfoLines((prev) => ({
+      ...prev,
+      [lineId]: newDeliveryInfo,
+    }));
+  };
 
-const [typingTimeout, setTypingTimeout] = useState(null);
+  const [typingTimeout, setTypingTimeout] = useState(null);
 
-const handleDeliveryInfoChange = (lineId, newDeliveryInfo) => {
-  // Mise à jour immédiate du state local pour avoir un affichage réactif
-  setDeliveryInfoLines(prev => ({
-    ...prev,
-    [lineId]: newDeliveryInfo,
-  }));
+  const handleDeliveryInfoChange = (lineId, newDeliveryInfo) => {
+    // Mise à jour immédiate du state local pour avoir un affichage réactif
+    setDeliveryInfoLines((prev) => ({
+      ...prev,
+      [lineId]: newDeliveryInfo,
+    }));
 
-  // On nettoie le précédent timer si l'utilisateur tape encore
-  if (typingTimeout) clearTimeout(typingTimeout);
+    // On nettoie le précédent timer si l'utilisateur tape encore
+    if (typingTimeout) clearTimeout(typingTimeout);
 
-  // On crée un nouveau timer qui déclenchera la sauvegarde 500ms après la dernière frappe
-  setTypingTimeout(
-    setTimeout(() => {
-      // On envoie la mise à jour en BDD, en gardant la valeur de "delivered" actuelle (ou false)
-      handleDeliveryToggle(lineId, deliveredLines[lineId] || false, newDeliveryInfo);
-    }, 500)
-  );
-};
-
+    // On crée un nouveau timer qui déclenchera la sauvegarde 500ms après la dernière frappe
+    setTypingTimeout(
+      setTimeout(() => {
+        // On envoie la mise à jour en BDD, en gardant la valeur de "delivered" actuelle (ou false)
+        handleDeliveryToggle(
+          lineId,
+          deliveredLines[lineId] || false,
+          newDeliveryInfo
+        );
+      }, 500)
+    );
+  };
 
   useEffect(() => {
     const loadQuotationData = async () => {
@@ -348,7 +354,6 @@ const handleDeliveryInfoChange = (lineId, newDeliveryInfo) => {
                 <th>Marge en %</th>
                 <th>Reçu </th>
                 <th>Délai</th>
-
               </tr>
             </thead>
             <tbody>
@@ -384,26 +389,31 @@ const handleDeliveryInfoChange = (lineId, newDeliveryInfo) => {
                         {((line.margin / line.pre_tax_amount) * 100).toFixed(1)}{" "}
                         %
                       </td>
-                     <td>
-  <input
-    type="checkbox"
-    checked={deliveredLines[index] || false}
-    onChange={async (e) => {
-      const newDelivered = e.target.checked;
-      const newDeliveryInfo = deliveryInfoLines[index] || "";
-      await handleDeliveryToggle(index, newDelivered, newDeliveryInfo);
-    }}
-  />
-</td>
-<td>
-  <input
-  type="text"
-  value={deliveryInfoLines[index] || ""}
-  onChange={(e) => handleDeliveryInfoChange(index, e.target.value)}
-/>
-
-</td>
-
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={deliveredLines[index] || false}
+                          onChange={async (e) => {
+                            const newDelivered = e.target.checked;
+                            const newDeliveryInfo =
+                              deliveryInfoLines[index] || "";
+                            await handleDeliveryToggle(
+                              index,
+                              newDelivered,
+                              newDeliveryInfo
+                            );
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          value={deliveryInfoLines[index] || ""}
+                          onChange={(e) =>
+                            handleDeliveryInfoChange(index, e.target.value)
+                          }
+                        />
+                      </td>
                     </tr>
                   ))}
                 </React.Fragment>

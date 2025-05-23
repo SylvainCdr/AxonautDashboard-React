@@ -85,7 +85,7 @@ function Header() {
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              Facturation
+              Facturation (beta)
             </NavLink>
           </li>
           <button
@@ -93,7 +93,10 @@ function Header() {
             className={styles.logoutButton}
             title="Déconnexion"
           >
-            <img src="https://img.icons8.com/?size=30&id=24337&format=png&color=FFFFFF" alt="déconnexion" />
+            <img
+              src="https://img.icons8.com/?size=30&id=24337&format=png&color=FFFFFF"
+              alt="déconnexion"
+            />
           </button>
         </ul>
         <div

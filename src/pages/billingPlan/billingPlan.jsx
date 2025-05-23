@@ -208,14 +208,14 @@ export default function BillingPlan({ onClose }) {
                       <th>Référence</th>
                       <th>Désignation</th>
                       <th>Quantité</th>
-                      <th>Prix unit HT</th>
+                      {/* <th>Prix unit HT</th>
                       <th>Montant total HT</th>
                       <th>PA unit</th>
                       <th>PA total</th>
                       <th>Marge total</th>
-                      <th>Marge en %</th>
+                      <th>Marge en %</th> */}
                       <th>Reçu </th>
-                      <th>Délai</th>
+                      <th>Délai livraison</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -238,7 +238,7 @@ export default function BillingPlan({ onClose }) {
                             <td>{line?.product_code || ""}</td>
                             <td>{line.product_name}</td>
                             <td>{line.quantity}</td>
-                            <td>{line.price} €</td>
+                            {/* <td>{line.price} €</td>
                             <td>{line.pre_tax_amount} €</td>
                             <td>{line.unit_job_costing} €</td>
                             <td>
@@ -254,7 +254,7 @@ export default function BillingPlan({ onClose }) {
                                 100
                               ).toFixed(1)}{" "}
                               %
-                            </td>
+                            </td> */}
                             <td>
                               <input
                                 type="checkbox"
@@ -267,14 +267,7 @@ export default function BillingPlan({ onClose }) {
                                 }}
                               />
                             </td>
-                            <td>
-                              <input
-                                type="text"
-                                value={deliveryInfoLines[index] || ""}
-                                readOnly= {!isEditable}
-                                // idem ici si tu veux mettre à jour le Firestore plus tard
-                              />
-                            </td>
+                            <td>{deliveryInfoLines[index] || ""}</td>
                           </tr>
                         ))}
                       </React.Fragment>
@@ -282,8 +275,6 @@ export default function BillingPlan({ onClose }) {
                   </tbody>
                 </table>
               )}
-
-              
             </div>
           </>
         )}
