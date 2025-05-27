@@ -106,7 +106,12 @@ export default function Billing() {
                         <td>
                           {format(item.date, "dd MMM yyyy", { locale: fr })}
                         </td>
-                        <td>{item.amount.toFixed(2)}</td>
+                        <td>
+  {item.revision
+    ? (parseFloat(item.amount) + parseFloat(item.revision)).toFixed(2)
+    : parseFloat(item.amount).toFixed(2)}
+</td>
+
                       </tr>
                     ))}
                   </tbody>

@@ -170,14 +170,28 @@ button[type="submit"] {
   }
 }
 
-button[type="button"] {
-  background-color: #e2e8f0;
-  color: #2d3748;
+// button[type="button"] {
+//   background-color: #e2e8f0;
+//   color: #2d3748;
+
+//   &:hover {
+//     background-color: #cbd5e0;
+//   }
+// }
+.removeStepBtn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 5px;
 
   &:hover {
-    background-color: #cbd5e0;
+    background-color: #d93636;
   }
 }
+
 
 .actions {
   display: flex;
