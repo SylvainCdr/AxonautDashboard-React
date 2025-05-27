@@ -41,6 +41,7 @@ export default function Billing() {
               date: stepDate,
               stepsComment: step.stepsComment,
               amount: step.amount,
+              revision: step.revision || 0, // Si révision, sinon 0
             });
 
             monthlyData[monthKey].total += step.amount;
@@ -107,11 +108,9 @@ export default function Billing() {
                           {format(item.date, "dd MMM yyyy", { locale: fr })}
                         </td>
                         <td>
-  {item.revision
-    ? (parseFloat(item.amount) + parseFloat(item.revision)).toFixed(2)
-    : parseFloat(item.amount).toFixed(2)}
-</td>
-
+                          {(parseFloat(item.amount || 0) + (item.revision ? parseFloat(item.revision || 0) : 0)).toFixed(2)}{" "}
+            €
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -23,7 +23,6 @@ export default function BillingPlan({ onClose }) {
       amount: "",
       date: "",
       stepsComment: "",
-      revision: false,
       revision: "",
     },
   ]);
@@ -102,23 +101,32 @@ export default function BillingPlan({ onClose }) {
     setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
   };
 
-  const updateStep = (index, field, value) => {
-    const updatedSteps = [...steps];
-    updatedSteps[index][field] = value;
-    setSteps(updatedSteps);
+  const updateStep = (index, key, value) => {
+    setSteps((prevSteps) => {
+      const newSteps = [...prevSteps];
+      newSteps[index] = {
+        ...newSteps[index],
+        [key]: value,
+      };
+      return newSteps;
+    });
   };
 
   const removeStep = (index) => {
-  const updatedSteps = [...steps];
-  updatedSteps.splice(index, 1);
-  setSteps(updatedSteps);
-};
-
+    const updatedSteps = [...steps];
+    updatedSteps.splice(index, 1);
+    setSteps(updatedSteps);
+  };
 
   const handleManualBillingPlanSave = async (steps, mainComment) => {
     setGenerating(true);
     try {
       const planRef = doc(db, "billingPlans", quotation.id.toString());
+
+      // On vérifie si une révision est cochée
+      const isRevisionChecked = steps.some(
+        (step) => !!step.revision && parseFloat(step.revision) > 0
+      );
 
       const totalStepAmount = steps.reduce(
         (sum, step) =>
@@ -128,7 +136,8 @@ export default function BillingPlan({ onClose }) {
         0
       );
 
-      if (totalStepAmount <= quotation.total_amount) {
+      // Si révision cochée, total doit être strictement supérieur
+      if (isRevisionChecked && totalStepAmount <= quotation.total_amount) {
         alert(
           `Le total à facturer (${totalStepAmount.toFixed(
             2
@@ -154,8 +163,6 @@ export default function BillingPlan({ onClose }) {
           date: new Date(step.date).toISOString(),
           stepsComment: step.stepsComment || "",
           revision: step.revision ? parseFloat(step.revision || 0) : null,
-
-
         })),
 
         quotation: {
@@ -216,19 +223,19 @@ export default function BillingPlan({ onClose }) {
             <p>Montant total TTC du devis : {quotation.total_amount} €</p>
             <p>Montant total de la TVA : {quotation.tax_amount} €</p>
 
-                  <p>
-            Total des étapes :{" "}
-            {steps
-              .reduce(
-                (sum, s) =>
-                  sum +
-                  parseFloat(s.amount || 0) +
-                  (s.revision ? parseFloat(s.revision || 0) : 0),
-                0
-              )
-              .toFixed(2)}{" "}
-            €
-          </p>
+            <p>
+              Total des étapes :{" "}
+              {steps
+                .reduce(
+                  (sum, s) =>
+                    sum +
+                    parseFloat(s.amount || 0) +
+                    (s.revision ? parseFloat(s.revision || 0) : 0),
+                  0
+                )
+                .toFixed(2)}{" "}
+              €
+            </p>
 
             <div className={styles.quotationLines}>
               <button
@@ -326,103 +333,106 @@ export default function BillingPlan({ onClose }) {
             />
           </label>
 
-         {steps.map((step, index) => (
-  <div key={index} className={styles.step}>
-    <h3>Étape {index + 1}</h3>
-    
-    <label>
-      Montant (€)
-      <input
-        type="number"
-        value={step.amount}
-        onChange={(e) => updateStep(index, "amount", e.target.value)}
-        disabled={!isEditable}
-        placeholder={
-  isEditable
-    ? `Reste : ${(
-        quotation.total_amount -
-        steps
-          .slice(0, index)
-          .reduce(
-            (sum, s) =>
-              sum +
-              parseFloat(s.amount || 0) +
-              (s.revision ? parseFloat(s.revisionAmount || 0) : 0),
-            0
-          )
-      ).toFixed(2)} €`
-    : ""
-}
+          {steps.map((step, index) => (
+            <div key={index} className={styles.step}>
+              <h3>Étape {index + 1}</h3>
 
-      />
-    </label>
+              <label>
+                Montant (€)
+                <input
+                  type="number"
+                  value={step.amount}
+                  onChange={(e) => updateStep(index, "amount", e.target.value)}
+                  disabled={!isEditable}
+                  placeholder={
+                    isEditable
+                      ? `Reste : ${(
+                          quotation.total_amount -
+                          steps
+                            .slice(0, index)
+                            .reduce(
+                              (sum, s) =>
+                                sum +
+                                parseFloat(s.amount || 0) +
+                                (s.revision
+                                  ? parseFloat(s.revisionAmount || 0)
+                                  : 0),
+                              0
+                            )
+                        ).toFixed(2)} €`
+                      : ""
+                  }
+                />
+              </label>
 
-    <label>
-      Date
-      <input
-        type="date"
-        value={step.date}
-        onChange={(e) => updateStep(index, "date", e.target.value)}
-        disabled={!isEditable}
-      />
-    </label>
+              <label>
+                Date
+                <input
+                  type="date"
+                  value={step.date ? step.date.substring(0, 10) : ""}
+                  onChange={(e) => updateStep(index, "date", e.target.value)}
+                  required
+                  disabled={!isEditable}
+                />
+              </label>
 
-    <label>
-      Commentaire
-      <input
-        type="text"
-        value={step.stepsComment}
-        onChange={(e) => updateStep(index, "stepsComment", e.target.value)}
-        disabled={!isEditable}
-      />
-    </label>
+              <label>
+                Commentaire
+                <input
+                  type="text"
+                  value={step.stepsComment}
+                  onChange={(e) =>
+                    updateStep(index, "stepsComment", e.target.value)
+                  }
+                  disabled={!isEditable}
+                />
+              </label>
 
-    <label>
-      Révision
-      <input
-        type="checkbox"
-        checked={!!step.revision}
-        onChange={(e) =>
-          updateStep(index, "revision", e.target.checked ? "0" : "")
-        }
-        disabled={!isEditable}
-      />
-    </label>
+              <label>
+                Révision
+                <input
+                  type="checkbox"
+                  checked={!!step.revision}
+                  onChange={(e) =>
+                    updateStep(index, "revision", e.target.checked ? "0" : "")
+                  }
+                  disabled={!isEditable}
+                />
+              </label>
 
-    {step.revision && (
-      <label>
-        Montant révision (€)
-        <input
-          type="number"
-          value={step.revision}
-          onChange={(e) => updateStep(index, "revision", e.target.value)}
-          disabled={!isEditable}
-        />
-      </label>
-    )}
+              {step.revision && (
+                <label>
+                  Montant révision (€)
+                  <input
+                    type="number"
+                    value={step.revision}
+                    onChange={(e) =>
+                      updateStep(index, "revision", e.target.value)
+                    }
+                    disabled={!isEditable}
+                  />
+                </label>
+              )}
 
-    {isEditable && steps.length > 1 && (
-      <button
-        type="button"
-        onClick={() => removeStep(index)}
-        className={styles.removeStepBtn}
-      >
-        Supprimer cette étape
-      </button>
-    )}
+              {isEditable && steps.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeStep(index)}
+                  className={styles.removeStepBtn}
+                >
+                  Supprimer cette étape
+                </button>
+              )}
 
-    <hr />
-  </div>
-))}
-
+              <hr />
+            </div>
+          ))}
 
           {isEditable && (
             <button type="button" onClick={addStep}>
               Ajouter un palier
             </button>
           )}
-
-    
 
           <div className={styles.actions}>
             {existingPlan && !isEditable && (
