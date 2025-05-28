@@ -121,34 +121,37 @@ export default function QuotationDetails() {
   };
 
   // Met à jour Firestore et le state local
-const handleDeliveryToggle = async (lineKey, newDelivered, newDeliveryInfo) => {
-  const docRef = doc(db, "addInfosQuotation", quotationId);
+  const handleDeliveryToggle = async (
+    lineKey,
+    newDelivered,
+    newDeliveryInfo
+  ) => {
+    const docRef = doc(db, "addInfosQuotation", quotationId);
 
-  await setDoc(
-    docRef,
-    {
-      quotation_id: quotationId,
-      lines: {
-        [lineKey]: {
-          delivered: newDelivered,
-          deliveryInfo: newDeliveryInfo,
+    await setDoc(
+      docRef,
+      {
+        quotation_id: quotationId,
+        lines: {
+          [lineKey]: {
+            delivered: newDelivered,
+            deliveryInfo: newDeliveryInfo,
+          },
         },
       },
-    },
-    { merge: true }
-  );
+      { merge: true }
+    );
 
-  setDeliveredLines((prev) => ({
-    ...prev,
-    [lineKey]: newDelivered,
-  }));
+    setDeliveredLines((prev) => ({
+      ...prev,
+      [lineKey]: newDelivered,
+    }));
 
-  setDeliveryInfoLines((prev) => ({
-    ...prev,
-    [lineKey]: newDeliveryInfo,
-  }));
-};
-
+    setDeliveryInfoLines((prev) => ({
+      ...prev,
+      [lineKey]: newDeliveryInfo,
+    }));
+  };
 
   const [typingTimeout, setTypingTimeout] = useState(null);
 
@@ -336,79 +339,93 @@ const handleDeliveryToggle = async (lineKey, newDelivered, newDeliveryInfo) => {
             : "  Voir les détails du devis"}
         </button>
 
-      {showDetails && (
-  <table>
-    <thead>
-      <tr>
-        <th>Référence</th>
-        <th>Désignation</th>
-        <th>Quantité</th>
-        <th>Prix unit HT</th>
-        <th>Montant total HT</th>
-        <th>PA unit</th>
-        <th>PA total</th>
-        <th>Marge total</th>
-        <th>Marge en %</th>
-        <th>Reçu </th>
-        <th>Délai</th>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.entries(
-        quotation.quotation_lines.reduce((groups, line) => {
-          const chapter = line.chapter || "Autres"; // Regrouper par `chapter`, ou "Autres" si non défini
-          if (!groups[chapter]) groups[chapter] = [];
-          groups[chapter].push(line);
-          return groups;
-        }, {})
-      ).map(([chapter, lines], chapterIndex) => (
-        <React.Fragment key={chapterIndex}>
-          {/* Affichage du chapitre */}
-          <tr>
-            <td colSpan="11" className={styles.chapterRow}>
-              {decodeHtmlEntities(chapter)}
-            </td>
-          </tr>
-          {/* Affichage des lignes dans le chapitre */}
-          {lines.map((line, index) => {
-            const lineKey = `${chapter}-${index}`; // clé unique par chapitre + index
-            return (
-              <tr key={lineKey}>
-                <td>{line?.product_code || ""}</td>
-                <td>{line.product_name}</td>
-                <td>{line.quantity}</td>
-                <td>{line.price} €</td>
-                <td>{line.pre_tax_amount} €</td>
-                <td>{line.unit_job_costing} €</td>
-                <td>{(line.unit_job_costing * line.quantity).toFixed(2)} €</td>
-                <td>{line.margin.toFixed(1)} €</td>
-                <td>{((line.margin / line.pre_tax_amount) * 100).toFixed(1)} %</td>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={deliveredLines[lineKey] || false}
-                    onChange={async (e) => {
-                      const newDelivered = e.target.checked;
-                      const newDeliveryInfo = deliveryInfoLines[lineKey] || "";
-                      await handleDeliveryToggle(lineKey, newDelivered, newDeliveryInfo);
-                    }}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={deliveryInfoLines[lineKey] || ""}
-                    onChange={(e) => handleDeliveryInfoChange(lineKey, e.target.value)}
-                  />
-                </td>
+        {showDetails && (
+          <table>
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Désignation</th>
+                <th>Quantité</th>
+                <th>Prix unit HT</th>
+                <th>Montant total HT</th>
+                <th>PA unit</th>
+                <th>PA total</th>
+                <th>Marge total</th>
+                <th>Marge en %</th>
+                <th>Reçu </th>
+                <th>Délai</th>
               </tr>
-            );
-          })}
-        </React.Fragment>
-      ))}
-    </tbody>
-  </table>
-)}
+            </thead>
+            <tbody>
+              {Object.entries(
+                quotation.quotation_lines.reduce((groups, line) => {
+                  const chapter = line.chapter || "Autres"; // Regrouper par `chapter`, ou "Autres" si non défini
+                  if (!groups[chapter]) groups[chapter] = [];
+                  groups[chapter].push(line);
+                  return groups;
+                }, {})
+              ).map(([chapter, lines], chapterIndex) => (
+                <React.Fragment key={chapterIndex}>
+                  {/* Affichage du chapitre */}
+                  <tr>
+                    <td colSpan="11" className={styles.chapterRow}>
+                      {decodeHtmlEntities(chapter)}
+                    </td>
+                  </tr>
+                  {/* Affichage des lignes dans le chapitre */}
+                  {lines.map((line, index) => {
+                    const lineKey = `${chapter}-${index}`; // clé unique par chapitre + index
+                    return (
+                      <tr key={lineKey}>
+                        <td>{line?.product_code || ""}</td>
+                        <td>{line.product_name}</td>
+                        <td>{line.quantity}</td>
+                        <td>{line.price} €</td>
+                        <td>{line.pre_tax_amount} €</td>
+                        <td>{line.unit_job_costing} €</td>
+                        <td>
+                          {(line.unit_job_costing * line.quantity).toFixed(2)} €
+                        </td>
+                        <td>{line.margin.toFixed(1)} €</td>
+                        <td>
+                          {((line.margin / line.pre_tax_amount) * 100).toFixed(
+                            1
+                          )}{" "}
+                          %
+                        </td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={deliveredLines[lineKey] || false}
+                            onChange={async (e) => {
+                              const newDelivered = e.target.checked;
+                              const newDeliveryInfo =
+                                deliveryInfoLines[lineKey] || "";
+                              await handleDeliveryToggle(
+                                lineKey,
+                                newDelivered,
+                                newDeliveryInfo
+                              );
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={deliveryInfoLines[lineKey] || ""}
+                            onChange={(e) =>
+                              handleDeliveryInfoChange(lineKey, e.target.value)
+                            }
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        )}
 
         <div className={styles.totals}>
           <p>

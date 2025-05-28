@@ -9,8 +9,9 @@
   text-align: center;
   color: black;
 }
+
 .billingPlanContainer {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   padding-top: 6rem;
@@ -24,16 +25,79 @@
   padding: 2rem;
 }
 
-h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #1a202c;
+.billingPlanHeader {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+
+    i {
+      margin-right: 0.5rem;
+      color: #3b82f6;
+    }
+  }
+
+  p {
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+    color: #4b5563;
+
+    strong {
+      color: #111827;
+    }
+  }
 }
 
-p {
-  font-size: 1rem;
-  color: #4a5568;
-  margin-bottom: 0.5rem;
+.headerGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.headerLeft,
+.headerRight {
+  flex: 1 1 45%;
+}
+
+.quotationLines {
+  margin-top: 1.5rem;
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  i {
+    font-size: 1rem;
+  }
+
+  &:hover {
+    background-color: #1e40af;
+  }
+}
+
+.chapterRow {
+  background-color: #f3f4f6;
+  font-weight: bold;
+  color: #1f2937;
+  padding: 0.75rem 1rem;
 }
 
 .quotationLines {
@@ -114,6 +178,16 @@ form {
   margin-top: 2rem;
 }
 
+h3 {
+  font-size: 1.25rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  background-color: #00224f;
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 label {
   display: flex;
   flex-direction: column;
@@ -124,6 +198,7 @@ label {
   input {
     margin-top: 0.4rem;
     padding: 0.6rem;
+    text-align: left;
     border: 1px solid #cbd5e0;
     border-radius: 8px;
     font-size: 0.95rem;
@@ -132,6 +207,20 @@ label {
     &:focus {
       border-color: #3182ce;
       outline: none;
+    }
+  }
+  .revisionCheckbox {
+    width: 4%;
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+      accent-color: #3182ce; /* Modern browsers */
     }
   }
 }
@@ -170,14 +259,6 @@ button[type="submit"] {
   }
 }
 
-// button[type="button"] {
-//   background-color: #e2e8f0;
-//   color: #2d3748;
-
-//   &:hover {
-//     background-color: #cbd5e0;
-//   }
-// }
 .removeStepBtn {
   background-color: #ff4d4d;
   color: white;
@@ -191,7 +272,6 @@ button[type="submit"] {
     background-color: #d93636;
   }
 }
-
 
 .actions {
   display: flex;

@@ -24,19 +24,17 @@ export default function BillingPlan({ onClose }) {
       date: "",
       stepsComment: "",
       revision: "",
+      invoiced: false, // Ajout de la propriété invoiced
     },
   ]);
 
   const [mainComment, setMainComment] = useState("");
   const [generating, setGenerating] = useState(false);
-
   const [existingPlan, setExistingPlan] = useState(null);
   const [isEditable, setIsEditable] = useState(true); // par défaut editable
-
   const [deliveredLines, setDeliveredLines] = useState([]);
   const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
   const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
-  const [totalPixProductCode, setTotalPixProductCode] = useState(0);
 
   useEffect(() => {
     if (existingPlan) {
@@ -65,9 +63,6 @@ export default function BillingPlan({ onClose }) {
       setDeliveryInfoLines(deliveryInfoData);
     }
   };
-  const hasDeliveryData =
-    Object.values(deliveredLines).some((val) => val === true) ||
-    Object.values(deliveryInfoLines).some((val) => val && val.trim() !== "");
 
   useEffect(() => {
     fetchDeliveredLines();
@@ -163,6 +158,7 @@ export default function BillingPlan({ onClose }) {
           date: new Date(step.date).toISOString(),
           stepsComment: step.stepsComment || "",
           revision: step.revision ? parseFloat(step.revision || 0) : null,
+          invoiced: step.invoiced || false, // Ajout de la propriété invoiced
         })),
 
         quotation: {
@@ -213,113 +209,118 @@ export default function BillingPlan({ onClose }) {
             : "Créer un plan de facturation"}
         </h1>
 
-        {quotation && (
-          <>
-            <h2>
-              <i className="fa-solid fa-folder"></i>{" "}
-              {decodeHtmlEntities(quotation.title)}
-            </h2>
-            <p>Montant total HT du devis : {quotation.pre_tax_amount} €</p>
-            <p>Montant total TTC du devis : {quotation.total_amount} €</p>
-            <p>Montant total de la TVA : {quotation.tax_amount} €</p>
+        <div className={styles.billingPlanHeader}>
+          {quotation && (
+            <>
+              <div className={styles.headerGrid}>
+                <div className={styles.headerLeft}>
+                  <a
+                    href={`/quotations/${quotation.id}/project/${quotation.project_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <h2>
+                      <i className="fa-solid fa-folder"></i>{" "}
+                      {decodeHtmlEntities(quotation.title)}
+                    </h2>
+                  </a>
 
-            <p>
-              Total des étapes :{" "}
-              {steps
-                .reduce(
-                  (sum, s) =>
-                    sum +
-                    parseFloat(s.amount || 0) +
-                    (s.revision ? parseFloat(s.revision || 0) : 0),
-                  0
-                )
-                .toFixed(2)}{" "}
-              €
-            </p>
+                  <p>
+                    Total des étapes :
+                    <strong>
+                      {" "}
+                      {steps
+                        .reduce(
+                          (sum, s) =>
+                            sum +
+                            parseFloat(s.amount || 0) +
+                            (s.revision ? parseFloat(s.revision || 0) : 0),
+                          0
+                        )
+                        .toFixed(2)}{" "}
+                      €
+                    </strong>
+                  </p>
 
-            <div className={styles.quotationLines}>
-              <button
-                onClick={() => setShowDetails(!showDetails)} // Toggle visibility on click
-                className={styles.toggleButton}
-              >
-                <i className="fa-solid fa-bars"></i>
-                {showDetails
-                  ? "  Cacher les détails du devis"
-                  : "  Voir les détails du devis"}
-              </button>
+                  <p>
+                    Établi / MAJ par :{" "}
+                    <strong>{existingPlan?.generatedBy}</strong>
+                  </p>
+                </div>
 
-              {showDetails && (
-                <table>
-                  <thead>
+                <div className={styles.headerRight}>
+                  <p>
+                    Montant HT : <strong>{quotation.pre_tax_amount} €</strong>
+                  </p>
+                  <p>
+                    Montant TVA : <strong>{quotation.tax_amount} €</strong>
+                  </p>
+                  <p>
+                    Montant TTC : <strong>{quotation.total_amount} €</strong>
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        <div className={styles.quotationLines}>
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className={styles.toggleButton}
+          >
+            <i className="fa-solid fa-bars"></i>
+            {showDetails
+              ? "  Cacher les détails du devis"
+              : "  Voir les détails du devis"}
+          </button>
+
+          {showDetails && (
+            <table>
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Désignation</th>
+                  <th>Quantité</th>
+                  <th>Reçu</th>
+                  <th>Délai livraison</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(
+                  quotation.quotation_lines.reduce((groups, line) => {
+                    const chapter = line.chapter || "Autres";
+                    if (!groups[chapter]) groups[chapter] = [];
+                    groups[chapter].push(line);
+                    return groups;
+                  }, {})
+                ).map(([chapter, lines], chapterIndex) => (
+                  <React.Fragment key={chapterIndex}>
                     <tr>
-                      <th>Référence</th>
-                      <th>Désignation</th>
-                      <th>Quantité</th>
-                      <th>Reçu </th>
-                      <th>Délai livraison</th>
+                      <td colSpan="11" className={styles.chapterRow}>
+                        {decodeHtmlEntities(chapter)}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(
-                      quotation.quotation_lines.reduce((groups, line) => {
-                        const chapter = line.chapter || "Autres";
-                        if (!groups[chapter]) groups[chapter] = [];
-                        groups[chapter].push(line);
-                        return groups;
-                      }, {})
-                    ).map(([chapter, lines], chapterIndex) => (
-                      <React.Fragment key={chapterIndex}>
-                        <tr>
-                          <td colSpan="11" className={styles.chapterRow}>
-                            {decodeHtmlEntities(chapter)}
-                          </td>
-                        </tr>
-                        {lines.map((line, index) => (
-                          <tr key={index}>
-                            <td>{line?.product_code || ""}</td>
-                            <td>{line.product_name}</td>
-                            <td>{line.quantity}</td>
-                            {/* <td>{line.price} €</td>
-                            <td>{line.pre_tax_amount} €</td>
-                            <td>{line.unit_job_costing} €</td>
-                            <td>
-                              {(line.unit_job_costing * line.quantity).toFixed(
-                                2
-                              )}{" "}
-                              €
-                            </td>
-                            <td>{line.margin.toFixed(1)} €</td>
-                            <td>
-                              {(
-                                (line.margin / line.pre_tax_amount) *
-                                100
-                              ).toFixed(1)}{" "}
-                              %
-                            </td> */}
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={deliveredLines[line.id] || false}
-                                disabled
-                                onChange={async (e) => {
-                                  const newDelivered = e.target.checked;
-                                  const newDeliveryInfo =
-                                    deliveryInfoLines[index] || "";
-                                  // ici tu pourrais ajouter une logique de mise à jour si besoin
-                                }}
-                              />
-                            </td>
-                            <td>{deliveryInfoLines[index] || ""}</td>
-                          </tr>
-                        ))}
-                      </React.Fragment>
+                    {lines.map((line, index) => (
+                      <tr key={index}>
+                        <td>{line?.product_code || ""}</td>
+                        <td>{line.product_name}</td>
+                        <td>{line.quantity}</td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={deliveredLines[line.id] || false}
+                            disabled
+                          />
+                        </td>
+                        <td>{deliveryInfoLines[index] || ""}</td>
+                      </tr>
                     ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </>
-        )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit}>
           <label>
@@ -335,7 +336,9 @@ export default function BillingPlan({ onClose }) {
 
           {steps.map((step, index) => (
             <div key={index} className={styles.step}>
-              <h3>Étape {index + 1}</h3>
+              <h3>
+                Étape {index + 1} {step.invoiced ? "(Facturée)" : ""}
+              </h3>
 
               <label>
                 Montant (€)
@@ -364,7 +367,6 @@ export default function BillingPlan({ onClose }) {
                   }
                 />
               </label>
-
               <label>
                 Date
                 <input
@@ -375,7 +377,6 @@ export default function BillingPlan({ onClose }) {
                   disabled={!isEditable}
                 />
               </label>
-
               <label>
                 Commentaire
                 <input
@@ -387,10 +388,10 @@ export default function BillingPlan({ onClose }) {
                   disabled={!isEditable}
                 />
               </label>
-
               <label>
-                Révision
+                Révision ?
                 <input
+                  className={styles.revisionCheckbox}
                   type="checkbox"
                   checked={!!step.revision}
                   onChange={(e) =>
@@ -399,7 +400,6 @@ export default function BillingPlan({ onClose }) {
                   disabled={!isEditable}
                 />
               </label>
-
               {step.revision && (
                 <label>
                   Montant révision (€)
@@ -414,6 +414,19 @@ export default function BillingPlan({ onClose }) {
                 </label>
               )}
 
+              <label>
+                Total de l'étape (€)
+                <input
+                  type="text"
+                  value={(
+                    parseFloat(step.amount || 0) +
+                    (step.revision ? parseFloat(step.revision || 0) : 0)
+                  ).toFixed(2)}
+                  readOnly
+                  disabled={!isEditable}
+                />
+              </label>
+
               {isEditable && steps.length > 1 && (
                 <button
                   type="button"
@@ -423,7 +436,6 @@ export default function BillingPlan({ onClose }) {
                   Supprimer cette étape
                 </button>
               )}
-
               <hr />
             </div>
           ))}
