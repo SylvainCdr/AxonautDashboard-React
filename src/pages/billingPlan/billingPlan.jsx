@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./style.module.scss";
 import { fetchQuotationById } from "../../services/api/quotations";
+import { fetchContractById } from "../../services/api/contracts";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../../firebase/firebase";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
@@ -74,6 +75,7 @@ export default function BillingPlan({ onClose }) {
         setLoading(true);
         const data = await fetchQuotationById(quotationId);
         setQuotation(data);
+        
 
         const planRef = doc(db, "billingPlans", data.id.toString());
         const planSnap = await getDoc(planRef);
@@ -322,150 +324,158 @@ export default function BillingPlan({ onClose }) {
           )}
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <label>
-            Commentaire principal
+     <form onSubmit={handleSubmit}>
+  <label>
+    Commentaire principal
+    <input
+      type="text"
+      id="mainComment"
+      value={mainComment}
+      onChange={(e) => setMainComment(e.target.value)}
+      disabled={!isEditable}
+    />
+  </label>
+
+  <table className={styles.stepsTable}>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Montant (€)</th>
+        <th>Date</th>
+        <th>Commentaire</th>
+        <th>Révision ?</th>
+        <th>Montant révision (€)</th>
+        <th>Total (€)</th>
+        <th> Statut</th>
+        {isEditable && <th>Action</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {steps.map((step, index) => (
+        <tr key={index}>
+          <td>{index + 1}</td>
+          <td>
             <input
-              type="text"
-              id="mainComment"
-              value={mainComment}
-              onChange={(e) => setMainComment(e.target.value)}
+              type="number"
+              value={step.amount}
+              onChange={(e) => updateStep(index, "amount", e.target.value)}
+              disabled={!isEditable}
+              placeholder={
+                isEditable
+                  ? `Reste : ${(
+                      quotation.total_amount -
+                      steps
+                        .slice(0, index)
+                        .reduce(
+                          (sum, s) =>
+                            sum +
+                            parseFloat(s.amount || 0) +
+                            (s.revision
+                              ? parseFloat(s.revision || 0)
+                              : 0),
+                          0
+                        )
+                    ).toFixed(2)} €`
+                  : ""
+              }
+            />
+          </td>
+          <td>
+            <input
+              type="date"
+              value={step.date ? step.date.substring(0, 10) : ""}
+              onChange={(e) => updateStep(index, "date", e.target.value)}
+              required
               disabled={!isEditable}
             />
-          </label>
-
-          {steps.map((step, index) => (
-            <div key={index} className={styles.step}>
-              <h3>
-                Étape {index + 1} {step.invoiced ? "(Facturée)" : ""}
-              </h3>
-
-              <label>
-                Montant (€)
-                <input
-                  type="number"
-                  value={step.amount}
-                  onChange={(e) => updateStep(index, "amount", e.target.value)}
-                  disabled={!isEditable}
-                  placeholder={
-                    isEditable
-                      ? `Reste : ${(
-                          quotation.total_amount -
-                          steps
-                            .slice(0, index)
-                            .reduce(
-                              (sum, s) =>
-                                sum +
-                                parseFloat(s.amount || 0) +
-                                (s.revision
-                                  ? parseFloat(s.revisionAmount || 0)
-                                  : 0),
-                              0
-                            )
-                        ).toFixed(2)} €`
-                      : ""
-                  }
-                />
-              </label>
-              <label>
-                Date
-                <input
-                  type="date"
-                  value={step.date ? step.date.substring(0, 10) : ""}
-                  onChange={(e) => updateStep(index, "date", e.target.value)}
-                  required
-                  disabled={!isEditable}
-                />
-              </label>
-              <label>
-                Commentaire
-                <input
-                  type="text"
-                  value={step.stepsComment}
-                  onChange={(e) =>
-                    updateStep(index, "stepsComment", e.target.value)
-                  }
-                  disabled={!isEditable}
-                />
-              </label>
-              <label>
-                Révision ?
-                <input
-                  className={styles.revisionCheckbox}
-                  type="checkbox"
-                  checked={!!step.revision}
-                  onChange={(e) =>
-                    updateStep(index, "revision", e.target.checked ? "0" : "")
-                  }
-                  disabled={!isEditable}
-                />
-              </label>
-              {step.revision && (
-                <label>
-                  Montant révision (€)
-                  <input
-                    type="number"
-                    value={step.revision}
-                    onChange={(e) =>
-                      updateStep(index, "revision", e.target.value)
-                    }
-                    disabled={!isEditable}
-                  />
-                </label>
-              )}
-
-              <label>
-                Total de l'étape (€)
-                <input
-                  type="text"
-                  value={(
-                    parseFloat(step.amount || 0) +
-                    (step.revision ? parseFloat(step.revision || 0) : 0)
-                  ).toFixed(2)}
-                  readOnly
-                  disabled={!isEditable}
-                />
-              </label>
-
-              {isEditable && steps.length > 1 && (
+          </td>
+          <td>
+            <input
+              type="text"
+              value={step.stepsComment}
+              onChange={(e) =>
+                updateStep(index, "stepsComment", e.target.value)
+              }
+              disabled={!isEditable}
+            />
+          </td>
+          <td>
+            <input
+              type="checkbox"
+              checked={!!step.revision}
+              onChange={(e) =>
+                updateStep(index, "revision", e.target.checked ? "0" : "")
+              }
+              disabled={!isEditable}
+            />
+          </td>
+          <td>
+            {step.revision && (
+              <input
+                type="number"
+                value={step.revision}
+                onChange={(e) =>
+                  updateStep(index, "revision", e.target.value)
+                }
+                disabled={!isEditable}
+              />
+            )}
+          </td>
+          <td>
+            {(
+              parseFloat(step.amount || 0) +
+              (step.revision ? parseFloat(step.revision || 0) : 0)
+            ).toFixed(2)}
+          </td>
+          {isEditable && (
+            <td>
+              {steps.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeStep(index)}
                   className={styles.removeStepBtn}
                 >
-                  Supprimer cette étape
+                  Supprimer
                 </button>
               )}
-              <hr />
-            </div>
-          ))}
-
-          {isEditable && (
-            <button type="button" onClick={addStep}>
-              Ajouter un palier
-            </button>
+            </td>
+          
           )}
+            <td>
+             
+  
+              {step.invoiced ? "Facturé" : "Non facturé"}
+            </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 
-          <div className={styles.actions}>
-            {existingPlan && !isEditable && (
-              <button onClick={() => setIsEditable(true)}>Modifier</button>
-            )}
-            {isEditable && (
-              <div className={styles.actions}>
-                <button type="submit" disabled={generating}>
-                  {generating ? "Enregistrement..." : "Enregistrer"}
-                </button>
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              disabled={generating}
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
+  {isEditable && (
+    <button type="button" onClick={addStep}>
+      Ajouter un palier
+    </button>
+  )}
+
+  <div className={styles.actions}>
+    {existingPlan && !isEditable && (
+      <button onClick={() => setIsEditable(true)}>Modifier</button>
+    )}
+    {isEditable && (
+      <button type="submit" disabled={generating}>
+        {generating ? "Enregistrement..." : "Enregistrer"}
+      </button>
+    )}
+    <button
+      type="button"
+      onClick={() => navigate(-1)}
+      disabled={generating}
+    >
+      Annuler
+    </button>
+  </div>
+</form>
+
       </div>
     </div>
   );
