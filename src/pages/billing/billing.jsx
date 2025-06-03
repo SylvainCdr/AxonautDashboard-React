@@ -39,16 +39,18 @@ export default function Billing() {
               parseFloat(step.amount || 0) + parseFloat(step.revision || 0);
 
             monthlyData[monthKey].items.push({
-              quotationId,
-              title: decodeHtmlEntities(projectTitle),
-              date: stepDate,
-              stepsComment: step.stepsComment,
-              amount: parseFloat(step.amount || 0),
-              revision: parseFloat(step.revision || 0),
-              invoiced,
-              docId: docSnap.id,
-              stepIndex: index,
-            });
+  quotationId,
+  title: decodeHtmlEntities(projectTitle),
+  date: stepDate,
+  stepsComment: step.stepsComment,
+  amount: parseFloat(step.amount || 0),
+  revision: parseFloat(step.revision || 0),
+  invoiced,
+  docId: docSnap.id,
+  stepIndex: index,
+  totalSteps: steps.length, // ⬅️ on ajoute cette ligne
+});
+
 
             if (!invoiced) {
               monthlyData[monthKey].total += amount;
@@ -148,11 +150,20 @@ export default function Billing() {
                 return (
                   <>
                     {/* Tableau Reste à facturer */}
-                    <h4>Reste à facturer</h4>
+                    <h4
+                      style={{
+                        marginTop: "2rem",
+                        backgroundColor: "#ff5a3d",
+                        color: "white",
+                      }}
+                    >
+                      Reste à facturer
+                    </h4>
                     <table className={styles.billingTable}>
                       <thead>
                         <tr>
-                          <th>Projet</th>
+                          <th>Commande</th>
+                          <th>Étape</th>
                           <th>Commentaire</th>
                           <th>Date</th>
                           <th>Montant (€)</th>
@@ -170,6 +181,10 @@ export default function Billing() {
                                 {item.title}
                               </Link>
                             </td>
+                            <td>
+  {item.stepIndex + 1}/{item.totalSteps}
+</td>
+
                             <td>{item.stepsComment}</td>
                             <td>
                               {format(item.date, "dd MMM yyyy", { locale: fr })}
@@ -216,7 +231,15 @@ export default function Billing() {
                     </table>
 
                     {/* Tableau Déjà facturé */}
-                    <h4 style={{ marginTop: "2rem" }}>Déjà facturé</h4>
+                    <h4
+                      style={{
+                        marginTop: "2rem",
+                        backgroundColor: "#00ab39",
+                        color: "white",
+                      }}
+                    >
+                      Déjà facturé
+                    </h4>
                     <table className={styles.billingTable}>
                       <thead>
                         <tr>

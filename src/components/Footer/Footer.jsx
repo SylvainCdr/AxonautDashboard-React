@@ -4,7 +4,7 @@ import "./style.scss";
 function Footer() {
   return (
     <div className="footer">
-      <p>Copyright © 2024. Tous droits réservés Pixecurity </p>
+      <p>Copyright © 2025. Tous droits réservés Pixecurity </p>
     </div>
   );
 }

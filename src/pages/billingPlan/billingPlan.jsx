@@ -3,16 +3,20 @@ import React, { useEffect, useState } from "react";
 import styles from "./style.module.scss";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchContractById } from "../../services/api/contracts";
+import { fetchInvoiceById } from "../../services/api/invoices";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../../firebase/firebase";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { GridLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
 export default function BillingPlan({ onClose }) {
   const { quotationId } = useParams();
   const [quotation, setQuotation] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const user = auth.currentUser;
@@ -36,6 +40,11 @@ export default function BillingPlan({ onClose }) {
   const [deliveredLines, setDeliveredLines] = useState([]);
   const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
   const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
+  const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
+  const [totalPaidAmount, setTotalPaidAmount] = useState(0);
+  const isPaidInvoice = (invoice) => {
+    return invoice.paid_date ? "green" : "red";
+  };
 
   useEffect(() => {
     if (existingPlan) {
@@ -75,7 +84,21 @@ export default function BillingPlan({ onClose }) {
         setLoading(true);
         const data = await fetchQuotationById(quotationId);
         setQuotation(data);
-        
+
+        // 🔍 Si un contrat est lié à ce devis, on le charge
+        if (data.contract_id) {
+          const contractData = await fetchContractById(data.contract_id);
+          setContract(contractData);
+
+          // 🔄 Récupérer les factures liées au contrat
+          if (contractData.invoices_id && contractData.invoices_id.length > 0) {
+            const invoicePromises = contractData.invoices_id.map((id) =>
+              fetchInvoiceById(id)
+            );
+            const fetchedInvoices = await Promise.all(invoicePromises);
+            setInvoices(fetchedInvoices);
+          }
+        }
 
         const planRef = doc(db, "billingPlans", data.id.toString());
         const planSnap = await getDoc(planRef);
@@ -86,11 +109,12 @@ export default function BillingPlan({ onClose }) {
         }
       } catch (err) {
         console.error(err);
-        setError("Impossible de charger les données du devis.");
+        setError("Impossible de charger les données du devis ou du contrat.");
       } finally {
         setLoading(false);
       }
     }
+
     loadQuotationData();
   }, [quotationId]);
 
@@ -115,17 +139,37 @@ export default function BillingPlan({ onClose }) {
     setSteps(updatedSteps);
   };
 
+  const addInvoiceToSteps = (invoice) => {
+    // Eviter doublons via id ou numéro facture
+    if (steps.some((step) => step.invoiceId === invoice.id)) return;
+
+    const newStep = {
+      amount: invoice.total,
+      date: invoice.date,
+      stepsComment: `Facture #${invoice.number}`,
+      revision: "",
+      invoiced: true,
+      invoiceId: invoice.id, // Pour référence future
+    };
+
+    setSteps((prev) => [...prev, newStep]);
+  };
+
   const handleManualBillingPlanSave = async (steps, mainComment) => {
     setGenerating(true);
     try {
       const planRef = doc(db, "billingPlans", quotation.id.toString());
 
-      // On vérifie si une révision est cochée
       const isRevisionChecked = steps.some(
         (step) => !!step.revision && parseFloat(step.revision) > 0
       );
 
       const totalStepAmount = steps.reduce(
+        (sum, step) => sum + parseFloat(step.amount || 0),
+        0
+      );
+
+      const totalWithRevision = steps.reduce(
         (sum, step) =>
           sum +
           parseFloat(step.amount || 0) +
@@ -133,15 +177,28 @@ export default function BillingPlan({ onClose }) {
         0
       );
 
-      // Si révision cochée, total doit être strictement supérieur
-      if (isRevisionChecked && totalStepAmount <= quotation.total_amount) {
-        alert(
-          `Le total à facturer (${totalStepAmount.toFixed(
+      if (!isRevisionChecked && totalStepAmount !== quotation.total_amount) {
+        toast.error(
+          `Le total des étapes (${totalStepAmount.toFixed(
+            2
+          )} €) doit être égal au montant TTC du devis (${
+            quotation.total_amount
+          } €).`
+        );
+
+        setGenerating(false);
+        return;
+      }
+
+      if (isRevisionChecked && totalWithRevision <= quotation.total_amount) {
+        toast.error(
+          `Le total des étapes avec révisions (${totalWithRevision.toFixed(
             2
           )} €) doit être supérieur au montant TTC du devis (${
             quotation.total_amount
-          } €) si une révision est cochée.`
+          } €).`
         );
+
         setGenerating(false);
         return;
       }
@@ -160,9 +217,8 @@ export default function BillingPlan({ onClose }) {
           date: new Date(step.date).toISOString(),
           stepsComment: step.stepsComment || "",
           revision: step.revision ? parseFloat(step.revision || 0) : null,
-          invoiced: step.invoiced || false, // Ajout de la propriété invoiced
+          invoiced: step.invoiced || false,
         })),
-
         quotation: {
           id: quotation.id,
           pre_tax_amount: quotation.pre_tax_amount || 0,
@@ -173,13 +229,17 @@ export default function BillingPlan({ onClose }) {
         },
       };
 
-      await setDoc(planRef, billingPlan); // setDoc met à jour ou crée
-      alert(existingPlan ? "Plan mis à jour !" : "Plan enregistré !");
+      await setDoc(planRef, billingPlan);
+      toast.success(
+        existingPlan
+          ? "Plan de facturation mis à jour avec succès."
+          : "Plan de facturation créé avec succès."
+      );
+      setExistingPlan(billingPlan);
       navigate("/billing");
       onClose();
     } catch (err) {
       console.error("Erreur enregistrement plan :", err);
-      alert("Erreur lors de l'enregistrement.");
     } finally {
       setGenerating(false);
     }
@@ -188,7 +248,8 @@ export default function BillingPlan({ onClose }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const valid = steps.every((step) => step.amount && step.date);
-    if (!valid) return alert("Veuillez remplir tous les champs.");
+    if (!valid)
+      return toast.error("Veuillez remplir tous les champs des étapes.");
     handleManualBillingPlanSave(steps, mainComment);
   };
 
@@ -261,6 +322,67 @@ export default function BillingPlan({ onClose }) {
                     Montant TTC : <strong>{quotation.total_amount} €</strong>
                   </p>
                 </div>
+                {invoices.length > 0 && (
+                  <div className={styles.invoicesSection}>
+                    <h3>📄 Facture(s) liée(s) sur Axonaut</h3>
+
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Numéro facture</th>
+                          <th>Montant TTC</th>
+                          <th>Date de création</th>
+                          <th>Date de Paiement</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invoices.map((invoice) => (
+                          <tr key={invoice.id}>
+                            <td>{invoice.number}</td>
+                            <td>{invoice.total} €</td>
+                            <td>
+                              {new Date(invoice.date).toLocaleDateString()}
+                            </td>
+                            <td>
+                              <span style={{ color: isPaidInvoice(invoice) }}>
+                                {invoice.paid_date
+                                  ? new Date(
+                                      invoice.paid_date
+                                    ).toLocaleDateString()
+                                  : "Non payée"}
+                              </span>
+                            </td>
+                            <td>
+                              <a
+                                href={invoice.public_path}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Voir la facture
+                              </a>
+                              <button
+                                onClick={() => addInvoiceToSteps(invoice)}
+                                disabled={!isEditable} // si tu veux bloquer quand non éditable
+                                style={{
+                                  marginLeft: 10,
+                                  padding: "5px 8px",
+                                  cursor: "pointer",
+                                  backgroundColor: "#C60F7B",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: 3,
+                                }}
+                              >
+                                Intégrer au plan
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -324,158 +446,160 @@ export default function BillingPlan({ onClose }) {
           )}
         </div>
 
-     <form onSubmit={handleSubmit}>
-  <label>
-    Commentaire principal
-    <input
-      type="text"
-      id="mainComment"
-      value={mainComment}
-      onChange={(e) => setMainComment(e.target.value)}
-      disabled={!isEditable}
-    />
-  </label>
-
-  <table className={styles.stepsTable}>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Montant (€)</th>
-        <th>Date</th>
-        <th>Commentaire</th>
-        <th>Révision ?</th>
-        <th>Montant révision (€)</th>
-        <th>Total (€)</th>
-        <th> Statut</th>
-        {isEditable && <th>Action</th>}
-      </tr>
-    </thead>
-    <tbody>
-      {steps.map((step, index) => (
-        <tr key={index}>
-          <td>{index + 1}</td>
-          <td>
-            <input
-              type="number"
-              value={step.amount}
-              onChange={(e) => updateStep(index, "amount", e.target.value)}
-              disabled={!isEditable}
-              placeholder={
-                isEditable
-                  ? `Reste : ${(
-                      quotation.total_amount -
-                      steps
-                        .slice(0, index)
-                        .reduce(
-                          (sum, s) =>
-                            sum +
-                            parseFloat(s.amount || 0) +
-                            (s.revision
-                              ? parseFloat(s.revision || 0)
-                              : 0),
-                          0
-                        )
-                    ).toFixed(2)} €`
-                  : ""
-              }
-            />
-          </td>
-          <td>
-            <input
-              type="date"
-              value={step.date ? step.date.substring(0, 10) : ""}
-              onChange={(e) => updateStep(index, "date", e.target.value)}
-              required
-              disabled={!isEditable}
-            />
-          </td>
-          <td>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Commentaire principal
             <input
               type="text"
-              value={step.stepsComment}
-              onChange={(e) =>
-                updateStep(index, "stepsComment", e.target.value)
-              }
+              id="mainComment"
+              value={mainComment}
+              onChange={(e) => setMainComment(e.target.value)}
               disabled={!isEditable}
             />
-          </td>
-          <td>
-            <input
-              type="checkbox"
-              checked={!!step.revision}
-              onChange={(e) =>
-                updateStep(index, "revision", e.target.checked ? "0" : "")
-              }
-              disabled={!isEditable}
-            />
-          </td>
-          <td>
-            {step.revision && (
-              <input
-                type="number"
-                value={step.revision}
-                onChange={(e) =>
-                  updateStep(index, "revision", e.target.value)
-                }
-                disabled={!isEditable}
-              />
-            )}
-          </td>
-          <td>
-            {(
-              parseFloat(step.amount || 0) +
-              (step.revision ? parseFloat(step.revision || 0) : 0)
-            ).toFixed(2)}
-          </td>
+          </label>
+
+          <table className={styles.stepsTable}>
+            <thead>
+              <tr>
+                <th>Etape</th>
+                <th>Montant (€)</th>
+                <th>Date</th>
+                <th>Commentaire</th>
+                <th>Révision ?</th>
+                <th>Montant révision (€)</th>
+                <th>Total (€)</th>
+                <th> Statut</th>
+                {isEditable && <th>Action</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {steps.map((step, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <input
+                      type="number"
+                      value={step.amount}
+                      onChange={(e) =>
+                        updateStep(index, "amount", e.target.value)
+                      }
+                      disabled={!isEditable}
+                      placeholder={
+                        isEditable
+                          ? `Reste : ${(
+                              quotation.total_amount -
+                              steps
+                                .slice(0, index)
+                                .reduce(
+                                  (sum, s) =>
+                                    sum +
+                                    parseFloat(s.amount || 0) +
+                                    (s.revision
+                                      ? parseFloat(s.revision || 0)
+                                      : 0),
+                                  0
+                                )
+                            ).toFixed(2)} €`
+                          : ""
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="date"
+                      value={step.date ? step.date.substring(0, 10) : ""}
+                      onChange={(e) =>
+                        updateStep(index, "date", e.target.value)
+                      }
+                      required
+                      disabled={!isEditable}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={step.stepsComment}
+                      onChange={(e) =>
+                        updateStep(index, "stepsComment", e.target.value)
+                      }
+                      disabled={!isEditable}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={!!step.revision}
+                      onChange={(e) =>
+                        updateStep(
+                          index,
+                          "revision",
+                          e.target.checked ? "0" : ""
+                        )
+                      }
+                      disabled={!isEditable}
+                    />
+                  </td>
+                  <td>
+                    {step.revision && (
+                      <input
+                        type="number"
+                        value={step.revision}
+                        onChange={(e) =>
+                          updateStep(index, "revision", e.target.value)
+                        }
+                        disabled={!isEditable}
+                      />
+                    )}
+                  </td>
+                  <td>
+                    {(
+                      parseFloat(step.amount || 0) +
+                      (step.revision ? parseFloat(step.revision || 0) : 0)
+                    ).toFixed(2)}
+                  </td>
+                  {isEditable && (
+                    <td>
+                      {steps.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeStep(index)}
+                          className={styles.removeStepBtn}
+                        >
+                          Supprimer
+                        </button>
+                      )}
+                    </td>
+                  )}
+                  <td>{step.invoiced ? "Facturé" : "Non facturé"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
           {isEditable && (
-            <td>
-              {steps.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeStep(index)}
-                  className={styles.removeStepBtn}
-                >
-                  Supprimer
-                </button>
-              )}
-            </td>
-          
+            <button type="button" onClick={addStep}>
+              Ajouter un palier
+            </button>
           )}
-            <td>
-             
-  
-              {step.invoiced ? "Facturé" : "Non facturé"}
-            </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
 
-  {isEditable && (
-    <button type="button" onClick={addStep}>
-      Ajouter un palier
-    </button>
-  )}
-
-  <div className={styles.actions}>
-    {existingPlan && !isEditable && (
-      <button onClick={() => setIsEditable(true)}>Modifier</button>
-    )}
-    {isEditable && (
-      <button type="submit" disabled={generating}>
-        {generating ? "Enregistrement..." : "Enregistrer"}
-      </button>
-    )}
-    <button
-      type="button"
-      onClick={() => navigate(-1)}
-      disabled={generating}
-    >
-      Annuler
-    </button>
-  </div>
-</form>
-
+          <div className={styles.actions}>
+            {existingPlan && !isEditable && (
+              <button onClick={() => setIsEditable(true)}>Modifier</button>
+            )}
+            {isEditable && (
+              <button type="submit" disabled={generating}>
+                {generating ? "Enregistrement..." : "Enregistrer"}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              disabled={generating}
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
