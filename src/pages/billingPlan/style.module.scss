@@ -11,10 +11,10 @@
 }
 
 .billingPlanContainer {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  padding-top: 6rem;
+  padding-top: 5rem;
   min-height: 100vh;
 }
 
@@ -32,12 +32,36 @@
   margin-bottom: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+a {
+  text-decoration: none;
+ 
+
+  &:hover {
+    color: #005fa3;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #222;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 0.5rem;
+      color: #ffbc42;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }}
 
   .headerGrid {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 2rem;
+    gap: 1rem;
 
     @media (max-width: 768px) {
       flex-direction: column;
@@ -46,33 +70,23 @@
 
   .headerLeft,
   .headerRight {
-    flex: 1 1 45%;
-  }
-
-  .headerLeft h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #222;
+    flex: 1 1 40%;
     display: flex;
-    align-items: center;
-
-    i {
-      margin-right: 0.5rem;
-      color: #c60f7b;
-    }
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .headerLeft p,
-  .headerRight p {
-    margin: 0.3rem 0;
-    font-size: 0.95rem;
+    flex-direction: column;
+    justify-content: center;
 
     strong {
       color: #333;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0.3rem;
+      font-size: 0.95rem;
+
+      strong {
+        color: #333;
+      }
     }
   }
 
@@ -102,7 +116,7 @@
 
       th,
       td {
-        padding: 0.75rem 1rem;
+        padding: 0.5rem 0.5rem;
         border: 1px solid #ddd;
         text-align: left;
         font-size: 0.9rem;
@@ -269,21 +283,30 @@
     background-color: #f5f5f5;
     font-weight: 600;
   }
-
+   .revisionInput {
+    width: 30%;
+    display: flex;
+    input {
+      width: 50%;
+   
+    }
+  }
   input[type="text"],
   input[type="number"],
   input[type="date"] {
-    width: 100%;
+    width: 90%;
     padding: 0.4rem 0.6rem;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 0.9rem;
+ 
   }
 
   input[type="checkbox"] {
     width: 18px;
     height: 18px;
   }
+  
 
   button {
     background-color: #e74c3c;
@@ -293,7 +316,6 @@
     font-size: 0.85rem;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.2s ease;
 
     &:hover {
       background-color: #c0392b;
@@ -307,7 +329,7 @@
   margin-top: 2rem;
 
   button {
-    padding: 0.6rem 1.2rem;
+    padding: 0.5rem 1rem;
     font-size: 1rem;
     border-radius: 6px;
     border: none;
@@ -328,10 +350,12 @@
 }
 
 .removeStepBtn {
-  background-color: #e67e22 !important;
+  background-color: #e61903 !important;
+  padding: 0.1rem;
+  font-weight: 500;
 
   &:hover {
-    background-color: #d35400 !important;
+    background-color: #ff3c3c !important;
   }
 }
 
@@ -351,6 +375,8 @@ label {
   font-size: 0.95rem;
   font-weight: 500;
   color: #2d3748;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 
   input {
     margin-top: 0.4rem;

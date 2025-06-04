@@ -40,8 +40,6 @@ export default function BillingPlan({ onClose }) {
   const [deliveredLines, setDeliveredLines] = useState([]);
   const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
   const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
-  const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
-  const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const isPaidInvoice = (invoice) => {
     return invoice.paid_date ? "green" : "red";
   };
@@ -275,19 +273,30 @@ export default function BillingPlan({ onClose }) {
         <div className={styles.billingPlanHeader}>
           {quotation && (
             <>
+              <a
+                href={`/quotations/${quotation.id}/project/${quotation.project_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h2>
+                  <i className="fa-solid fa-folder"></i>{" "}
+                  {decodeHtmlEntities(quotation.title)}
+                </h2>
+              </a>
               <div className={styles.headerGrid}>
                 <div className={styles.headerLeft}>
-                  <a
-                    href={`/quotations/${quotation.id}/project/${quotation.project_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <h2>
-                      <i className="fa-solid fa-folder"></i>{" "}
-                      {decodeHtmlEntities(quotation.title)}
-                    </h2>
-                  </a>
+                  <p>
+                    Montant HT : <strong>{quotation.pre_tax_amount} €</strong>
+                  </p>
+                  <p>
+                    Montant TVA : <strong>{quotation.tax_amount} €</strong>
+                  </p>
+                  <p>
+                    Montant TTC : <strong>{quotation.total_amount} €</strong>
+                  </p>
+                </div>
 
+                <div className={styles.headerRight}>
                   <p>
                     Total des étapes :
                     <strong>
@@ -310,22 +319,9 @@ export default function BillingPlan({ onClose }) {
                     <strong>{existingPlan?.generatedBy}</strong>
                   </p>
                 </div>
-
-                <div className={styles.headerRight}>
-                  <p>
-                    Montant HT : <strong>{quotation.pre_tax_amount} €</strong>
-                  </p>
-                  <p>
-                    Montant TVA : <strong>{quotation.tax_amount} €</strong>
-                  </p>
-                  <p>
-                    Montant TTC : <strong>{quotation.total_amount} €</strong>
-                  </p>
-                </div>
-                {invoices.length > 0 && (
-                  <div className={styles.invoicesSection}>
-                    <h3>📄 Facture(s) liée(s) sur Axonaut</h3>
-
+                <div className={styles.invoicesSection}>
+                  <h3>📄 Facture(s) liée(s) sur Axonaut</h3>
+                  {invoices.length > 0 ? (
                     <table>
                       <thead>
                         <tr>
@@ -363,7 +359,7 @@ export default function BillingPlan({ onClose }) {
                               </a>
                               <button
                                 onClick={() => addInvoiceToSteps(invoice)}
-                                disabled={!isEditable} // si tu veux bloquer quand non éditable
+                                disabled={!isEditable}
                                 style={{
                                   marginLeft: 10,
                                   padding: "5px 8px",
@@ -381,8 +377,12 @@ export default function BillingPlan({ onClose }) {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-                )}
+                  ) : (
+                    <div style={{ color: "#888", marginTop: 10 }}>
+                      Aucune facture existante sur Axonaut
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -466,7 +466,7 @@ export default function BillingPlan({ onClose }) {
                 <th>Date</th>
                 <th>Commentaire</th>
                 <th>Révision ?</th>
-                <th>Montant révision (€)</th>
+                <th>Révision (€)</th>
                 <th>Total (€)</th>
                 <th> Statut</th>
                 {isEditable && <th>Action</th>}
@@ -539,7 +539,7 @@ export default function BillingPlan({ onClose }) {
                       disabled={!isEditable}
                     />
                   </td>
-                  <td>
+                  <td >
                     {step.revision && (
                       <input
                         type="number"
@@ -570,7 +570,15 @@ export default function BillingPlan({ onClose }) {
                       )}
                     </td>
                   )}
-                  <td>{step.invoiced ? "Facturé" : "Non facturé"}</td>
+                  <td>
+                    <span
+                      style={{
+                        color: step.invoiced ? "green" : "red",
+                      }}
+                    >
+                      {step.invoiced ? "Facturé" : "Non facturé"}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

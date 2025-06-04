@@ -1,5 +1,5 @@
 import styles from "./style.module.scss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "../../firebase/firebase";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { format, isSameMonth } from "date-fns";
@@ -11,6 +11,8 @@ export default function Billing() {
   const [monthlyBilling, setMonthlyBilling] = useState({});
   const [selectedMonthKey, setSelectedMonthKey] = useState(null);
   const currentDate = new Date();
+
+  const monthRefs = useRef({}); // 👈 Pour garder une ref sur chaque mois affiché
 
   useEffect(() => {
     const fetchPlansGroupedByMonth = async () => {
@@ -60,10 +62,30 @@ export default function Billing() {
         setMonthlyBilling(monthlyData);
 
         // Sélectionner le mois courant automatiquement si présent
-        const keys = Object.entries(monthlyData).sort(
-          ([, a], [, b]) => b.dateSample - a.dateSample
-        );
-        if (keys.length > 0) setSelectedMonthKey(keys[0][0]);
+        let currentMonthKey = null;
+        for (const [key, value] of Object.entries(monthlyData)) {
+          if (isSameMonth(value.dateSample, currentDate)) {
+            currentMonthKey = key;
+            break;
+          }
+        }
+
+        if (currentMonthKey) {
+          setSelectedMonthKey(currentMonthKey);
+          // Après avoir défini selectedMonthKey :
+
+          if (currentMonthKey && monthRefs.current[currentMonthKey]) {
+            monthRefs.current[currentMonthKey].scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }
+        } else {
+          const keys = Object.entries(monthlyData).sort(
+            ([, a], [, b]) => b.dateSample - a.dateSample
+          );
+          if (keys.length > 0) setSelectedMonthKey(keys[0][0]);
+        }
       } catch (err) {
         console.error("Erreur chargement plans mensuels :", err);
       }
@@ -121,12 +143,17 @@ export default function Billing() {
             return (
               <div
                 key={month}
+                ref={(el) => {
+                  if (el) monthRefs.current[month] = el;
+                }}
                 className={`${styles.monthItem} ${
                   isCurrentMonth ? styles.currentMonth : ""
                 } ${isSelected ? styles.selectedMonth : ""}`}
                 onClick={() => setSelectedMonthKey(month)}
               >
-                🗓 {month.charAt(0).toUpperCase() + month.slice(1)} <br /> <br />{" "}
+                🗓 {month.charAt(0).toUpperCase() + month.slice(1)}
+                <br />
+                <br />
                 {data.total.toFixed(2)} €
               </div>
             );
@@ -247,6 +274,7 @@ export default function Billing() {
                       <thead>
                         <tr>
                           <th>Affaire</th>
+                          <th>Étape</th>
                           <th>Commentaire</th>
                           <th>Date</th>
                           <th>Montant (€)</th>
@@ -263,6 +291,9 @@ export default function Billing() {
                               >
                                 {item.title}
                               </Link>
+                            </td>
+                            <td>
+                              {item.stepIndex + 1}/{item.totalSteps}
                             </td>
                             <td>{item.stepsComment}</td>
                             <td>
