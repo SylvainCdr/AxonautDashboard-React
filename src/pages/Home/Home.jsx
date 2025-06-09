@@ -69,7 +69,7 @@ function Homepage() {
           </Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/billing">Facturation (beta)</Link>
+          <Link to="/billing">Facturation (v1)</Link>
         </motion.div>
         <motion.div variants={item}>
           <Link to="/">*</Link>

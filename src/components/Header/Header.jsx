@@ -85,7 +85,7 @@ function Header() {
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              Facturation (beta)
+              Facturation (v1)
             </NavLink>
           </li>
           <button
