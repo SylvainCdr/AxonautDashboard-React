@@ -165,7 +165,7 @@ export default function ProjectDetails() {
 
   return (
     <div className={styles.projectContainer}>
-      <h1>Détails du projet - {project.number}</h1>
+      <h1>Détails en temps réel </h1>
 
       <div className={styles.header}>
         <div className={styles.section1}>

@@ -116,6 +116,8 @@ export default function BillingPlan({ onClose }) {
     loadQuotationData();
   }, [quotationId]);
 
+  console.log ("quotation", quotation);
+
   const addStep = () => {
     setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
   };
@@ -407,8 +409,10 @@ export default function BillingPlan({ onClose }) {
                   <th>Référence</th>
                   <th>Désignation</th>
                   <th>Quantité</th>
+                  <th>PU HT</th>
+                  <th>Total HT</th>
                   <th>Reçu</th>
-                  <th>Délai livraison</th>
+                  <th>Infos suppl.</th>
                 </tr>
               </thead>
               <tbody>
@@ -431,6 +435,12 @@ export default function BillingPlan({ onClose }) {
                         <td>{line?.product_code || ""}</td>
                         <td>{line.product_name}</td>
                         <td>{line.quantity}</td>
+                        <td>
+                          {line.price} €
+                        </td>
+                        <td>
+                          {line.pre_tax_amount} €
+                        </td>
                         <td>
                           <input
                             type="checkbox"
@@ -470,8 +480,8 @@ export default function BillingPlan({ onClose }) {
                 <th>Révision ?</th>
                 <th>Révision (€)</th>
                 <th>Total (€)</th>
-                <th> Statut</th>
                 {isEditable && <th>Action</th>}
+                <th> Statut</th>
               </tr>
             </thead>
             <tbody>
