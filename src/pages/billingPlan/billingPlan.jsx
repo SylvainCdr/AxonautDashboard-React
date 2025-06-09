@@ -142,7 +142,7 @@ export default function BillingPlan({ onClose }) {
     if (steps.some((step) => step.invoiceId === invoice.id)) return;
 
     const newStep = {
-      amount: invoice.total,
+      amount: invoice.pre_tax_amount,
       date: invoice.date,
       stepsComment: `Facture #${invoice.number}`,
       revision: "",
@@ -175,12 +175,12 @@ export default function BillingPlan({ onClose }) {
         0
       );
 
-      if (!isRevisionChecked && totalStepAmount !== quotation.total_amount) {
+      if (!isRevisionChecked && totalStepAmount !== quotation.pre_tax_amount) {
         toast.error(
           `Le total des étapes (${totalStepAmount.toFixed(
             2
-          )} €) doit être égal au montant TTC du devis (${
-            quotation.total_amount
+          )} €) doit être égal au montant HT du devis (${
+            quotation.pre_tax_amount
           } €).`
         );
 
@@ -192,7 +192,7 @@ export default function BillingPlan({ onClose }) {
         toast.error(
           `Le total des étapes avec révisions (${totalWithRevision.toFixed(
             2
-          )} €) doit être supérieur au montant TTC du devis (${
+          )} €) doit être supérieur au montant HT du devis (${
             quotation.total_amount
           } €).`
         );
@@ -286,13 +286,13 @@ export default function BillingPlan({ onClose }) {
               <div className={styles.headerGrid}>
                 <div className={styles.headerLeft}>
                   <p>
-                    Montant HT : <strong>{quotation.pre_tax_amount} €</strong>
+                    Montant HT : <strong>{quotation.pre_tax_amount.toFixed(2)} €</strong>
                   </p>
                   <p>
-                    Montant TVA : <strong>{quotation.tax_amount} €</strong>
+                    Montant TVA : <strong>{quotation.tax_amount.toFixed(2)} €</strong>
                   </p>
                   <p>
-                    Montant TTC : <strong>{quotation.total_amount} €</strong>
+                    Montant TTC : <strong>{quotation.total_amount.toFixed(2)} €</strong>
                   </p>
                 </div>
 
@@ -326,6 +326,7 @@ export default function BillingPlan({ onClose }) {
                       <thead>
                         <tr>
                           <th>Numéro facture</th>
+                          <th>Montant HT</th>
                           <th>Montant TTC</th>
                           <th>Date de création</th>
                           <th>Date de Paiement</th>
@@ -336,7 +337,8 @@ export default function BillingPlan({ onClose }) {
                         {invoices.map((invoice) => (
                           <tr key={invoice.id}>
                             <td>{invoice.number}</td>
-                            <td>{invoice.total} €</td>
+                            <td>{invoice.pre_tax_amount.toFixed(2)} €</td>
+                            <td>{invoice.total.toFixed(2)} €</td>
                             <td>
                               {new Date(invoice.date).toLocaleDateString()}
                             </td>
@@ -462,7 +464,7 @@ export default function BillingPlan({ onClose }) {
             <thead>
               <tr>
                 <th>Etape</th>
-                <th>Montant (€)</th>
+                <th>Montant HT</th>
                 <th>Date</th>
                 <th>Commentaire</th>
                 <th>Révision ?</th>
@@ -487,7 +489,7 @@ export default function BillingPlan({ onClose }) {
                       placeholder={
                         isEditable
                           ? `Reste : ${(
-                              quotation.total_amount -
+                              quotation.pre_tax_amount -
                               steps
                                 .slice(0, index)
                                 .reduce(
