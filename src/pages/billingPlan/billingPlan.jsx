@@ -177,31 +177,39 @@ export default function BillingPlan({ onClose }) {
         0
       );
 
-      if (!isRevisionChecked && totalStepAmount !== quotation.pre_tax_amount) {
-        toast.error(
-          `Le total des étapes (${totalStepAmount.toFixed(
-            2
-          )} €) doit être égal au montant HT du devis (${
-            quotation.pre_tax_amount
-          } €).`
-        );
+     const EPSILON = 0.01; // Tolérance d'arrondi à 1 centime
 
-        setGenerating(false);
-        return;
-      }
+if (
+  !isRevisionChecked &&
+  Math.abs(totalStepAmount - quotation.pre_tax_amount) > EPSILON
+) {
+  toast.error(
+    `Le total des étapes (${totalStepAmount.toFixed(
+      2
+    )} €) doit être égal au montant HT du devis (${quotation.pre_tax_amount.toFixed(
+      2
+    )} €).`
+  );
+  setGenerating(false);
+  return;
+}
 
-      if (isRevisionChecked && totalWithRevision <= quotation.total_amount) {
-        toast.error(
-          `Le total des étapes avec révisions (${totalWithRevision.toFixed(
-            2
-          )} €) doit être supérieur au montant HT du devis (${
-            quotation.total_amount
-          } €).`
-        );
 
-        setGenerating(false);
-        return;
-      }
+    if (
+  isRevisionChecked &&
+  Math.abs(totalWithRevision - quotation.total_amount) < -EPSILON
+) {
+  toast.error(
+    `Le total des étapes avec révisions (${totalWithRevision.toFixed(
+      2
+    )} €) doit être supérieur au montant TTC du devis (${quotation.total_amount.toFixed(
+      2
+    )} €).`
+  );
+  setGenerating(false);
+  return;
+}
+
 
       const billingPlan = {
         projectId: quotation.project_id,

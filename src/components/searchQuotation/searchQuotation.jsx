@@ -159,7 +159,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
                 <td>{quotation.number}</td>
                 <td>{decodeHtmlEntities(quotation.title)}</td>
                 <td>{quotation.company_name || "Inconnu"}</td>
-                <td>{new Date(quotation.date).toLocaleDateString()}</td>
+                <td>{new Date(quotation.date_customer_answer).toLocaleDateString()}</td>
                 <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
                 <td style={{ color: statusColor((quotation.margin / quotation.pre_tax_amount) * 100) }}>
                   {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %

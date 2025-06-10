@@ -1,7 +1,7 @@
 import styles from "./style.module.scss";
 import { fetchQuotations } from "../../services/api/quotations";
 import { fetchAxonautUsers } from "../../services/api/employees";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
@@ -15,8 +15,7 @@ export default function Quotations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-
-  const [showClosed, setShowClosed] = useState(false); // false = En cours, true = Clôturés
+  const [showClosed, setShowClosed] = useState(false); 
 
   const filteredQuotations = quotations.filter(
     (quotation) => quotation.isClosed === showClosed
@@ -60,29 +59,40 @@ export default function Quotations() {
   };
 
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
-  const loadQuotationData = async (quotationsList) => {
-    const updatedQuotations = await Promise.all(
-      quotationsList.map(async (quotation) => {
-        const isClosed = await fetchClosedStatus(quotation.id);
-        const { realMarginPercent, supplyStudyFinished } =
-          await fetchRealMarginPercent(quotation.id);
+const loadQuotationData = async (quotationsList) => {
+  const updatedQuotations = await Promise.all(
+    quotationsList.map(async (quotation) => {
+      const isClosed = await fetchClosedStatus(quotation.id);
+      const { realMarginPercent, supplyStudyFinished } =
+        await fetchRealMarginPercent(quotation.id);
 
-        // Vérification si un plan de facturation existe
-        const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
-        const billingPlanSnap = await getDoc(billingPlanRef);
-        const hasBillingPlan = billingPlanSnap.exists();
+      const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
+      const billingPlanSnap = await getDoc(billingPlanRef);
+      const hasBillingPlan = billingPlanSnap.exists();
 
-        return {
-          ...quotation,
-          isClosed,
-          realMarginPercent,
-          supplyStudyFinished,
-          hasBillingPlan,
-        };
-      })
-    );
-    setQuotations(updatedQuotations);
-  };
+      return {
+        ...quotation,
+        isClosed,
+        realMarginPercent,
+        supplyStudyFinished,
+        hasBillingPlan,
+      };
+    })
+  );
+
+  // 🔽 Tri par date_customer_answer décroissante
+updatedQuotations.sort((a, b) => {
+  const dateA = a.date_customer_answer ? new Date(a.date_customer_answer) : new Date(0);
+  const dateB = b.date_customer_answer ? new Date(b.date_customer_answer) : new Date(0);
+  return dateB - dateA;
+});
+
+
+  setQuotations(updatedQuotations);
+};
+
+
+
 
   // Chargement des devis avec les données supplémentaires
   useEffect(() => {
@@ -90,10 +100,10 @@ export default function Quotations() {
       try {
         setLoading(true);
         const data = await fetchQuotations(page);
-        const limitedData = data.slice(0, 500); // On limite à 500 éléments
+     
 
         // Charge les données supplémentaires (Clôturé et Marges réelles)
-        await loadQuotationData(limitedData);
+        await loadQuotationData(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -242,7 +252,7 @@ export default function Quotations() {
               </td>
               <td>{quotation.company_name || "Inconnue"}</td>
               <td>{getQuotationUser(quotation).split(" ")[0]}</td>
-              <td>{new Date(quotation.date).toLocaleDateString()}</td>
+              <td>{new Date(quotation.date_customer_answer).toLocaleDateString()}</td>
 
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
               <td>{quotation.margin.toFixed(2)} €</td>
