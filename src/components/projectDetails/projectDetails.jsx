@@ -155,7 +155,7 @@ export default function ProjectDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <GridLoader color="#C60F7B" loading={loading} size={15} />
         <p>Chargement...</p>
       </div>
     );
@@ -279,7 +279,6 @@ export default function ProjectDetails() {
               // --col5: #001427;
               // --col6: #91F5AD;
               // --col7: #D9DBF1;
-            
             />
           </BarChart>
         </ResponsiveContainer>

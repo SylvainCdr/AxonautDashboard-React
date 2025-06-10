@@ -12,6 +12,7 @@ import Billing from "./pages/billing/billing";
 import SupplyStudy from "./pages/supplyStudy/supplyStudy";
 
 import BillingPlan from "./pages/billingPlan/billingPlan";
+import Opportunities from "./pages/opportunities/opportunities";
 
 import ProtectedRoute from "./utils/protectedRoute";
 import { ToastContainer } from "react-toastify";
@@ -50,6 +51,7 @@ function App() {
             path="/quotation/:quotationId/billing-plan"
             element={<BillingPlan />}
           />
+          <Route path="/opportunities" element={<Opportunities />} />
         </Route>
       </Routes>
       <ToastContainer />

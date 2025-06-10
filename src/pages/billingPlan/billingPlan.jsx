@@ -116,7 +116,7 @@ export default function BillingPlan({ onClose }) {
     loadQuotationData();
   }, [quotationId]);
 
-  console.log ("quotation", quotation);
+  console.log("quotation", quotation);
 
   const addStep = () => {
     setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
@@ -288,13 +288,16 @@ export default function BillingPlan({ onClose }) {
               <div className={styles.headerGrid}>
                 <div className={styles.headerLeft}>
                   <p>
-                    Montant HT : <strong>{quotation.pre_tax_amount.toFixed(2)} €</strong>
+                    Montant HT :{" "}
+                    <strong>{quotation.pre_tax_amount.toFixed(2)} €</strong>
                   </p>
                   <p>
-                    Montant TVA : <strong>{quotation.tax_amount.toFixed(2)} €</strong>
+                    Montant TVA :{" "}
+                    <strong>{quotation.tax_amount.toFixed(2)} €</strong>
                   </p>
                   <p>
-                    Montant TTC : <strong>{quotation.total_amount.toFixed(2)} €</strong>
+                    Montant TTC :{" "}
+                    <strong>{quotation.total_amount.toFixed(2)} €</strong>
                   </p>
                 </div>
 
@@ -435,12 +438,8 @@ export default function BillingPlan({ onClose }) {
                         <td>{line?.product_code || ""}</td>
                         <td>{line.product_name}</td>
                         <td>{line.quantity}</td>
-                        <td>
-                          {line.price} €
-                        </td>
-                        <td>
-                          {line.pre_tax_amount} €
-                        </td>
+                        <td>{line.price} €</td>
+                        <td>{line.pre_tax_amount} €</td>
                         <td>
                           <input
                             type="checkbox"
@@ -551,7 +550,7 @@ export default function BillingPlan({ onClose }) {
                       disabled={!isEditable}
                     />
                   </td>
-                  <td >
+                  <td>
                     {step.revision && (
                       <input
                         type="number"
