@@ -279,8 +279,8 @@ export default function BillingPlan({ onClose }) {
   }
 
   const chartStyle = {
-    height: 130,
-    width: 250,
+    height: 140,
+    width: 350,
   };
 
   return (
@@ -295,18 +295,18 @@ export default function BillingPlan({ onClose }) {
         <div className={styles.billingPlanHeader}>
           {quotation && (
             <>
-              <a
-                href={`/quotations/${quotation.id}/project/${quotation.project_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <h2>
-                  <i className="fa-solid fa-folder"></i>{" "}
-                  {decodeHtmlEntities(quotation.title)}
-                </h2>
-              </a>
               <div className={styles.headerGrid}>
                 <div className={styles.headerLeft}>
+                  <a
+                    href={`/quotations/${quotation.id}/project/${quotation.project_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <h2>
+                      <i className="fa-solid fa-folder"></i>{" "}
+                      {decodeHtmlEntities(quotation.title)}
+                    </h2>
+                  </a>
                   <p>
                     Montant HT :{" "}
                     <strong>{formatEuro(quotation.pre_tax_amount)} €</strong>
@@ -353,16 +353,16 @@ export default function BillingPlan({ onClose }) {
                     Total des étapes :
                     <strong>
                       {" "}
-                      {steps
-                        .reduce(
+                      {formatEuro(
+                        steps.reduce(
                           (sum, s) =>
                             sum +
                             parseFloat(s.amount || 0) +
                             (s.revision ? parseFloat(s.revision || 0) : 0),
                           0
                         )
-                        .toFixed(2)}{" "}
-                      €
+                      )}{" "}
+                      / {formatEuro(quotation.pre_tax_amount)} €
                     </strong>
                   </p>
                 </div>
@@ -384,8 +384,8 @@ export default function BillingPlan({ onClose }) {
                         {invoices.map((invoice) => (
                           <tr key={invoice.id}>
                             <td>{invoice.number}</td>
-                            <td>{invoice.pre_tax_amount.toFixed(2)} €</td>
-                            <td>{invoice.total.toFixed(2)} €</td>
+                            <td>{formatEuro(invoice.pre_tax_amount)} €</td>
+                            <td>{formatEuro(invoice.total)} €</td>
                             <td>
                               {new Date(invoice.date).toLocaleDateString()}
                             </td>
