@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { GridLoader } from "react-spinners";
 import { toast } from "react-toastify";
+import GaugeChart from "react-gauge-chart";
 
 export default function BillingPlan({ onClose }) {
   const { quotationId } = useParams();
@@ -40,6 +41,7 @@ export default function BillingPlan({ onClose }) {
   const [deliveredLines, setDeliveredLines] = useState([]);
   const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
   const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
+
   const isPaidInvoice = (invoice) => {
     return invoice.paid_date ? "green" : "red";
   };
@@ -177,39 +179,37 @@ export default function BillingPlan({ onClose }) {
         0
       );
 
-     const EPSILON = 0.01; // Tolérance d'arrondi à 1 centime
+      const EPSILON = 0.01; // Tolérance d'arrondi à 1 centime
 
-if (
-  !isRevisionChecked &&
-  Math.abs(totalStepAmount - quotation.pre_tax_amount) > EPSILON
-) {
-  toast.error(
-    `Le total des étapes (${totalStepAmount.toFixed(
-      2
-    )} €) doit être égal au montant HT du devis (${quotation.pre_tax_amount.toFixed(
-      2
-    )} €).`
-  );
-  setGenerating(false);
-  return;
-}
+      if (
+        !isRevisionChecked &&
+        Math.abs(totalStepAmount - quotation.pre_tax_amount) > EPSILON
+      ) {
+        toast.error(
+          `Le total des étapes (${totalStepAmount.toFixed(
+            2
+          )} €) doit être égal au montant HT du devis (${quotation.pre_tax_amount.toFixed(
+            2
+          )} €).`
+        );
+        setGenerating(false);
+        return;
+      }
 
-
-    if (
-  isRevisionChecked &&
-  Math.abs(totalWithRevision - quotation.total_amount) < -EPSILON
-) {
-  toast.error(
-    `Le total des étapes avec révisions (${totalWithRevision.toFixed(
-      2
-    )} €) doit être supérieur au montant TTC du devis (${quotation.total_amount.toFixed(
-      2
-    )} €).`
-  );
-  setGenerating(false);
-  return;
-}
-
+      if (
+        isRevisionChecked &&
+        Math.abs(totalWithRevision - quotation.total_amount) < -EPSILON
+      ) {
+        toast.error(
+          `Le total des étapes avec révisions (${totalWithRevision.toFixed(
+            2
+          )} €) doit être supérieur au montant TTC du devis (${quotation.total_amount.toFixed(
+            2
+          )} €).`
+        );
+        setGenerating(false);
+        return;
+      }
 
       const billingPlan = {
         projectId: quotation.project_id,
@@ -271,6 +271,18 @@ if (
   }
   if (error) return <div style={{ color: "red" }}>{error}</div>;
 
+  function formatEuro(amount) {
+    return amount.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  const chartStyle = {
+    height: 130,
+    width: 250,
+  };
+
   return (
     <div className={styles.billingPlanContainer}>
       <div className={styles.billingPlan}>
@@ -297,19 +309,46 @@ if (
                 <div className={styles.headerLeft}>
                   <p>
                     Montant HT :{" "}
-                    <strong>{quotation.pre_tax_amount.toFixed(2)} €</strong>
+                    <strong>{formatEuro(quotation.pre_tax_amount)} €</strong>
                   </p>
                   <p>
                     Montant TVA :{" "}
-                    <strong>{quotation.tax_amount.toFixed(2)} €</strong>
+                    <strong>{formatEuro(quotation.tax_amount)} €</strong>
                   </p>
                   <p>
                     Montant TTC :{" "}
-                    <strong>{quotation.total_amount.toFixed(2)} €</strong>
+                    <strong>{formatEuro(quotation.total_amount)} €</strong>
+                  </p>
+
+                  <p>
+                    <br />
+                    Établi / MAJ par :{" "}
+                    <strong>{existingPlan?.generatedBy}</strong>
                   </p>
                 </div>
 
                 <div className={styles.headerRight}>
+                  <GaugeChart
+                    className={`${styles.headerRight} ${styles.chartFadeIn}`}
+                    style={chartStyle}
+                    id="gauge-chart"
+                    colors={["#f07167", "#ffbc42", "#91f5ad"]}
+                    nrOfLevels={6}
+                    arcWidth={0.3}
+                    percent={
+                      quotation.pre_tax_amount > 0
+                        ? steps.reduce(
+                            (sum, s) =>
+                              sum +
+                              parseFloat(s.amount || 0) +
+                              (s.revision ? parseFloat(s.revision || 0) : 0),
+                            0
+                          ) / quotation.pre_tax_amount
+                        : 0
+                    }
+                    textColor="#000000"
+                  />
+
                   <p>
                     Total des étapes :
                     <strong>
@@ -325,11 +364,6 @@ if (
                         .toFixed(2)}{" "}
                       €
                     </strong>
-                  </p>
-
-                  <p>
-                    Établi / MAJ par :{" "}
-                    <strong>{existingPlan?.generatedBy}</strong>
                   </p>
                 </div>
                 <div className={styles.invoicesSection}>
@@ -571,10 +605,10 @@ if (
                     )}
                   </td>
                   <td>
-                    {(
+                    {formatEuro(
                       parseFloat(step.amount || 0) +
-                      (step.revision ? parseFloat(step.revision || 0) : 0)
-                    ).toFixed(2)}
+                        (step.revision ? parseFloat(step.revision || 0) : 0)
+                    )}
                   </td>
                   {isEditable && (
                     <td>

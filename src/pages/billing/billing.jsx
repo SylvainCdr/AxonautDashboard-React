@@ -130,6 +130,13 @@ export default function Billing() {
     ([, a], [, b]) => b.dateSample - a.dateSample
   );
 
+  function formatEuro(amount) {
+    return amount.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
   return (
     <div className={styles.billingContainer}>
       <h1>Facturation</h1>
@@ -151,10 +158,13 @@ export default function Billing() {
                 } ${isSelected ? styles.selectedMonth : ""}`}
                 onClick={() => setSelectedMonthKey(month)}
               >
-                🗓 {month.charAt(0).toUpperCase() + month.slice(1)}
+                <strong>
+                  {" "}
+                  🗓 {month.charAt(0).toUpperCase() + month.slice(1)}{" "}
+                </strong>
                 <br />
                 <br />
-                {data.total.toFixed(2)} €
+                {formatEuro(data.total)} €
               </div>
             );
           })}
@@ -190,18 +200,24 @@ export default function Billing() {
                     <table className={styles.billingTable}>
                       <thead>
                         <tr>
-                          <th>Affaire</th>
-                          <th>Étape</th>
+                          <th style={{ width: "80px", whiteSpace: "nowrap" }}>
+                            Affaire
+                          </th>
+                          <th style={{ width: "20px", whiteSpace: "nowrap" }}>
+                            Étape
+                          </th>
                           <th>Commentaire</th>
                           <th>Date</th>
-                          <th>Montant (€)</th>
+                          <th style={{ width: "45px", whiteSpace: "nowrap" }}>
+                            Montant (€)
+                          </th>
                           <th>Facturé ?</th>
                         </tr>
                       </thead>
                       <tbody>
                         {toBeInvoiced.map((item, idx) => (
                           <tr key={`toBeInvoiced-${idx}`}>
-                            <td>
+                            <td style={{ width: "80px", whiteSpace: "nowrap" }}>
                               <Link
                                 to={`/quotation/${item.quotationId}/billing-plan`}
                                 className={styles.projectLink}
@@ -209,16 +225,20 @@ export default function Billing() {
                                 {item.title}
                               </Link>
                             </td>
-                            <td>
+                            <td style={{ width: "20px", whiteSpace: "nowrap" }}>
                               {item.stepIndex + 1}/{item.totalSteps}
                             </td>
 
                             <td>{item.stepsComment}</td>
                             <td>
-                              {format(item.date, "dd MMM yyyy", { locale: fr })}
+                              {new Date(item.date).toLocaleDateString("fr-FR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                              })}
                             </td>
-                            <td>
-                              {(item.amount + item.revision).toFixed(2)} €
+                            <td style={{ width: "45px", whiteSpace: "nowrap" }}>
+                              {formatEuro(item.amount + item.revision)}
                             </td>
                             <td>
                               <input
@@ -245,14 +265,13 @@ export default function Billing() {
                             Total à facturer :
                           </td>
                           <td style={{ fontWeight: "bold" }}>
-                            {toBeInvoiced
-                              .reduce(
+                            {formatEuro(
+                              toBeInvoiced.reduce(
                                 (sum, item) =>
                                   sum + item.amount + item.revision,
                                 0
                               )
-                              .toFixed(2)}{" "}
-                            €
+                            )}
                           </td>
                         </tr>
                       </tfoot>
@@ -273,18 +292,24 @@ export default function Billing() {
                     <table className={styles.billingTable}>
                       <thead>
                         <tr>
-                          <th>Affaire</th>
-                          <th>Étape</th>
+                          <th style={{ width: "80px", whiteSpace: "nowrap" }}>
+                            Affaire
+                          </th>
+                          <th style={{ width: "20px", whiteSpace: "nowrap" }}>
+                            Étape
+                          </th>
                           <th>Commentaire</th>
                           <th>Date</th>
-                          <th>Montant (€)</th>
+                          <th style={{ width: "45px", whiteSpace: "nowrap" }}>
+                            Montant (€)
+                          </th>
                           <th>Facturé ?</th>
                         </tr>
                       </thead>
                       <tbody>
                         {alreadyInvoiced.map((item, idx) => (
                           <tr key={`alreadyInvoiced-${idx}`}>
-                            <td>
+                            <td style={{ width: "80px", whiteSpace: "nowrap" }}>
                               <Link
                                 to={`/quotation/${item.quotationId}/billing-plan`}
                                 className={styles.projectLink}
@@ -292,15 +317,19 @@ export default function Billing() {
                                 {item.title}
                               </Link>
                             </td>
-                            <td>
+                            <td style={{ width: "20px", whiteSpace: "nowrap" }}>
                               {item.stepIndex + 1}/{item.totalSteps}
                             </td>
                             <td>{item.stepsComment}</td>
                             <td>
-                              {format(item.date, "dd MMM yyyy", { locale: fr })}
+                              {new Date(item.date).toLocaleDateString("fr-FR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                              })}
                             </td>
-                            <td>
-                              {(item.amount + item.revision).toFixed(2)} €
+                            <td style={{ width: "45px", whiteSpace: "nowrap" }}>
+                              {formatEuro(item.amount + item.revision)}
                             </td>
                             <td>
                               <input
@@ -327,14 +356,13 @@ export default function Billing() {
                             Total déjà facturé :
                           </td>
                           <td style={{ fontWeight: "bold" }}>
-                            {alreadyInvoiced
-                              .reduce(
+                            {formatEuro(
+                              alreadyInvoiced.reduce(
                                 (sum, item) =>
                                   sum + item.amount + item.revision,
                                 0
                               )
-                              .toFixed(2)}{" "}
-                            €
+                            )}{" "}
                           </td>
                         </tr>
                       </tfoot>
