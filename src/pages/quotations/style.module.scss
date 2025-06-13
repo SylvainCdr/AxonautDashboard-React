@@ -90,6 +90,7 @@
           border-bottom: 1px solid #ddd;
           color: #333;
           font-size: 0.9rem;
+          height: 2.5rem;
 
           i {
             margin-right: 0.5rem;
@@ -98,6 +99,9 @@
 
           &.actionCell {
             text-align: center;
+            
+          
+            
 
             button {
               padding: 0.5rem 0.6rem;
@@ -107,12 +111,12 @@
               color: #fff;
               cursor: pointer;
               font-size: 0.9rem;
-             
               transition: background-color 0.3s;
 
               &:hover {
-                background-color: #0071bd;
-              }
+              background-color: #0071bd;
+              
+}
             }
           }
 

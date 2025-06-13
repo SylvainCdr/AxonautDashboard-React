@@ -15,7 +15,7 @@ export default function Quotations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [showClosed, setShowClosed] = useState(false); 
+  const [showClosed, setShowClosed] = useState(false);
 
   const filteredQuotations = quotations.filter(
     (quotation) => quotation.isClosed === showClosed
@@ -59,40 +59,40 @@ export default function Quotations() {
   };
 
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
-const loadQuotationData = async (quotationsList) => {
-  const updatedQuotations = await Promise.all(
-    quotationsList.map(async (quotation) => {
-      const isClosed = await fetchClosedStatus(quotation.id);
-      const { realMarginPercent, supplyStudyFinished } =
-        await fetchRealMarginPercent(quotation.id);
+  const loadQuotationData = async (quotationsList) => {
+    const updatedQuotations = await Promise.all(
+      quotationsList.map(async (quotation) => {
+        const isClosed = await fetchClosedStatus(quotation.id);
+        const { realMarginPercent, supplyStudyFinished } =
+          await fetchRealMarginPercent(quotation.id);
 
-      const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
-      const billingPlanSnap = await getDoc(billingPlanRef);
-      const hasBillingPlan = billingPlanSnap.exists();
+        const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
+        const billingPlanSnap = await getDoc(billingPlanRef);
+        const hasBillingPlan = billingPlanSnap.exists();
 
-      return {
-        ...quotation,
-        isClosed,
-        realMarginPercent,
-        supplyStudyFinished,
-        hasBillingPlan,
-      };
-    })
-  );
+        return {
+          ...quotation,
+          isClosed,
+          realMarginPercent,
+          supplyStudyFinished,
+          hasBillingPlan,
+        };
+      })
+    );
 
-  // 🔽 Tri par date_customer_answer décroissante
-updatedQuotations.sort((a, b) => {
-  const dateA = a.date_customer_answer ? new Date(a.date_customer_answer) : new Date(0);
-  const dateB = b.date_customer_answer ? new Date(b.date_customer_answer) : new Date(0);
-  return dateB - dateA;
-});
+    // 🔽 Tri par date_customer_answer décroissante
+    updatedQuotations.sort((a, b) => {
+      const dateA = a.date_customer_answer
+        ? new Date(a.date_customer_answer)
+        : new Date(0);
+      const dateB = b.date_customer_answer
+        ? new Date(b.date_customer_answer)
+        : new Date(0);
+      return dateB - dateA;
+    });
 
-
-  setQuotations(updatedQuotations);
-};
-
-
-
+    setQuotations(updatedQuotations);
+  };
 
   // Chargement des devis avec les données supplémentaires
   useEffect(() => {
@@ -100,7 +100,6 @@ updatedQuotations.sort((a, b) => {
       try {
         setLoading(true);
         const data = await fetchQuotations(page);
-     
 
         // Charge les données supplémentaires (Clôturé et Marges réelles)
         await loadQuotationData(data);
@@ -229,9 +228,9 @@ updatedQuotations.sort((a, b) => {
             <th>Marge co (€)</th>
             <th>Marge co (%)</th>
             <th>Marge réelle (%) </th>
-            <th>Factu</th> {/* Nouvelle colonne */}
+            <th>Factu</th>
+            <th>Détails</th>
             <th>Fermer</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -252,7 +251,9 @@ updatedQuotations.sort((a, b) => {
               </td>
               <td>{quotation.company_name || "Inconnue"}</td>
               <td>{getQuotationUser(quotation).split(" ")[0]}</td>
-              <td>{new Date(quotation.date_customer_answer).toLocaleDateString()}</td>
+              <td>
+                {new Date(quotation.date_customer_answer).toLocaleDateString()}
+              </td>
 
               <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
               <td>{quotation.margin.toFixed(2)} €</td>
@@ -333,11 +334,22 @@ updatedQuotations.sort((a, b) => {
                       )
                     }
                   >
-                    Voir
+                    Factu
                   </button>
                 ) : (
                   <span style={{ color: "#888" }}>–</span>
                 )}
+              </td>
+              <td className={styles.actionCell}>
+                <button
+                  onClick={() => {
+                    window.open(
+                      `/quotations/${quotation.id}/project/${quotation.project_id}`
+                    );
+                  }}
+                >
+                  Détails
+                </button>
               </td>
               <td>
                 <input
@@ -348,18 +360,6 @@ updatedQuotations.sort((a, b) => {
                     handleToggleClosed(quotation.id, quotation.isClosed)
                   }
                 />
-              </td>
-              <td className={styles.actionCell}>
-                {/* // bouton mais voir dans une autre fenetre */}
-                <button
-                  onClick={() => {
-                    window.open(
-                      `/quotations/${quotation.id}/project/${quotation.project_id}`
-                    );
-                  }}
-                >
-                  Voir
-                </button>
               </td>
             </tr>
           ))}

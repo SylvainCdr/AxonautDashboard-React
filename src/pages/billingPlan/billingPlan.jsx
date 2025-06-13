@@ -12,6 +12,7 @@ import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { GridLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import GaugeChart from "react-gauge-chart";
+import { getDocs, collection, updateDoc } from "firebase/firestore";
 
 export default function BillingPlan({ onClose }) {
   const { quotationId } = useParams();
@@ -41,6 +42,7 @@ export default function BillingPlan({ onClose }) {
   const [deliveredLines, setDeliveredLines] = useState([]);
   const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
   const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
+  const [monthlyBilling, setMonthlyBilling] = useState({});
 
   const isPaidInvoice = (invoice) => {
     return invoice.paid_date ? "green" : "red";
@@ -261,6 +263,53 @@ export default function BillingPlan({ onClose }) {
     handleManualBillingPlanSave(steps, mainComment);
   };
 
+  const handleToggleInvoiced = async (docId, stepIndex, currentValue) => {
+    try {
+      const planRef = doc(db, "billingPlans", docId);
+      const planSnap = await getDocs(collection(db, "billingPlans"));
+      const planDoc = planSnap.docs.find((d) => d.id === docId);
+      const planData = planDoc.data();
+
+      // 🔁 Met à jour Firestore
+      planData.steps[stepIndex].invoiced = !currentValue;
+      await updateDoc(planRef, { steps: planData.steps });
+
+      // ✅ Met à jour localement aussi
+      setSteps((prevSteps) => {
+        const updated = [...prevSteps];
+        updated[stepIndex] = {
+          ...updated[stepIndex],
+          invoiced: !currentValue,
+        };
+        return updated;
+      });
+
+      // ⚙️ Met à jour si nécessaire le résumé mensuel
+      const updated = Object.fromEntries(
+        Object.entries(monthlyBilling).map(([monthKey, monthData]) => {
+          const newItems = monthData.items.map((item) => {
+            if (item.docId === docId && item.stepIndex === stepIndex) {
+              return { ...item, invoiced: !currentValue };
+            }
+            return item;
+          });
+
+          const newTotal = newItems.reduce(
+            (sum, item) =>
+              !item.invoiced ? sum + item.amount + item.revision : sum,
+            0
+          );
+
+          return [monthKey, { ...monthData, items: newItems, total: newTotal }];
+        })
+      );
+
+      setMonthlyBilling(updated);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour :", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -328,6 +377,7 @@ export default function BillingPlan({ onClose }) {
                 </div>
 
                 <div className={styles.headerRight}>
+                  AVANCEMENT
                   <GaugeChart
                     className={`${styles.headerRight} ${styles.chartFadeIn}`}
                     style={chartStyle}
@@ -348,7 +398,6 @@ export default function BillingPlan({ onClose }) {
                     }
                     textColor="#000000"
                   />
-
                   <p>
                     Total des étapes :
                     <strong>
@@ -518,11 +567,12 @@ export default function BillingPlan({ onClose }) {
                 <th>Montant HT</th>
                 <th>Date</th>
                 <th>Commentaire</th>
-                <th>Révision ?</th>
-                <th>Révision (€)</th>
-                <th>Total (€)</th>
+                <th>Révision?</th>
+                <th>Révision(€)</th>
+                <th>Total(€)</th>
                 {isEditable && <th>Action</th>}
                 <th> Statut</th>
+                <th> Facturé?</th>
               </tr>
             </thead>
             <tbody>
@@ -631,6 +681,20 @@ export default function BillingPlan({ onClose }) {
                     >
                       {step.invoiced ? "Facturé" : "Non facturé"}
                     </span>
+                  </td>
+                  <td>
+                    {/* // checkbox pour marquer comme facturé */}
+                    <input
+                      type="checkbox"
+                      checked={step.invoiced || false}
+                      onChange={() =>
+                        handleToggleInvoiced(
+                          quotation.id.toString(),
+                          index,
+                          step.invoiced || false
+                        )
+                      }
+                    />
                   </td>
                 </tr>
               ))}

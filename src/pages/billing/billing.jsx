@@ -209,9 +209,9 @@ export default function Billing() {
                           <th>Commentaire</th>
                           <th>Date</th>
                           <th style={{ width: "45px", whiteSpace: "nowrap" }}>
-                            Montant (€)
+                            Montant(€)
                           </th>
-                          <th>Facturé ?</th>
+                          <th>Facturé?</th>
                         </tr>
                       </thead>
                       <tbody>
