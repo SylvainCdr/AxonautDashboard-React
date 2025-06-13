@@ -6,6 +6,7 @@ import { format, isSameMonth } from "date-fns";
 import { fr } from "date-fns/locale";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Billing() {
   const [monthlyBilling, setMonthlyBilling] = useState({});
@@ -94,36 +95,62 @@ export default function Billing() {
     fetchPlansGroupedByMonth();
   }, []);
 
-  const handleToggleInvoiced = async (docId, stepIndex, currentValue) => {
-    try {
-      const planRef = doc(db, "billingPlans", docId);
-      const planSnap = await getDocs(collection(db, "billingPlans"));
-      const planDoc = planSnap.docs.find((d) => d.id === docId);
-      const planData = planDoc.data();
+  const handleToggleInvoiced = (docId, stepIndex, currentValue) => {
+    toast.info(
+      ({ closeToast }) => (
+        <div>
+          <p style={{ marginBottom: "10px", marginTop: "20px" }}>
+            Confirmer la modification de l'état de facturation ?
+          </p>
+          <button
+            onClick={async () => {
+              try {
+                const planRef = doc(db, "billingPlans", docId);
+                const planSnap = await getDocs(collection(db, "billingPlans"));
+                const planDoc = planSnap.docs.find((d) => d.id === docId);
+                const planData = planDoc.data();
 
-      planData.steps[stepIndex].invoiced = !currentValue;
-      await updateDoc(planRef, { steps: planData.steps });
+                planData.steps[stepIndex].invoiced = !currentValue;
+                await updateDoc(planRef, { steps: planData.steps });
 
-      const updated = { ...monthlyBilling };
-      Object.keys(updated).forEach((monthKey) => {
-        updated[monthKey].items = updated[monthKey].items.map((item) => {
-          if (item.docId === docId && item.stepIndex === stepIndex) {
-            item.invoiced = !currentValue;
-          }
-          return item;
-        });
+                const updated = { ...monthlyBilling };
+                Object.keys(updated).forEach((monthKey) => {
+                  updated[monthKey].items = updated[monthKey].items.map(
+                    (item) => {
+                      if (
+                        item.docId === docId &&
+                        item.stepIndex === stepIndex
+                      ) {
+                        item.invoiced = !currentValue;
+                      }
+                      return item;
+                    }
+                  );
 
-        updated[monthKey].total = updated[monthKey].items.reduce(
-          (sum, item) =>
-            !item.invoiced ? sum + item.amount + item.revision : sum,
-          0
-        );
-      });
+                  updated[monthKey].total = updated[monthKey].items.reduce(
+                    (sum, item) =>
+                      !item.invoiced ? sum + item.amount + item.revision : sum,
+                    0
+                  );
+                });
 
-      setMonthlyBilling(updated);
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour :", error);
-    }
+                setMonthlyBilling(updated);
+                toast.success("Mise à jour réussie !");
+                closeToast();
+              } catch (error) {
+                console.error("Erreur lors de la mise à jour :", error);
+                toast.error("Erreur lors de la mise à jour");
+              }
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            ✅ Confirmer
+          </button>
+          <button onClick={closeToast}>❌ Annuler</button>
+        </div>
+      ),
+      { autoClose: false }
+    );
   };
 
   const sortedMonths = Object.entries(monthlyBilling).sort(

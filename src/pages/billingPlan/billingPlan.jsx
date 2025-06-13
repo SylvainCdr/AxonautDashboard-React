@@ -263,51 +263,82 @@ export default function BillingPlan({ onClose }) {
     handleManualBillingPlanSave(steps, mainComment);
   };
 
-  const handleToggleInvoiced = async (docId, stepIndex, currentValue) => {
-    try {
-      const planRef = doc(db, "billingPlans", docId);
-      const planSnap = await getDocs(collection(db, "billingPlans"));
-      const planDoc = planSnap.docs.find((d) => d.id === docId);
-      const planData = planDoc.data();
+  const handleToggleInvoiced = (docId, stepIndex, currentValue) => {
+    toast.info(
+      ({ closeToast }) => (
+        <div>
+          <p style={{ marginBottom: "10px", marginTop: "20px" }}>
+            Confirmer la modification de l'état de facturation ?
+          </p>
+          <button
+            onClick={async () => {
+              try {
+                const planRef = doc(db, "billingPlans", docId);
+                const planSnap = await getDocs(collection(db, "billingPlans"));
+                const planDoc = planSnap.docs.find((d) => d.id === docId);
+                const planData = planDoc.data();
 
-      // 🔁 Met à jour Firestore
-      planData.steps[stepIndex].invoiced = !currentValue;
-      await updateDoc(planRef, { steps: planData.steps });
+                // 🔁 Met à jour Firestore
+                planData.steps[stepIndex].invoiced = !currentValue;
+                await updateDoc(planRef, { steps: planData.steps });
 
-      // ✅ Met à jour localement aussi
-      setSteps((prevSteps) => {
-        const updated = [...prevSteps];
-        updated[stepIndex] = {
-          ...updated[stepIndex],
-          invoiced: !currentValue,
-        };
-        return updated;
-      });
+                // ✅ Met à jour localement aussi
+                setSteps((prevSteps) => {
+                  const updated = [...prevSteps];
+                  updated[stepIndex] = {
+                    ...updated[stepIndex],
+                    invoiced: !currentValue,
+                  };
+                  return updated;
+                });
 
-      // ⚙️ Met à jour si nécessaire le résumé mensuel
-      const updated = Object.fromEntries(
-        Object.entries(monthlyBilling).map(([monthKey, monthData]) => {
-          const newItems = monthData.items.map((item) => {
-            if (item.docId === docId && item.stepIndex === stepIndex) {
-              return { ...item, invoiced: !currentValue };
-            }
-            return item;
-          });
+                // ⚙️ Met à jour si nécessaire le résumé mensuel
+                const updated = Object.fromEntries(
+                  Object.entries(monthlyBilling).map(
+                    ([monthKey, monthData]) => {
+                      const newItems = monthData.items.map((item) => {
+                        if (
+                          item.docId === docId &&
+                          item.stepIndex === stepIndex
+                        ) {
+                          return { ...item, invoiced: !currentValue };
+                        }
+                        return item;
+                      });
 
-          const newTotal = newItems.reduce(
-            (sum, item) =>
-              !item.invoiced ? sum + item.amount + item.revision : sum,
-            0
-          );
+                      const newTotal = newItems.reduce(
+                        (sum, item) =>
+                          !item.invoiced
+                            ? sum + item.amount + item.revision
+                            : sum,
+                        0
+                      );
 
-          return [monthKey, { ...monthData, items: newItems, total: newTotal }];
-        })
-      );
+                      return [
+                        monthKey,
+                        { ...monthData, items: newItems, total: newTotal },
+                      ];
+                    }
+                  )
+                );
 
-      setMonthlyBilling(updated);
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour :", error);
-    }
+                setMonthlyBilling(updated);
+                toast.success("Mise à jour réussie !");
+                closeToast();
+              } catch (error) {
+                console.error("Erreur lors de la mise à jour :", error);
+                toast.error("Erreur lors de la mise à jour");
+              }
+            }}
+            style={{ marginBottom: "10px", marginRight: "10px" }}
+          >
+            ✅ Confirmer
+          </button>
+          <button onClick={closeToast}>❌ Annuler</button>
+        </div>
+      ),
+      { autoClose: false }
+    );
   };
 
   if (loading) {

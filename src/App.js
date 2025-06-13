@@ -54,7 +54,8 @@ function App() {
           <Route path="/opportunities" element={<Opportunities />} />
         </Route>
       </Routes>
-      <ToastContainer />
+
+      <ToastContainer position="bottom-center" />
     </BrowserRouter>
   );
 }
