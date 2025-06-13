@@ -137,6 +137,18 @@ export default function Billing() {
     });
   }
 
+  // fonction pour checker la date et si = jour actuelle ou depassé alors cellule en orange
+  function isDatePastOrToday(date) {
+    const today = new Date();
+    return (
+      date.getFullYear() < today.getFullYear() ||
+      (date.getFullYear() === today.getFullYear() &&
+        (date.getMonth() < today.getMonth() ||
+          (date.getMonth() === today.getMonth() &&
+            date.getDate() <= today.getDate())))
+    );
+  }
+
   return (
     <div className={styles.billingContainer}>
       <h1>Facturation</h1>
@@ -231,11 +243,22 @@ export default function Billing() {
 
                             <td>{item.stepsComment}</td>
                             <td>
-                              {new Date(item.date).toLocaleDateString("fr-FR", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "2-digit",
-                              })}
+                              <span
+                                className={
+                                  isDatePastOrToday(item.date)
+                                    ? styles.pastDate
+                                    : ""
+                                }
+                              >
+                                {new Date(item.date).toLocaleDateString(
+                                  "fr-FR",
+                                  {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "2-digit",
+                                  }
+                                )}
+                              </span>
                             </td>
                             <td style={{ width: "45px", whiteSpace: "nowrap" }}>
                               {formatEuro(item.amount + item.revision)}
