@@ -125,10 +125,7 @@ export default function Contracts() {
     loadQuotationsData();
   }, [page]);
 
-  console.log(quotations);
-  console.log("Page actuelle :", page);
-  console.log("Quotations chargées :", quotations.length);
-  console.log(data);
+  console.log("contracts :", quotations);
 
   // Fonction pour récupérer la marge réelle depuis supplyStudy
   const fetchRealMarginPercent = async (quotationId) => {
@@ -250,20 +247,22 @@ export default function Contracts() {
           </tr>
         </thead>
         <tbody>
-          {filteredQuotations.map((quotation) => (
-            <tr
-              key={quotation.id}
-              style={{
-                backgroundColor: hasPixProductCode(quotation)
-                  ? "#F8F0FB" // Jaune clair pour les devis contenant "Pix_"
-                  : "white", // Blanc pour les autres
-              }}
-            >
-              {/* <td>{quotation.id}</td> */}
-              {/* <td>
-                 {quotation.name}
-                 </td> */}
-              
+          {filteredQuotations.map((quotation) => {
+            // Vérifier si end_date existe et n'est pas null
+            const hasEndDate =
+              quotation.end_date && quotation.end_date !== null;
+
+            return (
+              <tr
+                key={quotation.id}
+                style={{
+                  backgroundColor: hasEndDate
+                    ? "#ff7070" // Fond rouge si end_date est présent
+                    : hasPixProductCode(quotation)
+                    ? "#F8F0FB" // Jaune clair pour les devis contenant "Pix_"
+                    : "white", // Blanc pour les autres
+                }}
+              >
                 <td className={styles.actionCell}>
                   <a
                     onClick={() => {
@@ -272,145 +271,104 @@ export default function Contracts() {
                       );
                     }}
                   >
-                    <i class="fa-regular fa-folder-open"></i>{" "}
+                    <i className="fa-regular fa-folder-open"></i>{" "}
                     {decodeHtmlEntities(quotation.name)}
                   </a>
                 </td>
-              
-              <td>{quotation.company?.name || "Inconnue"}</td>
-              <td>{getQuotationUser(quotation).split(" ")[0]}</td>
-              <td>
-                {new Date(quotation.last_update_date).toLocaleDateString()}
-              </td>
 
-              <td>{quotation.quotation?.pre_tax_amount.toFixed(2)} €</td>
-              {/* <td>
-                {quotation.margin.toFixed(2)} €
-                </td> */}
-              {/* <td>
-                {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
-                  2
-                ) < 15 ? (
-                  <span style={{ color: "red" }}>
-                    {(
-                      (quotation.margin / quotation.pre_tax_amount) *
-                      100
-                    ).toFixed(1)}{" "}
-                    %
-                  </span>
-                ) : (
-                    (quotation.margin / quotation.pre_tax_amount) *
-                    100
-                  ).toFixed(1) < 28 ? (
-                  <span style={{ color: "orange" }}>
-                    {(
-                      (quotation.margin / quotation.pre_tax_amount) *
-                      100
-                    ).toFixed(1)}{" "}
-                    %
-                  </span>
-                ) : (
-                  <span style={{ color: "green" }}>
-                    {(
-                      (quotation.margin / quotation.pre_tax_amount) *
-                      100
-                    ).toFixed(1)}{" "}
-                    %
-                  </span>
-                )}
-              </td> */}
+                <td>{quotation.company?.name || "Inconnue"}</td>
+                <td>{getQuotationUser(quotation).split(" ")[0]}</td>
+                <td>
+                  {new Date(quotation.last_update_date).toLocaleDateString()}
+                </td>
 
-              {/* // marge réelle */}
-              <td>
-                {quotation.realMarginPercent === null ? (
-                  <span
-                    role="img"
-                    aria-label="cross mark"
-                    style={{ color: "red", marginLeft: "25px" }}
-                  >
-                    ❌
-                  </span>
-                ) : (
-                  <span style={{ color: "black" }}>
-                    {quotation.supplyStudyFinished ? (
-                      <span
-                        role="img"
-                        aria-label="check mark"
-                        style={{ color: "green", marginLeft: "8px" }}
+                <td>{quotation.quotation?.pre_tax_amount.toFixed(2)} €</td>
+
+                {/* Affichage de la marge réelle */}
+                <td>
+                  {quotation.realMarginPercent === null ? (
+                    <span
+                      role="img"
+                      aria-label="cross mark"
+                      style={{ color: "red", marginLeft: "25px" }}
+                    >
+                      ❌
+                    </span>
+                  ) : (
+                    <span style={{ color: "black" }}>
+                      {quotation.supplyStudyFinished ? (
+                        <span
+                          role="img"
+                          aria-label="check mark"
+                          style={{ color: "green", marginLeft: "8px" }}
+                        >
+                          ✅
+                        </span>
+                      ) : (
+                        <span
+                          role="img"
+                          aria-label="hourglass"
+                          style={{ color: "orange", marginLeft: "8px" }}
+                        >
+                          ⏳
+                        </span>
+                      )}
+                      {quotation.realMarginPercent.toFixed(1)}%
+                    </span>
+                  )}
+                </td>
+
+                {/* Factures */}
+                <td>
+                  {quotation.invoices_id && quotation.invoices_id.length > 0 ? (
+                    quotation.invoices_id.map((invoiceId) => (
+                      <a
+                        key={invoiceId}
+                        onClick={() =>
+                          window.open(`/invoices/${invoiceId}`, "_blank")
+                        }
+                        className={styles.invoiceButton}
                       >
-                        ✅
-                      </span>
-                    ) : (
-                      <span
-                        role="img"
-                        aria-label="hourglass"
-                        style={{ color: "orange", marginLeft: "8px" }}
-                      >
-                        ⏳
-                      </span>
-                    )}
-                    {quotation.realMarginPercent.toFixed(1)}%
-                  </span>
-                )}
-              </td>
-              {/* // on map sur le tableau quotation.invoices_id et on affiche les invoide_id existantes */}
-              <td>
-                {quotation.invoices_id && quotation.invoices_id.length > 0 ? (
-                  quotation.invoices_id.map((invoiceId) => (
-                    <a
-                      key={invoiceId}
+                        <i className="fas fa-file-invoice"></i> N° {invoiceId}
+                      </a>
+                    ))
+                  ) : (
+                    <span style={{ color: "#888" }}>–</span>
+                  )}
+                </td>
+
+                {/* Plan de facturation */}
+                <td className={styles.actionCell}>
+                  {quotation.hasBillingPlan ? (
+                    <button
                       onClick={() =>
                         window.open(
-                          `/invoices/${invoiceId}`,
+                          `/quotation/${quotation.quotation?.id}/billing-plan`,
                           "_blank"
                         )
                       }
-                      className={styles.invoiceButton}
                     >
-                      <i className="fas fa-file-invoice"></i> N° {invoiceId}
-                    </a>
+                      Factu
+                    </button>
+                  ) : (
+                    <span style={{ color: "#888" }}>–</span>
+                  )}
+                </td>
 
-                  ))
-                ) : (
-                  <span style={{ color: "#888" }}>–</span>
-                )}
-
-                
-
-
-              </td>
-              
-
-              {/* Plan de factu  */}
-              <td className={styles.actionCell}>
-                {quotation.hasBillingPlan ? (
-                  <button
-                    onClick={() =>
-                      window.open(
-                        `/quotation/${quotation.quotation?.id}/billing-plan`,
-                        "_blank"
-                      )
+                {/* Checkbox de clôture */}
+                <td>
+                  <input
+                    type="checkbox"
+                    className={styles.formCheckInput}
+                    checked={quotation.isClosed || false}
+                    onChange={() =>
+                      handleToggleClosed(quotation.id, quotation.isClosed)
                     }
-                  >
-                    Factu
-                  </button>
-                ) : (
-                  <span style={{ color: "#888" }}>–</span>
-                )}
-              </td>
-
-              <td>
-                <input
-                  type="checkbox"
-                  className={styles.formCheckInput}
-                  checked={quotation.isClosed || false}
-                  onChange={() =>
-                    handleToggleClosed(quotation.id, quotation.isClosed)
-                  }
-                />
-              </td>
-            </tr>
-          ))}
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <footer className={styles.footer}>

@@ -13,6 +13,7 @@ export default function Billing() {
   const [selectedMonthKey, setSelectedMonthKey] = useState(null);
   const currentDate = new Date();
 
+
   const monthRefs = useRef({}); // 👈 Pour garder une ref sur chaque mois affiché
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function Billing() {
 
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          const { projectTitle, quotationId, steps } = data;
+          const { projectTitle, quotationId, steps, generatedBy } = data;
 
           steps.forEach((step, index) => {
             const stepDate = new Date(step.date);
@@ -49,6 +50,7 @@ export default function Billing() {
               amount: parseFloat(step.amount || 0),
               revision: parseFloat(step.revision || 0),
               invoiced,
+              generatedBy: generatedBy || "Inconnu",
               docId: docSnap.id,
               stepIndex: index,
               totalSteps: steps.length, // ⬅️ on ajoute cette ligne
@@ -94,6 +96,13 @@ export default function Billing() {
 
     fetchPlansGroupedByMonth();
   }, []);
+ 
+
+console.log("monthlyBilling", monthlyBilling);
+console.log("selectedMonthKey", selectedMonthKey);
+console.log("currentDate", currentDate);
+console.log("monthRefs", monthRefs.current);
+console.log("monthRefs.current[selectedMonthKey]", monthRefs.current[selectedMonthKey]);
 
   const handleToggleInvoiced = (docId, stepIndex, currentValue) => {
     toast.info(
@@ -246,6 +255,7 @@ export default function Billing() {
                             Étape
                           </th>
                           <th>Commentaire</th>
+                          <th> Etabli par </th>
                           <th>Date</th>
                           <th style={{ width: "45px", whiteSpace: "nowrap" }}>
                             Montant(€)
@@ -271,6 +281,10 @@ export default function Billing() {
                             </td>
 
                             <td>{item.stepsComment}</td>
+
+                        
+                            <td>{item.generatedBy.split('.')[0]}</td>
+                        
                             <td>
                               <span
                                 className={
@@ -351,6 +365,7 @@ export default function Billing() {
                             Étape
                           </th>
                           <th>Commentaire</th>
+                          <th> Etabli par </th>
                           <th>Date</th>
                           <th style={{ width: "45px", whiteSpace: "nowrap" }}>
                             Montant (€)
@@ -375,6 +390,7 @@ export default function Billing() {
                               {item.stepIndex + 1}/{item.totalSteps}
                             </td>
                             <td>{item.stepsComment}</td>
+                                <td>{item.generatedBy.split('.')[0]}</td>
                             <td>
                               {new Date(item.date).toLocaleDateString("fr-FR", {
                                 day: "2-digit",

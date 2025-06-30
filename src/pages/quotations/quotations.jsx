@@ -113,7 +113,6 @@ export default function Quotations() {
     loadQuotationsData();
   }, [page]);
 
-  console.log(quotations);
 
   // Fonction pour récupérer la marge réelle depuis supplyStudy
   const fetchRealMarginPercent = async (quotationId) => {

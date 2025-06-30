@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { searchQuotationByNumber } from "../../services/api/quotations";
+import { searchQuotation } from "../../services/api/quotations"; // Mettez à jour l'import
 import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
@@ -22,43 +22,57 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
   const navigate = useNavigate();
 
   const handleSearchSubmit = async () => {
-    if (!search.trim()) return;
-    setError(null);
-    setHasSearched(true);
-  
-    const normalizedSearch = search.toLowerCase().replace(/^pix/, "");
-  
-    // Recherche côté client
-    const clientResult = cachedQuotations.find((quotation) => {
-      const normalizedQuotationNumber = quotation.number
-        .toLowerCase()
-        .replace(/^pix/, "");
-      return normalizedQuotationNumber === normalizedSearch;
-    });
-  
-    if (clientResult) {
-      setQuotation(clientResult);
-      return;
+  if (!search.trim()) return;
+  setError(null);
+  setHasSearched(true);
+
+  const normalizedSearch = search.toLowerCase().replace(/^pix/, "");
+
+  // Recherche côté client dans les devis déjà chargés
+  const clientResults = cachedQuotations.filter((quotation) => {
+    const normalizedQuotationNumber = quotation.number
+      .toLowerCase()
+      .replace(/^pix/, "");
+    const normalizedQuotationName = quotation.title.toLowerCase();
+
+    return (
+      normalizedQuotationNumber === normalizedSearch ||
+      normalizedQuotationName.includes(normalizedSearch)
+    );
+  });
+
+  if (clientResults.length > 0) {
+    setQuotation(clientResults); // Enregistrer une liste de résultats côté client
+    return;
+  }
+
+  // Recherche côté serveur
+  const controller = new AbortController(); // Créez un AbortController pour annuler la recherche
+  setAbortController(controller); // Sauvegardez le controller dans l'état
+  setLoading(true);
+  try {
+    const data = await searchQuotation(normalizedSearch, { signal: controller.signal });
+    console.log('Search result:', data); // Affichez les résultats pour déboguer
+
+if (data.length === 1) {
+  setQuotation(data[0]);  // Un seul devis trouvé
+} else if (data.length > 1) {
+  setQuotation(data); // Plusieurs devis trouvés (modifié pour stocker plusieurs résultats)
+} else {
+  setQuotation(null); // Aucun devis trouvé
+}
+
+  } catch (err) {
+    if (err.name === "AbortError") {
+      console.log("Recherche annulée");
+    } else {
+      setError(err.message);
     }
-  
-    // Recherche côté serveur
-    const controller = new AbortController(); // Créez un AbortController pour annuler la recherche
-    setAbortController(controller); // Sauvegardez le controller dans l'état
-    setLoading(true);
-    try {
-      const data = await searchQuotationByNumber(normalizedSearch, { signal: controller.signal });
-      console.log('Search result:', data); // Ajoutez ce log pour vérifier la structure
-      setQuotation(data);
-    } catch (err) {
-      if (err.name === "AbortError") {
-        console.log("Recherche annulée");
-      } else {
-        setError(err.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Fonction pour annuler la recherche en cours
   const handleCancelSearch = () => {
@@ -114,6 +128,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
     return "green";
   };
 
+
   return (
     <div className={styles.searchContainer}>
       <div className={styles.searchInputContainer}>
@@ -140,60 +155,116 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
       {error && <p className={styles.error}>{error}</p>}
 
       {hasSearched && quotation ? (
-        <div className={styles.searchResults}>
-          <table className={styles.quotationTable}>
-            <thead>
-              <tr>
-                <th>Numéro</th>
-                <th>Nom</th>
-                <th>Client</th>
-                <th>Date</th>
-                <th>Montant HT</th>
-                <th>Marge co (%)</th>
-                <th>Marge réelle (%)</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr key={quotation.id}>
-                <td>{quotation.number}</td>
-                <td>{decodeHtmlEntities(quotation.title)}</td>
-                <td>{quotation.company_name || "Inconnu"}</td>
-                <td>{new Date(quotation.date_customer_answer).toLocaleDateString()}</td>
-                <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
-                <td style={{ color: statusColor((quotation.margin / quotation.pre_tax_amount) * 100) }}>
-                  {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
-                </td>
-                <td>
-                  {supplyStudy.realMarginPercent === null ? (
-                    <span role="img" aria-label="cross mark" style={{ color: "red" }}>❌</span>
+  <div className={styles.searchResults}>
+    {Array.isArray(quotation) ? (
+      // Si plusieurs devis sont trouvés
+      <table className={styles.quotationTable}>
+        <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Nom</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Montant HT</th>
+            <th>Marge co (%)</th>
+            <th>Marge réelle (%)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {quotation.map((q) => (
+            <tr key={q.id}>
+              <td>{q.number}</td>
+              <td>{decodeHtmlEntities(q.title)}</td>
+              <td>{q.company_name || "Inconnu"}</td>
+              <td>{new Date(q.date_customer_answer).toLocaleDateString()}</td>
+              <td style={{ color: statusColor((q.margin / q.pre_tax_amount) * 100) }}>
+                {((q.margin / q.pre_tax_amount) * 100).toFixed(1)} %
+              </td>
+              <td>
+                {supplyStudy.realMarginPercent === null ? (
+                  <span role="img" aria-label="cross mark" style={{ color: "red" }}>❌</span>
+                ) : (
+                  <span style={{ color: "black" }}>
+                    {supplyStudy.supplyStudyFinished ? (
+                      <span role="img" aria-label="check mark" style={{ color: "green" }}>✅</span>
+                    ) : (
+                      <span role="img" aria-label="hourglass" style={{ color: "orange" }}>⏳</span>
+                    )}
+                    {supplyStudy.realMarginPercent.toFixed(1)}%
+                  </span>
+                )}
+              </td>
+              <td>
+                <button
+                  onClick={() =>
+                    window.open(`/quotations/${q.id}/project/${q.project_id}`)
+                  }
+                >
+                  Voir
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      // Si un seul devis est trouvé
+      <table className={styles.quotationTable}>
+        <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Nom</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Montant HT</th>
+            <th>Marge co (%)</th>
+            <th>Marge réelle (%)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr key={quotation.id}>
+            <td>{quotation.number}</td>
+            <td>{decodeHtmlEntities(quotation.title)}</td>
+            <td>{quotation.company_name || "Inconnu"}</td>
+            <td>{new Date(quotation.date_customer_answer).toLocaleDateString()}</td>
+             <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
+            <td style={{ color: statusColor((quotation.margin / quotation.pre_tax_amount) * 100) }}>
+              {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(1)} %
+            </td>
+            <td>
+              {supplyStudy.realMarginPercent === null ? (
+                <span role="img" aria-label="cross mark" style={{ color: "red" }}>❌</span>
+              ) : (
+                <span style={{ color: "black" }}>
+                  {supplyStudy.supplyStudyFinished ? (
+                    <span role="img" aria-label="check mark" style={{ color: "green" }}>✅</span>
                   ) : (
-                    <span style={{ color: "black" }}>
-                      {supplyStudy.supplyStudyFinished ? (
-                        <span role="img" aria-label="check mark" style={{ color: "green" }}>✅</span>
-                      ) : (
-                        <span role="img" aria-label="hourglass" style={{ color: "orange" }}>⏳</span>
-                      )}
-                      {supplyStudy.realMarginPercent.toFixed(1)}%
-                    </span>
+                    <span role="img" aria-label="hourglass" style={{ color: "orange" }}>⏳</span>
                   )}
-                </td>
-                <td>
-                  <button
-                    onClick={() =>
-                      window.open(`/quotations/${quotation.id}/project/${quotation.project_id}`)
-                    }
-                  >
-                    Voir
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        hasSearched && <p className={styles.noResults}>Aucun résultat trouvé</p>
-      )}
+                  {supplyStudy.realMarginPercent.toFixed(1)}%
+                </span>
+              )}
+            </td>
+            <td>
+              <button
+                onClick={() =>
+                  window.open(`/quotations/${quotation.id}/project/${quotation.project_id}`)
+                }
+              >
+                Voir
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    )}
+  </div>
+) : (
+  hasSearched && <p className={styles.noResults}>Aucun résultat trouvé</p>
+)}
+
     </div>
   );
 }

@@ -94,15 +94,14 @@
 
           i {
             margin-right: 0.5rem;
-            color : var(--col3);
+            color: var(--col3);
           }
 
           a {
-            
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
-            cursor : pointer;
+            cursor: pointer;
             line-height: 1.5;
 
             &:hover {
@@ -112,9 +111,6 @@
 
           &.actionCell {
             text-align: center;
-            
-          
-            
 
             button {
               padding: 0.5rem 0.6rem;
@@ -127,9 +123,8 @@
               transition: background-color 0.3s;
 
               &:hover {
-              background-color: #0071bd;
-              
-}
+                background-color: #0071bd;
+              }
             }
           }
 
@@ -150,7 +145,7 @@
     justify-content: center;
     gap: 1rem;
     margin-top: 2rem;
-    margin-bottom :1rem;
+    margin-bottom: 1rem;
 
     button {
       padding: 0.8rem 1.5rem;

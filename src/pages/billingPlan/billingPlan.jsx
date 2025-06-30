@@ -580,7 +580,7 @@ export default function BillingPlan({ onClose }) {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <label>
+          {/* <label>
             Commentaire principal
             <input
               type="text"
@@ -589,7 +589,7 @@ export default function BillingPlan({ onClose }) {
               onChange={(e) => setMainComment(e.target.value)}
               disabled={!isEditable}
             />
-          </label>
+          </label> */}
 
           <table className={styles.stepsTable}>
             <thead>

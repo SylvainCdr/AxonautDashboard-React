@@ -52,9 +52,9 @@ export const fetchQuotationByProjectId = async (projectId) => {
   return response.json();
 };
 
-export const searchQuotationByNumber = async (quotationNumber) => {
+export const searchQuotation = async (searchTerm) => {
   const response = await fetch(
-    `${BASE_URL}/quotations/search/${quotationNumber}`,
+    `${BASE_URL}/quotations/search/${searchTerm}`,  // Notez que c'est 'search' et non 'searchByNumber'
     {
       method: "GET",
       headers: {
@@ -68,3 +68,4 @@ export const searchQuotationByNumber = async (quotationNumber) => {
   }
   return response.json();
 };
+
