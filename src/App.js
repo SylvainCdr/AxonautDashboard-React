@@ -5,6 +5,7 @@ import Login from "./pages/login/login";
 import Companies from "./pages/companies/companies";
 import ProjectDetails from "./components/projectDetails/projectDetails";
 import Quotations from "./pages/quotations/quotations";
+import Contracts from "./pages/contracts/contracts";
 import Employees from "./pages/employees/employees";
 import CompanyDetails from "./pages/companyDetails/companyDetails";
 import QuotationAndProjectDetails from "./pages/quotationAndProjectDetails/quotationAndProjectDetails";
@@ -36,6 +37,7 @@ function App() {
           <Route path="/companies" element={<Companies />} />
           <Route path="/projects/:projectId" element={<ProjectDetails />} />
           <Route path="/quotations" element={<Quotations />} />
+          <Route path="/contracts" element={<Contracts />} />
           <Route path="/employees" element={<Employees />} />
           <Route path="/companies/:companyId" element={<CompanyDetails />} />
           <Route

@@ -1,5 +1,5 @@
 import styles from "./style.module.scss";
-import { fetchQuotations } from "../../services/api/quotations";
+import { fetchContracts } from "../../services/api/contracts";
 import { fetchAxonautUsers } from "../../services/api/employees";
 import { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
@@ -8,8 +8,9 @@ import { db } from "../../firebase/firebase";
 import SearchQuotation from "../../components/searchQuotation/searchQuotation";
 import { toast } from "react-toastify";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
+import { data } from "framer-motion/client";
 
-export default function Quotations() {
+export default function Contracts() {
   const [quotations, setQuotations] = useState([]);
   const [axonautUsers, setAxonautUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,15 +59,26 @@ export default function Quotations() {
     return snapshot.exists() ? snapshot.data().isClosed : false;
   };
 
+  // Vérification de l'état "hasBillingPlan" en base de données
+  const fetchHasBillingPlan = async (quotationId) => {
+    const billingPlanRef = doc(db, "billingPlans", quotationId.toString());
+    const billingPlanSnap = await getDoc(billingPlanRef);
+    return billingPlanSnap.exists();
+  };
+
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
   const loadQuotationData = async (quotationsList) => {
     const updatedQuotations = await Promise.all(
       quotationsList.map(async (quotation) => {
-        const isClosed = await fetchClosedStatus(quotation.id);
+        const isClosed = await fetchClosedStatus(quotation.quotation?.id);
         const { realMarginPercent, supplyStudyFinished } =
-          await fetchRealMarginPercent(quotation.id);
+          await fetchRealMarginPercent(quotation.quotation?.id);
 
-        const billingPlanRef = doc(db, "billingPlans", quotation.id.toString());
+        const billingPlanRef = doc(
+          db,
+          "billingPlans",
+          quotation.quotation?.id.toString()
+        );
         const billingPlanSnap = await getDoc(billingPlanRef);
         const hasBillingPlan = billingPlanSnap.exists();
 
@@ -99,7 +111,7 @@ export default function Quotations() {
     const loadQuotationsData = async () => {
       try {
         setLoading(true);
-        const data = await fetchQuotations(page);
+        const data = await fetchContracts(page);
 
         // Charge les données supplémentaires (Clôturé et Marges réelles)
         await loadQuotationData(data);
@@ -114,6 +126,9 @@ export default function Quotations() {
   }, [page]);
 
   console.log(quotations);
+  console.log("Page actuelle :", page);
+  console.log("Quotations chargées :", quotations.length);
+  console.log(data);
 
   // Fonction pour récupérer la marge réelle depuis supplyStudy
   const fetchRealMarginPercent = async (quotationId) => {
@@ -185,7 +200,7 @@ export default function Quotations() {
   if (error) return <p>Erreur : {error}</p>;
 
   return (
-    <div className={styles.quotationsContainer}>
+    <div className={styles.contractsContainer}>
       <h1>
         {" "}
         <i class="fas fa-list"></i> Liste des Commandes & Projets
@@ -217,7 +232,7 @@ export default function Quotations() {
         <thead>
           <tr>
             {/* <th>ID</th> */}
-            <th>N°</th>
+            {/* <th>N°</th> */}
             <th>Titre</th>
             <th>Client</th>
             <th>Commercial(e)</th>
@@ -225,9 +240,10 @@ export default function Quotations() {
             {/* <th>Statut</th> */}
             <th>Montant HT</th>
             {/* <th>Montant TTC</th> */}
-            <th>Marge co (€)</th>
-            <th>Marge co (%)</th>
+            {/* <th>Marge co (€)</th>
+            <th>Marge co (%)</th> */}
             <th>Marge réelle (%) </th>
+            <th>Axo Bills </th>
             <th>Factu</th>
             {/* <th>Détails</th> */}
             <th>Fermer</th>
@@ -244,29 +260,34 @@ export default function Quotations() {
               }}
             >
               {/* <td>{quotation.id}</td> */}
-              <td> {quotation.number}</td>
-
-              <td>
-                <a
-                  onClick={() => {
-                    window.open(
-                      `/quotations/${quotation.id}/project/${quotation.project_id}`
-                    );
-                  }}
-                >
-                  <i class="fa-regular fa-folder-open"></i>{" "}
-                  {decodeHtmlEntities(quotation.title)}
-                </a>
-              </td>
-              <td>{quotation.company_name || "Inconnue"}</td>
+              {/* <td>
+                 {quotation.name}
+                 </td> */}
+              
+                <td className={styles.actionCell}>
+                  <a
+                    onClick={() => {
+                      window.open(
+                        `/quotations/${quotation.quotation?.id}/project/${quotation.project?.id}`
+                      );
+                    }}
+                  >
+                    <i class="fa-regular fa-folder-open"></i>{" "}
+                    {decodeHtmlEntities(quotation.name)}
+                  </a>
+                </td>
+              
+              <td>{quotation.company?.name || "Inconnue"}</td>
               <td>{getQuotationUser(quotation).split(" ")[0]}</td>
               <td>
-                {new Date(quotation.date_customer_answer).toLocaleDateString()}
+                {new Date(quotation.last_update_date).toLocaleDateString()}
               </td>
 
-              <td>{quotation.pre_tax_amount.toFixed(2)} €</td>
-              <td>{quotation.margin.toFixed(2)} €</td>
-              <td>
+              <td>{quotation.quotation?.pre_tax_amount.toFixed(2)} €</td>
+              {/* <td>
+                {quotation.margin.toFixed(2)} €
+                </td> */}
+              {/* <td>
                 {((quotation.margin / quotation.pre_tax_amount) * 100).toFixed(
                   2
                 ) < 15 ? (
@@ -297,7 +318,7 @@ export default function Quotations() {
                     %
                   </span>
                 )}
-              </td>
+              </td> */}
 
               {/* // marge réelle */}
               <td>
@@ -332,13 +353,41 @@ export default function Quotations() {
                   </span>
                 )}
               </td>
+              {/* // on map sur le tableau quotation.invoices_id et on affiche les invoide_id existantes */}
+              <td>
+                {quotation.invoices_id && quotation.invoices_id.length > 0 ? (
+                  quotation.invoices_id.map((invoiceId) => (
+                    <a
+                      key={invoiceId}
+                      onClick={() =>
+                        window.open(
+                          `/invoices/${invoiceId}`,
+                          "_blank"
+                        )
+                      }
+                      className={styles.invoiceButton}
+                    >
+                      <i className="fas fa-file-invoice"></i> N° {invoiceId}
+                    </a>
+
+                  ))
+                ) : (
+                  <span style={{ color: "#888" }}>–</span>
+                )}
+
+                
+
+
+              </td>
+              
+
               {/* Plan de factu  */}
               <td className={styles.actionCell}>
                 {quotation.hasBillingPlan ? (
                   <button
                     onClick={() =>
                       window.open(
-                        `/quotation/${quotation.id}/billing-plan`,
+                        `/quotation/${quotation.quotation?.id}/billing-plan`,
                         "_blank"
                       )
                     }

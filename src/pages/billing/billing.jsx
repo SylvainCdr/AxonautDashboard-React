@@ -261,7 +261,9 @@ export default function Billing() {
                                 to={`/quotation/${item.quotationId}/billing-plan`}
                                 className={styles.projectLink}
                               >
-                                {item.title}
+                                {item.title.length > 50
+                                  ? item.title.slice(0, 50) + "..."
+                                  : item.title}
                               </Link>
                             </td>
                             <td style={{ width: "20px", whiteSpace: "nowrap" }}>
@@ -364,7 +366,9 @@ export default function Billing() {
                                 to={`/quotation/${item.quotationId}/billing-plan`}
                                 className={styles.projectLink}
                               >
-                                {item.title}
+                                  {item.title.length > 50
+                                  ? item.title.slice(0, 50) + "..."
+                                  : item.title}
                               </Link>
                             </td>
                             <td style={{ width: "20px", whiteSpace: "nowrap" }}>
