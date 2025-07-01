@@ -37,7 +37,7 @@ export default function BillingSummaryChart({ dataForMonth, monthName }) {
   }
 
   return (
-    <div style={{ maxWidth: "350px", margin: "20px auto" }}>
+    <div style={{ maxWidth: "280px", margin: "0px auto" }}>
       <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
         Synthèse de facturation – {monthName}
       </h3>

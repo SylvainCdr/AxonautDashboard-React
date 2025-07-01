@@ -71,7 +71,7 @@ export default function YearlyBillingBarChart({ monthlyBilling }) {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: "40px auto" }}>
+    <div style={{ maxWidth: 800, margin: "0px auto" }}>
       <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
         Bilan annuel – {currentYear}
       </h3>

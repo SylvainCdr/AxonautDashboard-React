@@ -191,20 +191,6 @@ export default function Billing() {
   return (
     <div className={styles.billingContainer}>
       <h1>Facturation</h1>
-      <div className={styles.charts}>
-        <div className={styles.chart1}>
-          {selectedMonthKey && (
-            <BillingSummaryChart
-              dataForMonth={monthlyBilling[selectedMonthKey]}
-              monthName={selectedMonthKey}
-            />
-          )}
-        </div>
-
-        <div className={styles.chart2}>
-          <YearlyBillingBarChart monthlyBilling={monthlyBilling} />
-        </div>
-      </div>
       <div className={styles.twoColumns}>
         <aside className={styles.monthSidebar}>
           <h3>Mois</h3>
@@ -236,6 +222,20 @@ export default function Billing() {
         </aside>
 
         <main className={styles.monthDetails}>
+          <div className={styles.charts}>
+            <div className={styles.chart1}>
+              {selectedMonthKey && (
+                <BillingSummaryChart
+                  dataForMonth={monthlyBilling[selectedMonthKey]}
+                  monthName={selectedMonthKey}
+                />
+              )}
+            </div>
+
+            <div className={styles.chart2}>
+              <YearlyBillingBarChart monthlyBilling={monthlyBilling} />
+            </div>
+          </div>
           {selectedMonthKey && monthlyBilling[selectedMonthKey] ? (
             <>
               <h3>Détails : {selectedMonthKey}</h3>
