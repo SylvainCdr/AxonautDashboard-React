@@ -7,12 +7,13 @@ import { fr } from "date-fns/locale";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import BillingSummaryChart from "../../components/billingSummaryChart/billingSummaryChart";
+import YearlyBillingBarChart from "../../components/yearlyBillingBarChart/yearlyBillingBarChart";
 
 export default function Billing() {
   const [monthlyBilling, setMonthlyBilling] = useState({});
   const [selectedMonthKey, setSelectedMonthKey] = useState(null);
   const currentDate = new Date();
-
 
   const monthRefs = useRef({}); // 👈 Pour garder une ref sur chaque mois affiché
 
@@ -96,13 +97,15 @@ export default function Billing() {
 
     fetchPlansGroupedByMonth();
   }, []);
- 
 
-console.log("monthlyBilling", monthlyBilling);
-console.log("selectedMonthKey", selectedMonthKey);
-console.log("currentDate", currentDate);
-console.log("monthRefs", monthRefs.current);
-console.log("monthRefs.current[selectedMonthKey]", monthRefs.current[selectedMonthKey]);
+  console.log("monthlyBilling", monthlyBilling);
+  console.log("selectedMonthKey", selectedMonthKey);
+  console.log("currentDate", currentDate);
+  console.log("monthRefs", monthRefs.current);
+  console.log(
+    "monthRefs.current[selectedMonthKey]",
+    monthRefs.current[selectedMonthKey]
+  );
 
   const handleToggleInvoiced = (docId, stepIndex, currentValue) => {
     toast.info(
@@ -188,6 +191,20 @@ console.log("monthRefs.current[selectedMonthKey]", monthRefs.current[selectedMon
   return (
     <div className={styles.billingContainer}>
       <h1>Facturation</h1>
+      <div className={styles.charts}>
+        <div className={styles.chart1}>
+          {selectedMonthKey && (
+            <BillingSummaryChart
+              dataForMonth={monthlyBilling[selectedMonthKey]}
+              monthName={selectedMonthKey}
+            />
+          )}
+        </div>
+
+        <div className={styles.chart2}>
+          <YearlyBillingBarChart monthlyBilling={monthlyBilling} />
+        </div>
+      </div>
       <div className={styles.twoColumns}>
         <aside className={styles.monthSidebar}>
           <h3>Mois</h3>
@@ -282,9 +299,8 @@ console.log("monthRefs.current[selectedMonthKey]", monthRefs.current[selectedMon
 
                             <td>{item.stepsComment}</td>
 
-                        
-                            <td>{item.generatedBy.split('.')[0]}</td>
-                        
+                            <td>{item.generatedBy.split(".")[0]}</td>
+
                             <td>
                               <span
                                 className={
@@ -381,7 +397,7 @@ console.log("monthRefs.current[selectedMonthKey]", monthRefs.current[selectedMon
                                 to={`/quotation/${item.quotationId}/billing-plan`}
                                 className={styles.projectLink}
                               >
-                                  {item.title.length > 50
+                                {item.title.length > 50
                                   ? item.title.slice(0, 50) + "..."
                                   : item.title}
                               </Link>
@@ -390,7 +406,7 @@ console.log("monthRefs.current[selectedMonthKey]", monthRefs.current[selectedMon
                               {item.stepIndex + 1}/{item.totalSteps}
                             </td>
                             <td>{item.stepsComment}</td>
-                                <td>{item.generatedBy.split('.')[0]}</td>
+                            <td>{item.generatedBy.split(".")[0]}</td>
                             <td>
                               {new Date(item.date).toLocaleDateString("fr-FR", {
                                 day: "2-digit",

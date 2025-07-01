@@ -15,13 +15,13 @@ export const fetchContracts = async (page = 1) => {
     return data.items || data; // Retourne les items ou les données si pas de structure
     // paginée
   } catch (error) {
-    console.error("Erreur lors de la récupération des contrats :", error.message);
+    console.error(
+      "Erreur lors de la récupération des contrats :",
+      error.message
+    );
     throw error;
   }
-}
-;
-
-
+};
 
 export const fetchContractById = async (contractId) => {
   const response = await fetch(`${BASE_URL}/contracts/${contractId}`, {

@@ -17,6 +17,22 @@ h4 {
   -o-border-radius: 8px 8px 0px 0px;
 }
 
+.charts {
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+
+  .chart1,
+  .chart2 {
+    flex: 1;
+    margin-right: 10px;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
 .billingContainer h1 {
   text-align: center;
   margin-bottom: 20px;
