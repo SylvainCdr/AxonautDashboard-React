@@ -17,6 +17,8 @@ export default function Contracts() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [showClosed, setShowClosed] = useState(false);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true); // pour savoir si on peut encore charger
 
   const filteredQuotations = quotations.filter(
     (quotation) => quotation.isClosed === showClosed
@@ -92,7 +94,6 @@ export default function Contracts() {
       })
     );
 
-    // 🔽 Tri par date_customer_answer décroissante
     updatedQuotations.sort((a, b) => {
       const dateA = a.date_customer_answer
         ? new Date(a.date_customer_answer)
@@ -103,18 +104,20 @@ export default function Contracts() {
       return dateB - dateA;
     });
 
-    setQuotations(updatedQuotations);
+    return updatedQuotations; // ✅ indispensable
   };
 
   // Chargement des devis avec les données supplémentaires
+
   useEffect(() => {
     const loadQuotationsData = async () => {
+      if (page !== 1) return; // ⛔ empêche les scrolls de déclencher ici
+
       try {
         setLoading(true);
-        const data = await fetchContracts(page);
-
-        // Charge les données supplémentaires (Clôturé et Marges réelles)
-        await loadQuotationData(data);
+        const data = await fetchContracts(1);
+        const enriched = await loadQuotationData(data);
+        setQuotations(enriched); // ✅ initialise
       } catch (err) {
         setError(err.message);
       } finally {
@@ -185,6 +188,46 @@ export default function Contracts() {
       line.product_code?.startsWith("Pix_")
     );
 
+  const loadMoreContracts = async () => {
+    if (isFetchingMore || !hasMore) return;
+
+    setIsFetchingMore(true);
+    const nextPage = page + 1;
+
+    try {
+      const newData = await fetchContracts(nextPage);
+      if (!newData || newData.length === 0) {
+        setHasMore(false);
+        return;
+      }
+
+      const newEnriched = await loadQuotationData(newData);
+      setQuotations((prev) => [...prev, ...newEnriched]); // ✅ concatène
+      setPage(nextPage); // ne déclenche plus de reset grâce à la condition dans useEffect
+    } catch (err) {
+      console.error("Erreur lors du scroll:", err);
+      setHasMore(false);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 300 &&
+        !isFetchingMore &&
+        hasMore
+      ) {
+        loadMoreContracts();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isFetchingMore, hasMore, page]);
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -254,7 +297,7 @@ export default function Contracts() {
 
             return (
               <tr
-                key={quotation.id}
+                key={`${quotation.id}-${quotation.quotation?.id}`}
                 style={{
                   backgroundColor: hasEndDate
                     ? "#ff7070" // Fond rouge si end_date est présent
@@ -272,7 +315,7 @@ export default function Contracts() {
                     }}
                   >
                     <i className="fa-regular fa-folder-open"></i>{" "}
-                    {decodeHtmlEntities(quotation.name)}
+                    {decodeHtmlEntities(quotation.name.slice(0, 80))}
                   </a>
                 </td>
 
@@ -372,10 +415,20 @@ export default function Contracts() {
         </tbody>
       </table>
       <footer className={styles.footer}>
-        <button onClick={handlePreviousPage} disabled={page === 1}>
-          Page précédente
-        </button>
-        <button onClick={handleNextPage}>Page suivante</button>
+        {isFetchingMore && (
+          <div style={{ textAlign: "center", margin: "2rem 0" }}>
+            <GridLoader color="#C60F7B" size={10} />
+            <p style={{ marginTop: "0.5rem" }}>
+              Chargement de plus de contrats...
+            </p>
+          </div>
+        )}
+
+        {!isFetchingMore && !hasMore && (
+          <p style={{ textAlign: "center", margin: "2rem 0", color: "#888" }}>
+            Tous les contrats sont chargés.
+          </p>
+        )}
       </footer>
     </div>
   );

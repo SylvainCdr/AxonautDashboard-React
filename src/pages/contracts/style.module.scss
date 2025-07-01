@@ -86,8 +86,8 @@
         }
 
         td {
-          padding: 0.3rem 0.5rem;
-          // border-bottom: 1px solid #ddd;
+          padding: 0.5rem 0.5rem;
+          border-bottom: 1px solid #ddd;
           color: #333;
           font-size: 0.9rem;
           height: 2.5rem;
@@ -100,9 +100,10 @@
           a {
             cursor: pointer;
             font-size: 0.9rem;
+            line-height: 1.5;
 
             &:hover {
-              font-weight: bold;
+              color: rgb(3, 3, 194);
             }
           }
 
