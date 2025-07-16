@@ -23,4 +23,3 @@ const auth = getAuth(app);
 
 // Export the database
 export { db, auth };
-

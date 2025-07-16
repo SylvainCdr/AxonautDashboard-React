@@ -6,7 +6,7 @@ import { fetchContractById } from "../../services/api/contracts";
 import { fetchInvoiceById } from "../../services/api/invoices";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../../firebase/firebase";
-import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, Timestamp, deleteDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { GridLoader } from "react-spinners";
@@ -339,6 +339,48 @@ export default function BillingPlan({ onClose }) {
       ),
       { autoClose: false }
     );
+  };
+
+  const handleDelete = async () => {
+    toast.info(
+      ({ closeToast }) => (
+        <div>
+          <p style={{ marginBottom: "10px", marginTop: "20px" }}>
+            Êtes-vous sûr de vouloir supprimer ce plan de facturation ? Cette
+            action est irréversible.
+          </p>
+          <button
+            onClick={async () => {
+              closeToast();
+              try {
+                const planRef = doc(
+                  db,
+                  "billingPlans",
+                  quotation.id.toString()
+                );
+                await deleteDoc(planRef);
+                toast.success("Plan de facturation supprimé avec succès.");
+                setExistingPlan(null);
+                setSteps([{ amount: "", date: "", stepsComment: "" }]);
+                setMainComment("");
+                navigate("/billing");
+              } catch (err) {
+                console.error("Erreur lors de la suppression du plan :", err);
+                toast.error(
+                  "Erreur lors de la suppression du plan de facturation."
+                );
+              }
+            }}
+            style={{ marginBottom: "10px", marginRight: "10px" }}
+          >
+            ✅ Confirmer
+          </button>
+          <button onClick={closeToast}>❌ Annuler</button>
+        </div>
+      ),
+      { autoClose: false }
+    );
+    return;
   };
 
   if (loading) {
@@ -739,6 +781,12 @@ export default function BillingPlan({ onClose }) {
           )}
 
           <div className={styles.actions}>
+            {existingPlan && (
+              <button type="button" onClick={handleDelete}>
+                Supprimer le plan de facturation
+              </button>
+            )}
+
             {existingPlan && !isEditable && (
               <button onClick={() => setIsEditable(true)}>Modifier</button>
             )}

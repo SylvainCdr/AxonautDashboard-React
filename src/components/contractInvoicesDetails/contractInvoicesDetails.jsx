@@ -59,6 +59,9 @@ export default function ContractInvoicesDetails() {
     loadQuotationData();
   }, [quotationId]);
 
+ 
+  console.log("ContractInvoicesDetails - Invoices:", invoices);
+
   const isPaidInvoice = (invoice) =>
     invoice.paid_date && new Date(invoice.paid_date) >= new Date(invoice.date)
       ? "green"

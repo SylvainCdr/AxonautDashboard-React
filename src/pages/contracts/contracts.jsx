@@ -1,6 +1,7 @@
 import styles from "./style.module.scss";
 import { fetchContracts } from "../../services/api/contracts";
 import { fetchAxonautUsers } from "../../services/api/employees";
+import { fetchInvoiceById } from "../../services/api/invoices";
 import { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -8,7 +9,7 @@ import { db } from "../../firebase/firebase";
 import SearchQuotation from "../../components/searchQuotation/searchQuotation";
 import { toast } from "react-toastify";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
-import { data } from "framer-motion/client";
+import { getCachedInvoicesWithLimit } from "../../utils/getCachedInvoicesWithLimit";
 
 export default function Contracts() {
   const [quotations, setQuotations] = useState([]);
@@ -19,6 +20,7 @@ export default function Contracts() {
   const [showClosed, setShowClosed] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true); // pour savoir si on peut encore charger
+  const [invoiceDataMap, setInvoiceDataMap] = useState({}); // pour stocker les données des factures
 
   const filteredQuotations = quotations.filter(
     (quotation) => quotation.isClosed === showClosed
@@ -59,13 +61,6 @@ export default function Contracts() {
     const docRef = doc(db, "isClosedQuotations", quotationId.toString());
     const snapshot = await getDoc(docRef);
     return snapshot.exists() ? snapshot.data().isClosed : false;
-  };
-
-  // Vérification de l'état "hasBillingPlan" en base de données
-  const fetchHasBillingPlan = async (quotationId) => {
-    const billingPlanRef = doc(db, "billingPlans", quotationId.toString());
-    const billingPlanSnap = await getDoc(billingPlanRef);
-    return billingPlanSnap.exists();
   };
 
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
@@ -111,13 +106,21 @@ export default function Contracts() {
 
   useEffect(() => {
     const loadQuotationsData = async () => {
-      if (page !== 1) return; // ⛔ empêche les scrolls de déclencher ici
+      if (page !== 1) return;
 
       try {
         setLoading(true);
         const data = await fetchContracts(1);
         const enriched = await loadQuotationData(data);
         setQuotations(enriched); // ✅ initialise
+
+        // ✅ Lance le chargement des factures en parallèle
+        const allInvoiceIds = enriched
+          .flatMap((q) => q.invoices_id || [])
+          .filter(Boolean);
+        const uniqueIds = [...new Set(allInvoiceIds)];
+        const cachedInvoices = await getCachedInvoicesWithLimit(uniqueIds, 20);
+        setInvoiceDataMap(cachedInvoices);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -179,10 +182,6 @@ export default function Contracts() {
     loadAxonautUsersData();
   }, []);
 
-  // Navigation entre les pages
-  const handleNextPage = () => setPage((prev) => prev + 1);
-  const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
-
   const hasPixProductCode = (quotation) =>
     quotation.quotation_lines?.some((line) =>
       line.product_code?.startsWith("Pix_")
@@ -202,8 +201,22 @@ export default function Contracts() {
       }
 
       const newEnriched = await loadQuotationData(newData);
+
       setQuotations((prev) => [...prev, ...newEnriched]); // ✅ concatène
-      setPage(nextPage); // ne déclenche plus de reset grâce à la condition dans useEffect
+
+      // ✅ charge les factures associées aux nouveaux devis
+      const newInvoiceIds = newEnriched
+        .flatMap((q) => q.invoices_id || [])
+        .filter(Boolean);
+      const uniqueIds = [...new Set(newInvoiceIds)];
+      const cachedInvoices = await getCachedInvoicesWithLimit(uniqueIds, 20);
+
+      setInvoiceDataMap((prev) => ({
+        ...prev,
+        ...cachedInvoices, // ajoute au map existant
+      }));
+
+      setPage(nextPage);
     } catch (err) {
       console.error("Erreur lors du scroll:", err);
       setHasMore(false);
@@ -283,7 +296,7 @@ export default function Contracts() {
             {/* <th>Marge co (€)</th>
             <th>Marge co (%)</th> */}
             <th>Marge réelle (%) </th>
-            <th>Axo Bills </th>
+            <th>Montant facturé</th>
             <th>Factu</th>
             {/* <th>Détails</th> */}
             <th>Fermer</th>
@@ -362,7 +375,7 @@ export default function Contracts() {
                 </td>
 
                 {/* Factures */}
-                <td>
+                {/* <td>
                   {quotation.invoices_id && quotation.invoices_id.length > 0 ? (
                     quotation.invoices_id.map((invoiceId) => (
                       <a
@@ -375,6 +388,32 @@ export default function Contracts() {
                         <i className="fas fa-file-invoice"></i> N° {invoiceId}
                       </a>
                     ))
+                  ) : (
+                    <span style={{ color: "#888" }}>–</span>
+                  )}
+                </td> */}
+                <td>
+                  {quotation.invoices_id && quotation.invoices_id.length > 0 ? (
+                    (() => {
+                      const total = quotation.invoices_id.reduce(
+                        (acc, invoiceId) => {
+                          const invoice =
+                            invoiceDataMap?.[invoiceId.toString()];
+                          return acc + (invoice?.preTaxAmount || 0);
+                        },
+                        0
+                      );
+
+                      const formattedTotal = total.toLocaleString("fr-FR", {
+                        style: "currency",
+                        currency: "EUR",
+                      });
+
+                      // Optionnel : couleur en fonction du signe
+                      const color = total >= 0 ? "#006400" : "#C60F7B"; // vert ou rose
+
+                      return <span style={{ color }}>{formattedTotal}</span>;
+                    })()
                   ) : (
                     <span style={{ color: "#888" }}>–</span>
                   )}
