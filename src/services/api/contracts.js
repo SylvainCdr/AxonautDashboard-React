@@ -79,3 +79,23 @@ export const fetchSupplierContractsByProjectTitle = async (
     throw error;
   }
 };
+
+
+export const searchContract = async (searchTerm) => {
+  const response = await fetch(
+    `${BASE_URL}/contracts/search/${searchTerm}`,  // Notez que c'est 'search' et non 'searchByNumber'
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Erreur lors de la récupération des données du projet");
+  }
+  return response.json();
+};
+
+

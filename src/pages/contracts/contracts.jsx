@@ -1,12 +1,11 @@
 import styles from "./style.module.scss";
 import { fetchContracts } from "../../services/api/contracts";
 import { fetchAxonautUsers } from "../../services/api/employees";
-import { fetchInvoiceById } from "../../services/api/invoices";
 import { useEffect, useState } from "react";
 import { GridLoader } from "react-spinners";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
-import SearchQuotation from "../../components/searchQuotation/searchQuotation";
+import SearchContract from "../../components/searchContract/searchContract";
 import { toast } from "react-toastify";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
 import { getCachedInvoicesWithLimit } from "../../utils/getCachedInvoicesWithLimit";
@@ -279,7 +278,7 @@ export default function Contracts() {
       </div>
 
       {/* <SearchQuotationsV2 /> */}
-      <SearchQuotation cachedQuotations={quotations} />
+      <SearchContract cachedQuotations={quotations} />
 
       <table className={styles.quotationTable}>
         <thead>
@@ -430,7 +429,7 @@ export default function Contracts() {
                         )
                       }
                     >
-                      Factu
+                      Plan factu
                     </button>
                   ) : (
                     <span style={{ color: "#888" }}>–</span>

@@ -4,7 +4,6 @@ import styles from "./style.module.scss";
 import { BarLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
-import { toast } from "react-toastify";
 import { db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
