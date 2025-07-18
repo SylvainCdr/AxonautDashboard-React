@@ -246,7 +246,7 @@ export default function Contracts() {
     return (
       <div className={styles.loaderContainer}>
         <GridLoader color="#C60F7B" loading={loading} size={15} />
-        <p>Chargement des commandes...</p>
+        <p>Chargement des affaires en cours...</p>
       </div>
     );
   }
@@ -257,7 +257,7 @@ export default function Contracts() {
     <div className={styles.contractsContainer}>
       <h1>
         {" "}
-        <i class="fas fa-list"></i> Liste des Commandes & Projets
+        <i class="fas fa-list"></i> Liste des Affaires en Cours
       </h1>
 
       <div className={styles.filterContainer}>

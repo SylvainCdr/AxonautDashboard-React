@@ -15,11 +15,6 @@ export default function Quotations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [showClosed, setShowClosed] = useState(false);
-
-  const filteredQuotations = quotations.filter(
-    (quotation) => quotation.isClosed === showClosed
-  );
 
   // Mise à jour de l'état "Clôturé"
   const handleToggleClosed = async (quotationId, currentState) => {
@@ -113,7 +108,6 @@ export default function Quotations() {
     loadQuotationsData();
   }, [page]);
 
-
   // Fonction pour récupérer la marge réelle depuis supplyStudy
   const fetchRealMarginPercent = async (quotationId) => {
     try {
@@ -187,27 +181,8 @@ export default function Quotations() {
     <div className={styles.quotationsContainer}>
       <h1>
         {" "}
-        <i class="fas fa-list"></i> Liste des Commandes & Projets
+        <i class="fas fa-list"></i> Liste de toutes les Commandes & Projets
       </h1>
-
-      <div className={styles.filterContainer}>
-        <button
-          className={`${styles.toggleButton} ${
-            !showClosed ? styles.activeButton : ""
-          }`}
-          onClick={() => setShowClosed(false)}
-        >
-          Non masquées
-        </button>
-        <button
-          className={`${styles.toggleButton} ${
-            showClosed ? styles.activeButton : ""
-          }`}
-          onClick={() => setShowClosed(true)}
-        >
-          Masquées
-        </button>
-      </div>
 
       {/* <SearchQuotationsV2 /> */}
       <SearchQuotation cachedQuotations={quotations} />
@@ -233,7 +208,7 @@ export default function Quotations() {
           </tr>
         </thead>
         <tbody>
-          {filteredQuotations.map((quotation) => (
+          {quotations.map((quotation) => (
             <tr
               key={quotation.id}
               style={{

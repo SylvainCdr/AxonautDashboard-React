@@ -134,7 +134,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyPress}
-          placeholder="Numéro d'affaire"
+          placeholder="N° ou nom de l'affaire"
         />
         <button onClick={handleSearchSubmit}>
           <i className="fas fa-search"></i>
