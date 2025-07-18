@@ -116,17 +116,20 @@
           }
 
           button {
-            padding: 0.2rem 0.5rem;
+            padding: 0.5rem 0.9rem;
             background-color: var(--col1);
             border: none;
             border-radius: 4px;
             color: #fff;
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 400;
+            font-size: 1rem;
+            font-weight: 500;
             transition: background-color 0.3s;
 
-          
+            &:hover {
+              scale: 1.02;
+              background-color: #0089e5;
+            }
           }
         }
       }

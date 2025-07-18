@@ -197,7 +197,7 @@ export default function Quotations() {
           }`}
           onClick={() => setShowClosed(false)}
         >
-          En cours
+          Non masquées
         </button>
         <button
           className={`${styles.toggleButton} ${
@@ -205,7 +205,7 @@ export default function Quotations() {
           }`}
           onClick={() => setShowClosed(true)}
         >
-          Clôturés
+          Masquées
         </button>
       </div>
 
@@ -229,7 +229,7 @@ export default function Quotations() {
             <th>Marge réelle (%) </th>
             <th>Factu</th>
             {/* <th>Détails</th> */}
-            <th>Fermer</th>
+            <th>Masquer</th>
           </tr>
         </thead>
         <tbody>

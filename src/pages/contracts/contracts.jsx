@@ -28,82 +28,80 @@ export default function Contracts() {
   );
 
   // Mise à jour de l'état "Clôturé"
- const handleToggleClosed = async (quotation, currentState) => {
-  const quotationId = getQuotationId(quotation);
-  if (!quotationId) return toast.error("ID de devis introuvable.");
+  const handleToggleClosed = async (quotation, currentState) => {
+    const quotationId = getQuotationId(quotation);
+    if (!quotationId) return toast.error("ID de devis introuvable.");
 
-  try {
-    const quotationRef = doc(db, "isClosedQuotations", quotationId);
-    await setDoc(quotationRef, { isClosed: !currentState });
+    try {
+      const quotationRef = doc(db, "isClosedQuotations", quotationId);
+      await setDoc(quotationRef, { isClosed: !currentState });
 
-    toast.success(
-      `La commande ${quotationId} a été ${
-        !currentState ? "clôturée" : "réouverte"
-      } avec succès.`
-    );
+      toast.success(
+        `La commande ${quotationId} a été ${
+          !currentState ? "clôturée" : "réouverte"
+        } avec succès.`
+      );
 
-    setQuotations((prev) =>
-      prev.map((q) =>
-        getQuotationId(q) === quotationId
-          ? { ...q, isClosed: !currentState }
-          : q
-      )
-    );
-  } catch (err) {
-    console.error("Erreur lors de la mise à jour :", err);
-    toast.error("Erreur lors de la mise à jour du statut.");
-  }
-};
-
+      setQuotations((prev) =>
+        prev.map((q) =>
+          getQuotationId(q) === quotationId
+            ? { ...q, isClosed: !currentState }
+            : q
+        )
+      );
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour :", err);
+      toast.error("Erreur lors de la mise à jour du statut.");
+    }
+  };
 
   // Vérification de l'état "Clôturé" en base de données
   const fetchClosedStatus = async (quotation) => {
-  const quotationId = getQuotationId(quotation);
-  if (!quotationId) return false;
+    const quotationId = getQuotationId(quotation);
+    if (!quotationId) return false;
 
-  const docRef = doc(db, "isClosedQuotations", quotationId);
-  const snapshot = await getDoc(docRef);
-  return snapshot.exists() ? snapshot.data().isClosed : false;
-};
+    const docRef = doc(db, "isClosedQuotations", quotationId);
+    const snapshot = await getDoc(docRef);
+    return snapshot.exists() ? snapshot.data().isClosed : false;
+  };
 
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
   const loadQuotationData = async (quotationsList) => {
-  const updatedQuotations = await Promise.all(
-    quotationsList.map(async (quotation) => {
-      const quotationId = getQuotationId(quotation);
+    const updatedQuotations = await Promise.all(
+      quotationsList.map(async (quotation) => {
+        const quotationId = getQuotationId(quotation);
 
-      const isClosed = await fetchClosedStatus(quotation);
-      const { realMarginPercent, supplyStudyFinished } =
-        await fetchRealMarginPercent(quotationId);
+        const isClosed = await fetchClosedStatus(quotation);
+        const { realMarginPercent, supplyStudyFinished } =
+          await fetchRealMarginPercent(quotationId);
 
-      const billingPlanRef = doc(db, "billingPlans", quotationId);
-      const billingPlanSnap = await getDoc(billingPlanRef);
-      const hasBillingPlan = billingPlanSnap.exists();
+        const billingPlanRef = doc(db, "billingPlans", quotationId);
+        const billingPlanSnap = await getDoc(billingPlanRef);
+        const hasBillingPlan = billingPlanSnap.exists();
 
-      return {
-        ...quotation,
-        isClosed,
-        realMarginPercent,
-        supplyStudyFinished,
-        hasBillingPlan,
-      };
-    })
-  );
+        return {
+          ...quotation,
+          isClosed,
+          realMarginPercent,
+          supplyStudyFinished,
+          hasBillingPlan,
+        };
+      })
+    );
 
-  // tri
-  updatedQuotations.sort((a, b) => {
-    const dateA = a.date_customer_answer
-      ? new Date(a.date_customer_answer)
-      : new Date(0);
-    const dateB = b.date_customer_answer
-      ? new Date(b.date_customer_answer)
-      : new Date(0);
-    return dateB - dateA;
-  });
+    // tri
+    updatedQuotations.sort((a, b) => {
+      const dateA = a.date_customer_answer
+        ? new Date(a.date_customer_answer)
+        : new Date(0);
+      const dateB = b.date_customer_answer
+        ? new Date(b.date_customer_answer)
+        : new Date(0);
+      return dateB - dateA;
+    });
 
-  return updatedQuotations;
-};
-
+    return updatedQuotations;
+  };
 
   // Chargement des devis avec les données supplémentaires
 
@@ -277,7 +275,7 @@ export default function Contracts() {
           }`}
           onClick={() => setShowClosed(true)}
         >
-          Clôturés
+          Masquées
         </button>
       </div>
 
@@ -289,7 +287,7 @@ export default function Contracts() {
           <tr>
             {/* <th>ID</th> */}
             {/* <th>N°</th> */}
-            <th>Titre</th>
+            <th>Affaire</th>
             <th>Client</th>
             <th>Commercial(e)</th>
             <th>Date</th>
@@ -300,9 +298,9 @@ export default function Contracts() {
             <th>Marge co (%)</th> */}
             <th>Marge réelle (%) </th>
             <th>Montant facturé</th>
-            <th>Factu</th>
+            <th>Facturat°</th>
             {/* <th>Détails</th> */}
-            <th>Fermer</th>
+            <th>Masquer</th>
           </tr>
         </thead>
         <tbody>
@@ -433,7 +431,7 @@ export default function Contracts() {
                         )
                       }
                     >
-                      Plan factu
+                      Plan
                     </button>
                   ) : (
                     <span style={{ color: "#888" }}>–</span>
