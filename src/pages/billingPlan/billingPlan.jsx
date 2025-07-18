@@ -80,6 +80,9 @@ export default function BillingPlan({ onClose }) {
     fetchDeliveredLines();
   }, [quotationId]);
 
+  console.log("deliveredLines", deliveredLines);
+  console.log("deliveryInfoLines", deliveryInfoLines);
+
   useEffect(() => {
     async function loadQuotationData() {
       try {
@@ -119,8 +122,6 @@ export default function BillingPlan({ onClose }) {
 
     loadQuotationData();
   }, [quotationId]);
-
-  console.log("quotation", quotation);
 
   const addStep = () => {
     setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
@@ -597,23 +598,26 @@ export default function BillingPlan({ onClose }) {
                         {decodeHtmlEntities(chapter)}
                       </td>
                     </tr>
-                    {lines.map((line, index) => (
-                      <tr key={index}>
-                        <td>{line?.product_code || ""}</td>
-                        <td>{line.product_name}</td>
-                        <td>{line.quantity}</td>
-                        <td>{line.price} €</td>
-                        <td>{line.pre_tax_amount} €</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={deliveredLines[line.id] || false}
-                            disabled
-                          />
-                        </td>
-                        <td>{deliveryInfoLines[index] || ""}</td>
-                      </tr>
-                    ))}
+                    {lines.map((line, index) => {
+                      const lineKey = `${chapter}-${index}`;
+                      return (
+                        <tr key={line.id || index}>
+                          <td>{line.product_code || ""}</td>
+                          <td>{line.product_name}</td>
+                          <td>{line.quantity}</td>
+                          <td>{line.price} €</td>
+                          <td>{line.pre_tax_amount} €</td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={deliveredLines[lineKey] || false}
+                              disabled
+                            />
+                          </td>
+                          <td>{deliveryInfoLines[lineKey] || ""}</td>
+                        </tr>
+                      );
+                    })}
                   </React.Fragment>
                 ))}
               </tbody>
