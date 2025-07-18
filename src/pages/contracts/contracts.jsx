@@ -21,85 +21,89 @@ export default function Contracts() {
   const [hasMore, setHasMore] = useState(true); // pour savoir si on peut encore charger
   const [invoiceDataMap, setInvoiceDataMap] = useState({}); // pour stocker les données des factures
 
+  const getQuotationId = (q) => q.quotation?.id?.toString();
+
   const filteredQuotations = quotations.filter(
     (quotation) => quotation.isClosed === showClosed
   );
 
   // Mise à jour de l'état "Clôturé"
-  const handleToggleClosed = async (quotationId, currentState) => {
-    try {
-      const quotationRef = doc(
-        db,
-        "isClosedQuotations",
-        quotationId.toString()
-      );
-      await setDoc(quotationRef, { isClosed: !currentState });
-      // alert
-      toast.success(
-        `La commande ${quotationId} a été ${
-          !currentState ? "clôturée" : "réouverte"
-        } avec succès.`
-      );
-      // Mise à jour de l'état dans le tableau
+ const handleToggleClosed = async (quotation, currentState) => {
+  const quotationId = getQuotationId(quotation);
+  if (!quotationId) return toast.error("ID de devis introuvable.");
 
-      setQuotations((prev) =>
-        prev.map((quotation) =>
-          quotation.id === quotationId
-            ? { ...quotation, isClosed: !currentState }
-            : quotation
-        )
-      );
-    } catch (err) {
-      console.error("Erreur lors de la mise à jour :", err);
-      alert("Erreur lors de la mise à jour de la quotation.");
-    }
-  };
+  try {
+    const quotationRef = doc(db, "isClosedQuotations", quotationId);
+    await setDoc(quotationRef, { isClosed: !currentState });
+
+    toast.success(
+      `La commande ${quotationId} a été ${
+        !currentState ? "clôturée" : "réouverte"
+      } avec succès.`
+    );
+
+    setQuotations((prev) =>
+      prev.map((q) =>
+        getQuotationId(q) === quotationId
+          ? { ...q, isClosed: !currentState }
+          : q
+      )
+    );
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour :", err);
+    toast.error("Erreur lors de la mise à jour du statut.");
+  }
+};
+
 
   // Vérification de l'état "Clôturé" en base de données
-  const fetchClosedStatus = async (quotationId) => {
-    const docRef = doc(db, "isClosedQuotations", quotationId.toString());
-    const snapshot = await getDoc(docRef);
-    return snapshot.exists() ? snapshot.data().isClosed : false;
-  };
+  const fetchClosedStatus = async (quotation) => {
+  const quotationId = getQuotationId(quotation);
+  if (!quotationId) return false;
+
+  const docRef = doc(db, "isClosedQuotations", quotationId);
+  const snapshot = await getDoc(docRef);
+  return snapshot.exists() ? snapshot.data().isClosed : false;
+};
 
   // Chargement des états "Clôturé" et des marges réelles pour chaque devis
   const loadQuotationData = async (quotationsList) => {
-    const updatedQuotations = await Promise.all(
-      quotationsList.map(async (quotation) => {
-        const isClosed = await fetchClosedStatus(quotation.quotation?.id);
-        const { realMarginPercent, supplyStudyFinished } =
-          await fetchRealMarginPercent(quotation.quotation?.id);
+  const updatedQuotations = await Promise.all(
+    quotationsList.map(async (quotation) => {
+      const quotationId = getQuotationId(quotation);
 
-        const billingPlanRef = doc(
-          db,
-          "billingPlans",
-          quotation.quotation?.id.toString()
-        );
-        const billingPlanSnap = await getDoc(billingPlanRef);
-        const hasBillingPlan = billingPlanSnap.exists();
+      const isClosed = await fetchClosedStatus(quotation);
+      const { realMarginPercent, supplyStudyFinished } =
+        await fetchRealMarginPercent(quotationId);
 
-        return {
-          ...quotation,
-          isClosed,
-          realMarginPercent,
-          supplyStudyFinished,
-          hasBillingPlan,
-        };
-      })
-    );
+      const billingPlanRef = doc(db, "billingPlans", quotationId);
+      const billingPlanSnap = await getDoc(billingPlanRef);
+      const hasBillingPlan = billingPlanSnap.exists();
 
-    updatedQuotations.sort((a, b) => {
-      const dateA = a.date_customer_answer
-        ? new Date(a.date_customer_answer)
-        : new Date(0);
-      const dateB = b.date_customer_answer
-        ? new Date(b.date_customer_answer)
-        : new Date(0);
-      return dateB - dateA;
-    });
+      return {
+        ...quotation,
+        isClosed,
+        realMarginPercent,
+        supplyStudyFinished,
+        hasBillingPlan,
+      };
+    })
+  );
 
-    return updatedQuotations; // ✅ indispensable
-  };
+  // tri
+  updatedQuotations.sort((a, b) => {
+    const dateA = a.date_customer_answer
+      ? new Date(a.date_customer_answer)
+      : new Date(0);
+    const dateB = b.date_customer_answer
+      ? new Date(b.date_customer_answer)
+      : new Date(0);
+    return dateB - dateA;
+  });
+
+  return updatedQuotations;
+};
+
 
   // Chargement des devis avec les données supplémentaires
 
@@ -440,10 +444,9 @@ export default function Contracts() {
                 <td>
                   <input
                     type="checkbox"
-                    className={styles.formCheckInput}
                     checked={quotation.isClosed || false}
                     onChange={() =>
-                      handleToggleClosed(quotation.id, quotation.isClosed)
+                      handleToggleClosed(quotation, quotation.isClosed)
                     }
                   />
                 </td>
