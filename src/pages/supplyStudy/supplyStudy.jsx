@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { db, auth } from "../../firebase/firebase";
 import { getDoc, updateDoc, doc, setDoc } from "firebase/firestore";
 import { getUserByUid } from "../../utils/getUserByUid";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 import {
   Tooltip,
   Legend,
@@ -204,7 +204,7 @@ export default function SupplyStudy() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement...</p>
       </div>
     );

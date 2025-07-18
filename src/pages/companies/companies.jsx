@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchCompanies } from "../../services/api/companies";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import { useNavigate } from "react-router-dom";
 import SearchCompany from "../../components/searchCompany/searchCompany";
@@ -37,7 +37,7 @@ export default function Companies() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement des entreprises...</p>
       </div>
     );

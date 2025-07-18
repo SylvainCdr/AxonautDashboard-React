@@ -9,7 +9,7 @@ import { db, auth } from "../../firebase/firebase";
 import { doc, setDoc, getDoc, Timestamp, deleteDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { decodeHtmlEntities } from "../../utils/htmlDecoder";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import GaugeChart from "react-gauge-chart";
 import { getDocs, collection, updateDoc } from "firebase/firestore";
@@ -387,7 +387,7 @@ export default function BillingPlan({ onClose }) {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement...</p>
       </div>
     );

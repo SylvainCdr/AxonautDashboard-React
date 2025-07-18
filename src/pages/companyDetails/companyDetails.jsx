@@ -74,7 +74,6 @@ export default function CompanyDetails() {
     loadInvoices();
   }, [companyId]);
 
-  
   // **Nouveau useEffect pour arrêter le chargement de la section finance**
   useEffect(() => {
     if (!loadingQuotations && !loadingInvoices) {
@@ -85,39 +84,41 @@ export default function CompanyDetails() {
   console.log(company);
   console.log(quotations);
   console.log("invoices", invoices);
-// Fonction pour regrouper les montants par année
-const groupByYear = (items, dateKey) => {
-  return items.reduce((acc, item) => {
-    const year = new Date(item[dateKey]).getFullYear();
-    if (!acc[year]) {
-      acc[year] = 0;
-    }
-    acc[year] += item.pre_tax_amount || 0;
-    return acc;
-  }, {});
-};
+  // Fonction pour regrouper les montants par année
+  const groupByYear = (items, dateKey) => {
+    return items.reduce((acc, item) => {
+      const year = new Date(item[dateKey]).getFullYear();
+      if (!acc[year]) {
+        acc[year] = 0;
+      }
+      acc[year] += item.pre_tax_amount || 0;
+      return acc;
+    }, {});
+  };
 
-// Regrouper les devis (CA prévisionnel) par année
-const quotationAmountsByYear = groupByYear(quotations, "date");
+  // Regrouper les devis (CA prévisionnel) par année
+  const quotationAmountsByYear = groupByYear(quotations, "date");
 
-// Regrouper les factures (CA réel) par année
-const invoiceAmountsByYear = groupByYear(invoices, "date");
+  // Regrouper les factures (CA réel) par année
+  const invoiceAmountsByYear = groupByYear(invoices, "date");
 
-// Obtenir toutes les années uniques (triées)
-const allYears = [...new Set([...Object.keys(quotationAmountsByYear), ...Object.keys(invoiceAmountsByYear)])]
-  .map(Number)
-  .sort((a, b) => b - a); // Trier de la plus récente à la plus ancienne
+  // Obtenir toutes les années uniques (triées)
+  const allYears = [
+    ...new Set([
+      ...Object.keys(quotationAmountsByYear),
+      ...Object.keys(invoiceAmountsByYear),
+    ]),
+  ]
+    .map(Number)
+    .sort((a, b) => b - a); // Trier de la plus récente à la plus ancienne
 
-
-
-// Définition des couleurs selon les statuts
-const statusColor = (status) => {
-  if (status === "accepted") return "green";
-  if (status === "pending") return "orange";
-  if (status === "refused") return "red";
-  return "black";
-};
-
+  // Définition des couleurs selon les statuts
+  const statusColor = (status) => {
+    if (status === "accepted") return "green";
+    if (status === "pending") return "orange";
+    if (status === "refused") return "red";
+    return "black";
+  };
 
   return (
     <div className={styles.companyDetailsContainer}>
@@ -168,12 +169,12 @@ const statusColor = (status) => {
         </div>
       </div>
 
-        {/* SECTION CA PRÉVISIONNEL ET RÉEL PAR ANNÉE */}
-        <div className={styles.sectionFinance}>
+      {/* SECTION CA PRÉVISIONNEL ET RÉEL PAR ANNÉE */}
+      <div className={styles.sectionFinance}>
         <h1>Chiffre d'affaires par année</h1>
         {loadingTotals ? (
           <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingTotals} size={15} />
+            <BarLoader color="#4520ff" loading={loadingTotals} size={60} />
             <p>Chargement du chiffre d'affaires...</p>
           </div>
         ) : (
@@ -202,7 +203,7 @@ const statusColor = (status) => {
         <h1>Commandes / Projets</h1>
         {loadingQuotations ? (
           <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingQuotations} size={15} />
+            <BarLoader color="#4520ff" loading={loadingQuotations} size={60} />
             <p>Chargement des commandes / projets </p>
           </div>
         ) : quotations.length > 0 ? (
@@ -253,7 +254,7 @@ const statusColor = (status) => {
         <h1>Factures</h1>
         {loadingInvoices ? (
           <div className={styles.loaderContainer}>
-            <BarLoader color="#4520ff" loading={loadingInvoices} size={15} />
+            <BarLoader color="#4520ff" loading={loadingInvoices} size={60} />
             <p>Chargement des factures...</p>
           </div>
         ) : invoices.length > 0 ? (

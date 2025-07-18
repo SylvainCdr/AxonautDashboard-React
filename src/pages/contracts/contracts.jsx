@@ -2,7 +2,7 @@ import styles from "./style.module.scss";
 import { fetchContracts } from "../../services/api/contracts";
 import { fetchAxonautUsers } from "../../services/api/employees";
 import { useEffect, useState } from "react";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import SearchContract from "../../components/searchContract/searchContract";
@@ -245,7 +245,7 @@ export default function Contracts() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement des affaires en cours...</p>
       </div>
     );
@@ -456,7 +456,7 @@ export default function Contracts() {
       <footer className={styles.footer}>
         {isFetchingMore && (
           <div style={{ textAlign: "center", margin: "2rem 0" }}>
-            <GridLoader color="#C60F7B" size={10} />
+            <DotLoader color="#C60F7B" size={10} />
             <p style={{ marginTop: "0.5rem" }}>
               Chargement de plus de contrats...
             </p>

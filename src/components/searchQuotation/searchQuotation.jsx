@@ -143,7 +143,7 @@ export default function SearchQuotation({ cachedQuotations = [] }) {
 
       {loading && (
         <div className={styles.loaderContainer}>
-          <BarLoader color="#4520ff" loading={loading} size={15} />
+          <BarLoader color="#4520ff" loading={loading} size={60} />
           <p>Chargement des résultats...</p>
           <button onClick={handleCancelSearch} className={styles.cancelButton}>
             Annuler

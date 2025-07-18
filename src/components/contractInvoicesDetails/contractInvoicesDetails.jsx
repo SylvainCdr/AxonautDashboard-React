@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchQuotationById } from "../../services/api/quotations";
 import { fetchContractById } from "../../services/api/contracts";
 import { fetchInvoiceById } from "../../services/api/invoices";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import { db, auth } from "../../firebase/firebase";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
@@ -59,7 +59,6 @@ export default function ContractInvoicesDetails() {
     loadQuotationData();
   }, [quotationId]);
 
- 
   console.log("ContractInvoicesDetails - Invoices:", invoices);
 
   const isPaidInvoice = (invoice) =>
@@ -70,7 +69,7 @@ export default function ContractInvoicesDetails() {
   if (loading) {
     return (
       <div style={{ textAlign: "center", marginTop: "2rem" }}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement...</p>
       </div>
     );
@@ -111,22 +110,21 @@ export default function ContractInvoicesDetails() {
 
       <h1>Détails de la facturation</h1>
 
-     <div style={{ marginTop: "1rem" }}>
-  {hasBillingPlan ? (
-    <button
-      onClick={() => navigate(`/quotation/${quotation.id}/billing-plan`)}
-    >
-      Voir le plan de facturation
-    </button>
-  ) : (
-    <button
-      onClick={() => navigate(`/quotation/${quotation.id}/billing-plan`)}
-    >
-      Créer un plan de facturation
-    </button>
-  )}
-</div>
-
+      <div style={{ marginTop: "1rem" }}>
+        {hasBillingPlan ? (
+          <button
+            onClick={() => navigate(`/quotation/${quotation.id}/billing-plan`)}
+          >
+            Voir le plan de facturation
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate(`/quotation/${quotation.id}/billing-plan`)}
+          >
+            Créer un plan de facturation
+          </button>
+        )}
+      </div>
 
       <div className={styles.contractDetails}>
         <p>
@@ -203,7 +201,6 @@ export default function ContractInvoicesDetails() {
           </tbody>
         </table>
       </div>
- 
     </div>
   );
 }

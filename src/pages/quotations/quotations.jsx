@@ -2,7 +2,7 @@ import styles from "./style.module.scss";
 import { fetchQuotations } from "../../services/api/quotations";
 import { fetchAxonautUsers } from "../../services/api/employees";
 import { useEffect, useState } from "react";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import SearchQuotation from "../../components/searchQuotation/searchQuotation";
@@ -169,7 +169,7 @@ export default function Quotations() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement des commandes...</p>
       </div>
     );

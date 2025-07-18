@@ -1,4 +1,4 @@
-import { BarLoader, GridLoader } from "react-spinners";
+import { BarLoader, DotLoader } from "react-spinners";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProjectById } from "../../services/api/projects";
@@ -155,7 +155,7 @@ export default function ProjectDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement...</p>
       </div>
     );

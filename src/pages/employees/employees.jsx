@@ -1,7 +1,7 @@
 import styles from "./style.module.scss";
 import { fetchEmployees } from "../../services/api/employees";
 import React, { useEffect, useState } from "react";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
@@ -26,7 +26,7 @@ export default function Employees() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-       <GridLoader color="#C60F7B" loading={loading} size={15} /> 
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement des employés...</p>
       </div>
     );

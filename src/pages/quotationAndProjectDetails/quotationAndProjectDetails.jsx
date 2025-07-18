@@ -6,7 +6,7 @@ import ProjectDetails from "../../components/projectDetails/projectDetails";
 import ContractInvoicesDetails from "../../components/contractInvoicesDetails/contractInvoicesDetails";
 import DeliveryNotesDetails from "../../components/deliveryNotesDetails/deliveryNotesDetails";
 import styles from "./style.module.scss";
-import { GridLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 
 export default function QuotationAndProjectDetails() {
   const { quotationId } = useParams();
@@ -33,7 +33,7 @@ export default function QuotationAndProjectDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <GridLoader color="#C60F7B" loading={loading} size={15} />
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
         <p>Chargement...</p>
       </div>
     );

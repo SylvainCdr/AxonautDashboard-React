@@ -72,7 +72,7 @@ export default function DeliveryNotesDetails() {
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
-        <BarLoader color="#4520ff" loading={loading} size={15} />
+        <BarLoader color="#4520ff" loading={loading} size={60} />
         <p>Chargement...</p>
       </div>
     );
