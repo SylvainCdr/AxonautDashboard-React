@@ -504,13 +504,54 @@ export default function Opportunities() {
                         });
                       }
                     }
+                    // Vérifie les anomalies de dates et applique le style
+                    const isSameDate =
+                      dueDate?.toDateString() === finDate?.toDateString();
+                    const isDueAfterEnd =
+                      dueDate &&
+                      finDate &&
+                      dueDate.getTime() > finDate.getTime();
+
+                    const ligneAlerteStyle =
+                      isSameDate || isDueAfterEnd
+                        ? { backgroundColor: "#ffe6e6" } // rouge clair
+                        : {};
+
+                    const lignesAvecPourcentage = plan.filter(
+                      (l) =>
+                        /\d+%/.test(l) &&
+                        !l.toLowerCase().includes("avancement")
+                    );
+
+                    const sommePourcentages = lignesAvecPourcentage
+                      .map((l) => {
+                        const m = l.match(/(\d+)%/);
+                        return m ? parseFloat(m[1]) : 0;
+                      })
+                      .reduce((a, b) => a + b, 0);
+
+                    const contientAvancement = plan.some((l) =>
+                      l.toLowerCase().includes("avancement")
+                    );
+
+                    // 👉 Cas valides :
+                    const planValide =
+                      // Cas 1 : 100% exact sans avancement
+                      (sommePourcentages === 100 && !contientAvancement) ||
+                      // Cas 2 : somme < 100% avec avancement
+                      (sommePourcentages < 100 && contientAvancement) ||
+                      // Cas 3 : aucune ligne %, juste avancement
+                      (sommePourcentages === 0 && contientAvancement);
+
+                    // ❌ Sinon invalide
+                    const planInvalide = !planValide;
 
                     return (
                       <React.Fragment key={oppId}>
                         <tr
                           onClick={() => toggleRow(oppId)}
                           className={styles.opportunityRow}
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: "pointer", ...ligneAlerteStyle }}
                         >
                           <td>{opp.name}</td>
                           <td>{opp.user_name}</td>
@@ -519,11 +560,23 @@ export default function Opportunities() {
                           <td>{amount.toLocaleString("fr-FR")} €</td>
                           <td>{opp.probability}%</td>
                           <td>{caPondere.toLocaleString("fr-FR")} €</td>
-                          <td>
+                          <td
+                            style={
+                              planInvalide ? { backgroundColor: "#fff3cd" } : {}
+                            }
+                            title={
+                              planInvalide
+                                ? `Plan invalide : pourcentage total = ${sommePourcentages}%, Avancement ${
+                                    contientAvancement ? "présent" : "absent"
+                                  }`
+                                : undefined
+                            }
+                          >
                             {plan.map((l, i) => (
                               <div key={i}>{l}</div>
                             ))}
                           </td>
+
                           <td>{expandedRows[oppId] ? "▼" : "▶"}</td>
                         </tr>
 
