@@ -34,6 +34,11 @@ export default function Opportunities() {
     loadOpportunities();
   }, [page]);
 
+  console.log("Opportunités chargées :", opportunities);
+  //count
+  const totalCount = opportunities.length;
+  console.log("Total d'opportunités :", totalCount);
+
   // Utilitaires dates
   function parseDate(dateStr) {
     if (!dateStr) return null;
@@ -215,6 +220,14 @@ export default function Opportunities() {
     }));
   };
 
+  const [expandedRows, setExpandedRows] = useState({});
+  const toggleRow = (oppId) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [oppId]: !prev[oppId],
+    }));
+  };
+
   return (
     <div className={styles.opportunitiesContainer}>
       <h1>Opportunités</h1>
@@ -357,6 +370,7 @@ export default function Opportunities() {
                     return étapeDansLeMois || avancementDansLeMois;
                   })
                   .map((opp) => {
+                    const oppId = opp.id;
                     const amount = parseFloat(
                       opp.amount?.toString().replace(/[^0-9.-]+/g, "") || 0
                     );
@@ -372,23 +386,24 @@ export default function Opportunities() {
                       "100% - Livraison",
                     ];
 
-                    // Montants par étape pour ce mois
-                    const monthStart = parseDateMonthYear(selectedMonth);
-                    const monthEnd = new Date(monthStart);
-                    monthEnd.setMonth(monthEnd.getMonth() + 1);
+                    const étapes = [];
 
-                    const montantsParÉtape = [];
+                    const montantDéjàAlloué = plan
+                      .filter((l) => !l.toLowerCase().includes("avancement"))
+                      .map((l) => {
+                        const m = l.match(/(\d+)%/);
+                        return m ? parseFloat(m[1]) / 100 : 0;
+                      })
+                      .reduce((a, b) => a + b, 0);
 
-                    // Étapes fixes
                     plan.forEach((ligne) => {
                       const match = ligne.match(/(\d+)%\s*-\s*([\wÀ-ÿ]+)/i);
                       if (!match) return;
                       const pourcentage = parseFloat(match[1]) / 100;
-                      const step = match[2].toLowerCase();
-
-                      if (step.includes("avancement")) return;
-
+                      const label = match[2];
                       let dateClé = null;
+
+                      const step = label.toLowerCase();
                       if (step.includes("commande")) dateClé = dueDate;
                       else if (
                         step.includes("livraison") ||
@@ -400,93 +415,88 @@ export default function Opportunities() {
                           (dueDate.getTime() + finDate.getTime()) / 2
                         );
 
-                      if (
-                        dateClé &&
-                        dateClé >= monthStart &&
-                        dateClé < monthEnd
-                      ) {
-                        montantsParÉtape.push({
-                          étape: step,
+                      if (dateClé) {
+                        étapes.push({
+                          label,
+                          mois: formatDateToMonthYear(dateClé),
                           montant: caPondere * pourcentage,
                         });
                       }
                     });
 
-                    // Avancement réparti sur plusieurs mois
-                    const montantDéjàAlloué = plan
-                      .filter(
-                        (ligne) => !ligne.toLowerCase().includes("avancement")
-                      )
-                      .map((ligne) => {
-                        const match = ligne.match(/(\d+)%/);
-                        return match ? parseFloat(match[1]) / 100 : 0;
-                      })
-                      .reduce((acc, val) => acc + val, 0);
-
+                    // Avancement réparti
                     const ligneAvancement = plan.find((l) =>
                       l.toLowerCase().includes("avancement")
                     );
-
                     if (ligneAvancement) {
                       const pourcentageAvancement = 1 - montantDéjàAlloué;
                       const montantAvancement =
                         caPondere * pourcentageAvancement;
                       const nbMois = monthDiff(dueDate, finDate);
+                      const partParMois = montantAvancement / nbMois;
 
-                      if (nbMois > 0 && montantAvancement > 0) {
-                        for (let i = 0; i < nbMois; i++) {
-                          const moisDate = new Date(dueDate);
-                          moisDate.setMonth(moisDate.getMonth() + i);
-                          if (moisDate >= monthStart && moisDate < monthEnd) {
-                            const partParMois = montantAvancement / nbMois;
-                            montantsParÉtape.push({
-                              étape: "avancement",
-                              montant: partParMois,
-                            });
-                          }
-                        }
+                      for (let i = 0; i < nbMois; i++) {
+                        const moisDate = new Date(dueDate);
+                        moisDate.setMonth(moisDate.getMonth() + i);
+                        étapes.push({
+                          label: "Avancement",
+                          mois: formatDateToMonthYear(moisDate),
+                          montant: partParMois,
+                        });
                       }
                     }
 
                     return (
-                      <tr key={opp.id}>
-                        <td>{opp.name}</td>
-                        <td>{opp.due_date || "-"}</td>
-                        <td>
-                          {opp.custom_fields?.["Date de Fin estimée"] || "-"}
-                        </td>
-                        <td>
-                          {amount.toLocaleString("fr-FR", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}
-                        </td>
-                        <td>{(probability * 100).toFixed(0)}</td>
-                        <td>
-                          {caPondere.toLocaleString("fr-FR", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}
-                        </td>
-                        <td>
-                          {plan.map((ligne, i) => (
-                            <div key={i}>{ligne}</div>
-                          ))}
-                        </td>
-                        <td>
-                          {montantsParÉtape.length === 0
-                            ? "-"
-                            : montantsParÉtape.map(({ étape, montant }, i) => (
-                                <div key={i}>
-                                  {étape} :{" "}
-                                  {montant.toLocaleString("fr-FR", {
-                                    style: "currency",
-                                    currency: "EUR",
-                                  })}
-                                </div>
-                              ))}
-                        </td>
-                      </tr>
+                      <React.Fragment key={oppId}>
+                        <tr
+                          onClick={() => toggleRow(oppId)}
+                          className={styles.opportunityRow}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <td>{opp.name}</td>
+                          <td>{dueDate?.toLocaleDateString("fr-FR")}</td>
+                          <td>{finDate?.toLocaleDateString("fr-FR")}</td>
+                          <td>{amount.toLocaleString("fr-FR")} €</td>
+                          <td>{opp.probability}%</td>
+                          <td>{caPondere.toLocaleString("fr-FR")} €</td>
+                          <td>
+                            {plan.map((l, i) => (
+                              <div key={i}>{l}</div>
+                            ))}
+                          </td>
+                          <td>{expandedRows[oppId] ? "▼" : "▶"}</td>
+                        </tr>
+
+                        {expandedRows[oppId] && (
+                          <tr className={styles.expandedRow}>
+                            <td colSpan="8">
+                              <table className={styles.subTable}>
+                                <thead>
+                                  <tr>
+                                    <th>Étape</th>
+                                    <th>Mois</th>
+                                    <th>Montant pondéré</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {étapes.map((etape, i) => (
+                                    <tr key={i}>
+                                      <td>{etape.label}</td>
+                                      <td>{etape.mois}</td>
+                                      <td>
+                                        {etape.montant.toLocaleString("fr-FR", {
+                                          style: "currency",
+                                          currency: "EUR",
+                                        })}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     );
                   })}
               </tbody>
