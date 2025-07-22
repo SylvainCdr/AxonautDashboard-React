@@ -1,6 +1,7 @@
 import styles from "./style.module.scss";
 import React, { useState, useEffect } from "react";
 import { fetchOpportunities } from "../../services/api/opportunities";
+import DotLoader from "react-spinners/DotLoader";
 
 export default function Opportunities() {
   const [opportunities, setOpportunities] = useState([]);
@@ -8,6 +9,7 @@ export default function Opportunities() {
   const [loading, setLoading] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(null); // Mois sélectionné
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadOpportunities = async () => {
@@ -228,11 +230,33 @@ export default function Opportunities() {
     }));
   };
 
+  if (loading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <DotLoader color="#C60F7B" loading={loading} size={60} />
+        <p>Chargement de l'analyse prévisionnelle du CA...</p>
+      </div>
+    );
+  }
+
+  if (error) return <p>Erreur : {error}</p>;
+
   return (
     <div className={styles.opportunitiesContainer}>
       <h1>Opportunités</h1>
 
       <h2>Projection du chiffre d'affaires pondéré par mois</h2>
+
+      <p className={styles.description}>
+        Cette projection permet d’estimer le chiffre d’affaires mensuel à venir
+        en fonction des opportunités en cours et de leur plan de facturation.
+        Chaque étape (Commande, Études, Réception, Livraison, etc.) est pondérée
+        selon le pourcentage associé dans l’opportunité, puis répartie sur la
+        période correspondante (date de commande, fin estimée, ou échéance
+        intermédiaire). L’objectif est de fournir une vision réaliste et
+        pondérée du chiffre d’affaires attendu, en tenant compte de l’avancement
+        commercial et opérationnel.
+      </p>
       <table className={styles.revenueTable}>
         <thead>
           <tr>
@@ -293,13 +317,14 @@ export default function Opportunities() {
               <thead>
                 <tr>
                   <th>Nom de l'opportunité</th>
-                  <th>Due date</th>
+                  <th>Commercial(e)</th>
+                  <th>Date de C° estimée</th>
                   <th>Date de fin estimée</th>
                   <th>Montant initial (€)</th>
                   <th>Probabilité (%)</th>
                   <th>CA pondéré (€)</th>
-                  <th>Plan de facturation</th>
-                  <th>Montants par étape de facturation</th>
+                  <th>Plan prévi de factu</th>
+                  <th>Montants par étape de factu</th>
                 </tr>
               </thead>
               <tbody>
@@ -454,6 +479,7 @@ export default function Opportunities() {
                           style={{ cursor: "pointer" }}
                         >
                           <td>{opp.name}</td>
+                          <td>{opp.user_name}</td>
                           <td>{dueDate?.toLocaleDateString("fr-FR")}</td>
                           <td>{finDate?.toLocaleDateString("fr-FR")}</td>
                           <td>{amount.toLocaleString("fr-FR")} €</td>
@@ -514,6 +540,7 @@ export default function Opportunities() {
         <thead>
           <tr>
             <th>Nom</th>
+            <th>Commercial(e)</th>
             <th>Due date</th>
             <th>Date de fin estimée</th>
             <th>Montant (€)</th>
@@ -533,6 +560,7 @@ export default function Opportunities() {
             return (
               <tr key={opp.id}>
                 <td>{opp.name}</td>
+                <td>{opp.user_name}</td>
                 <td>{opp.due_date || "-"}</td>
                 <td>{opp.custom_fields?.["Date de Fin estimée"] || "-"}</td>
                 <td>

@@ -1,3 +1,14 @@
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  color: rgb(0, 0, 0);
+}
+
 .opportunitiesContainer {
   min-height: 100vh;
   padding-top: 5rem;
@@ -10,9 +21,13 @@
     color: #333;
   }
 
-  /* Table Styles */
+  .description {
+    margin: 1rem 0;
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.6rem;
+  }
 
-  /* Projection du CA pondéré par mois */
   .revenueTable {
     width: 100%;
     border-collapse: collapse;
@@ -60,7 +75,6 @@
     }
   }
 
-  /* Styles pour la modal */
   /* Styles pour la modal */
   // Modal container : fond semi-transparent couvrant toute la fenêtre
   .modalOverlay {
