@@ -4,6 +4,152 @@
   max-width: 1440px;
   margin: 0 auto;
 
+  h2 {
+    margin-top: 2rem;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  /* Table Styles */
+
+  /* Projection du CA pondéré par mois */
+  .revenueTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    /* En-tête de table */
+    thead {
+      background-color: #007bff;
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 1rem;
+      font-weight: bold;
+
+      th {
+        padding: 1rem;
+        text-align: center;
+      }
+    }
+
+    /* Corps de la table */
+    tbody {
+      background-color: #f9f9f9;
+
+      tr {
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #f1f1f1;
+          transform: translateY(-2px);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        td {
+          padding: 1rem;
+          text-align: center;
+          color: #333;
+          font-size: 1rem;
+          border-bottom: 1px solid #e5e5e5;
+        }
+      }
+    }
+  }
+
+  /* Styles pour la modal */
+  /* Styles pour la modal */
+  // Modal container : fond semi-transparent couvrant toute la fenêtre
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); // fond noir transparent
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  // Contenu de la modale : bloc blanc avec ombre et bord arrondi
+  .modalContent {
+    background: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+
+      thead {
+        background-color: #007bff;
+        color: white;
+
+        th {
+          padding: 0.5rem 0.75rem;
+          text-align: left;
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 1px solid #ddd;
+
+          &:hover {
+            background-color: #f9f9f9;
+          }
+
+          td {
+            padding: 0.8rem 0.75rem;
+            vertical-align: top;
+            font-size: 0.9rem;
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+
+  // Bouton de fermeture de la modale
+  .closeButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+
+    &:focus {
+      outline: 2px solid #0056b3;
+      outline-offset: 2px;
+    }
+  }
+
   .opportunitiesTable {
     width: 100%;
     border-collapse: collapse;
