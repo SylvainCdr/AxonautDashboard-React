@@ -60,19 +60,22 @@ function Homepage() {
 
       <motion.div className={styles.categories} variants={container}>
         <motion.div variants={item}>
-          <Link to="/companies">Entreprises</Link>
-        </motion.div>
-        <motion.div variants={item}>
           <Link to="/quotations">
             Commmandes <br />& <br />
             Projets
           </Link>
         </motion.div>
         <motion.div variants={item}>
+          <Link to="/companies">Entreprises</Link>
+        </motion.div>
+        <motion.div variants={item}>
           <Link to="/contracts">Affaires en cours</Link>
         </motion.div>
         <motion.div variants={item}>
           <Link to="/billing">Facturation</Link>
+        </motion.div>
+        <motion.div variants={item}>
+          <Link to="/billing">Analyse prévisionnelle CA</Link>
         </motion.div>
       </motion.div>
     </motion.div>
