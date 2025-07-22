@@ -6,7 +6,8 @@
   align-items: center;
   min-height: 100vh;
   text-align: center;
-  color: rgb(0, 0, 0);
+  color: #333;
+  font-size: 1.2rem;
 }
 
 .opportunitiesContainer {
@@ -17,32 +18,86 @@
 
   h2 {
     margin-top: 2rem;
-    font-size: 2rem;
-    color: #333;
+    font-size: 1.5rem;
+    color: #3b3b3b;
+    font-weight: 600;
   }
 
   .description {
     margin: 1rem 0;
     font-size: 1.1rem;
-    color: #555;
-    line-height: 1.6rem;
+    color: #666;
+    line-height: 1.7rem;
+  }
+
+  .filterContainer {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    margin-bottom: 1.5rem;
+    gap: 2rem;
+
+    label {
+      font-size: 1rem;
+      color: #0a0a0a;
+    }
+
+    select {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: var(--col3);
+      }
+    }
   }
 
   .revenueTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 2rem;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
 
-    /* En-tête de table */
+    .yearRow {
+      background-color: #eaf4ff;
+      font-weight: 600;
+      color: #003366;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #d6eaff;
+      }
+    }
+
+    .monthRow {
+      background-color: #f9f9f9;
+      font-weight: 400;
+      color: #333;
+      border-left: 4px solid #007bff;
+      transition: background-color 0.3s;
+
+      td {
+        padding-left: 2.5rem; // indentation visuelle
+      }
+
+      &:hover {
+        background-color: #f1f1f1;
+      }
+    }
+
     thead {
-      background-color: #007bff;
+      background-color: #0066cc;
       color: #fff;
       text-transform: uppercase;
-      font-size: 1rem;
-      font-weight: bold;
+      font-size: 1.2rem;
+      font-weight: 600;
 
       th {
         padding: 1rem;
@@ -50,182 +105,117 @@
       }
     }
 
-    /* Corps de la table */
     tbody {
-      background-color: #f9f9f9;
+      background-color: #fafafa;
 
       tr {
-        transition: all 0.3s ease-in-out;
+        transition: background 0.2s ease-in-out, transform 0.15s ease;
         cursor: pointer;
 
         &:hover {
-          background-color: #f1f1f1;
+          background-color: #f0f8ff;
           transform: translateY(-2px);
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         td {
           padding: 1rem;
           text-align: center;
           color: #333;
-          font-size: 1rem;
+          font-size: 0.95rem;
           border-bottom: 1px solid #e5e5e5;
         }
       }
     }
   }
 
-  /* Styles pour la modal */
-  // Modal container : fond semi-transparent couvrant toute la fenêtre
   .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); // fond noir transparent
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-  }
 
-  // Contenu de la modale : bloc blanc avec ombre et bord arrondi
-  .modalContent {
-    background: #fff;
-    padding: 1.5rem 2rem;
-    border-radius: 8px;
-    max-width: 90vw;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
+    .modalContent {
+      position: relative; // Ajoute cette ligne
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 95%;
+      max-width: 1200px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      color: #222;
 
-    h2 {
-      margin-top: 0;
-      margin-bottom: 1rem;
-      font-size: 1.6rem;
-      font-weight: 600;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1.5rem;
-
-      thead {
-        background-color: #007bff;
-        color: white;
-
-        th {
-          padding: 0.5rem 0.75rem;
-          text-align: left;
-        }
+      h2 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #333;
       }
 
-      tbody {
-        tr {
-          border-bottom: 1px solid #ddd;
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1.5rem;
 
-          &:hover {
-            background-color: #f9f9f9;
+        thead {
+          background-color: #0066cc;
+          color: white;
+
+          th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
           }
+        }
 
-          td {
-            padding: 0.8rem 0.75rem;
-            vertical-align: top;
-            font-size: 0.9rem;
-            color: #333;
+        tbody {
+          tr {
+            border-bottom: 1px solid #ddd;
+
+            &:hover {
+              background-color: #f5faff;
+            }
+
+            td {
+              padding: 0.8rem 1rem;
+              vertical-align: top;
+              font-size: 0.9rem;
+              color: #333;
+            }
           }
         }
       }
     }
-  }
 
-  // Bouton de fermeture de la modale
-  .closeButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 4px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: #0056b3;
-    }
-
-    &:focus {
-      outline: 2px solid #0056b3;
-      outline-offset: 2px;
-    }
-  }
-
-  .opportunitiesTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 2rem;
-
-    th,
-    td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f4f4f4;
-      font-weight: bold;
-    }
-
-    tr {
-      background-color: #f9f9f9bc;
-    }
-
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-    tfoot {
-      background-color: #f4f4f4;
-      text-align: center;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      background-color: #007bff;
+    .closeButton {
+      position: absolute; // Au lieu de fixed
+      top: 0.05rem;
+      right: 0.1rem;
+      background-color: #6e6e6e;
       color: white;
       border: none;
-      border-radius: 4px;
+      padding: 0.4rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: #0056b3;
+        background-color: #004f99;
       }
-    }
-    p {
-      margin: 0;
-      padding: 0.5rem;
-      color: #666;
-    }
-    div {
-      margin-bottom: 0.5rem;
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-      color: #333;
-    }
-    h3 {
-      margin-top: 0.5rem;
-      font-size: 1.2rem;
-      color: #555;
-    }
-    p {
-      margin: 0.5rem 0;
-      color: #666;
+
+      &:focus {
+        outline: 2px solid #004f99;
+        outline-offset: 2px;
+      }
     }
   }
 }

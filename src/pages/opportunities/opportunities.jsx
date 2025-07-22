@@ -10,6 +10,7 @@ export default function Opportunities() {
   const [selectedMonth, setSelectedMonth] = useState(null); // Mois sélectionné
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     const loadOpportunities = async () => {
@@ -155,7 +156,13 @@ export default function Opportunities() {
   };
 
   // Projection calculée
-  const monthlyRevenue = getMonthlyProjectedRevenue(opportunities);
+  // const monthlyRevenue = getMonthlyProjectedRevenue(opportunities);
+
+  const filteredOpps = selectedUser
+    ? opportunities.filter((o) => o.user_name === selectedUser)
+    : opportunities;
+
+  const monthlyRevenue = getMonthlyProjectedRevenue(filteredOpps);
 
   // Gestion clic mois
   const handleMonthClick = (mois) => {
@@ -230,6 +237,10 @@ export default function Opportunities() {
     }));
   };
 
+  const users = Array.from(
+    new Set(opportunities.map((o) => o.user_name).filter(Boolean))
+  ).sort();
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -245,7 +256,10 @@ export default function Opportunities() {
     <div className={styles.opportunitiesContainer}>
       <h1>Opportunités</h1>
 
-      <h2>Projection du chiffre d'affaires pondéré par mois</h2>
+      <h2>
+        Projection du chiffre d'affaires pondéré
+        {selectedUser ? ` – ${selectedUser}` : ""}
+      </h2>
 
       <p className={styles.description}>
         Cette projection permet d’estimer le chiffre d’affaires mensuel à venir
@@ -257,6 +271,20 @@ export default function Opportunities() {
         pondérée du chiffre d’affaires attendu, en tenant compte de l’avancement
         commercial et opérationnel.
       </p>
+      <div className={styles.filterContainer}>
+        <label>Filtrer par commercial :</label>
+        <select
+          value={selectedUser || ""}
+          onChange={(e) => setSelectedUser(e.target.value || null)}
+        >
+          <option value="">Tous</option>
+          {users.map((user) => (
+            <option key={user} value={user}>
+              {user}
+            </option>
+          ))}
+        </select>
+      </div>
       <table className={styles.revenueTable}>
         <thead>
           <tr>
@@ -272,7 +300,13 @@ export default function Opportunities() {
                 style={{ cursor: "pointer", fontWeight: "bold" }}
                 className={styles.yearRow}
               >
-                <td>{year}</td>
+                <td>
+                  <span style={{ marginRight: "0.5em" }}>
+                    {openYears[year] ? "▼" : "▶"}
+                  </span>
+                  {year}
+                </td>
+
                 <td>
                   {revenueByYear[year].total.toLocaleString("fr-FR", {
                     style: "currency",
@@ -529,59 +563,14 @@ export default function Opportunities() {
             </table>
 
             <button className={styles.closeButton} onClick={closeModal}>
+              X
+            </button>
+            <button className={styles.closeButton2} onClick={closeModal}>
               Fermer
             </button>
           </div>
         </div>
       )}
-
-      <h2>Liste des opportunités</h2>
-      <table className={styles.opportunitiesTable}>
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Commercial(e)</th>
-            <th>Due date</th>
-            <th>Date de fin estimée</th>
-            <th>Montant (€)</th>
-            <th>Probabilité (%)</th>
-            <th>CA pondéré (€)</th>
-            <th>Plan de facturation</th>
-          </tr>
-        </thead>
-        <tbody>
-          {opportunities.map((opp) => {
-            const amount = parseFloat(
-              opp.amount?.toString().replace(/[^0-9.-]+/g, "") || 0
-            );
-            const probability = (opp.probability || 0) / 100;
-            const caPondere = amount * probability;
-
-            return (
-              <tr key={opp.id}>
-                <td>{opp.name}</td>
-                <td>{opp.user_name}</td>
-                <td>{opp.due_date || "-"}</td>
-                <td>{opp.custom_fields?.["Date de Fin estimée"] || "-"}</td>
-                <td>
-                  {amount.toLocaleString("fr-FR", {
-                    style: "currency",
-                    currency: "EUR",
-                  })}
-                </td>
-                <td>{(probability * 100).toFixed(0)}</td>
-                <td>
-                  {caPondere.toLocaleString("fr-FR", {
-                    style: "currency",
-                    currency: "EUR",
-                  })}
-                </td>
-                <td>{opp.custom_fields?.["Plan de facturation"] || "-"}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
     </div>
   );
 }
