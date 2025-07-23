@@ -14,6 +14,10 @@ export default function Billing() {
   const [monthlyBilling, setMonthlyBilling] = useState({});
   const [selectedMonthKey, setSelectedMonthKey] = useState(null);
   const currentDate = new Date();
+  const [openYears, setOpenYears] = useState(() => {
+    const currentYear = currentDate.getFullYear();
+    return { [currentYear]: true }; // année en cours ouverte par défaut
+  });
 
   const monthRefs = useRef({}); // 👈 Pour garder une ref sur chaque mois affiché
 
@@ -98,15 +102,6 @@ export default function Billing() {
     fetchPlansGroupedByMonth();
   }, []);
 
-  console.log("monthlyBilling", monthlyBilling);
-  console.log("selectedMonthKey", selectedMonthKey);
-  console.log("currentDate", currentDate);
-  console.log("monthRefs", monthRefs.current);
-  console.log(
-    "monthRefs.current[selectedMonthKey]",
-    monthRefs.current[selectedMonthKey]
-  );
-
   const handleToggleInvoiced = (docId, stepIndex, currentValue) => {
     toast.info(
       ({ closeToast }) => (
@@ -188,42 +183,126 @@ export default function Billing() {
     );
   }
 
+  // Calculer le total à facturer et déjà facturé par année disponible
+  const yearlyTotals = {};
+
+  Object.values(monthlyBilling).forEach((month) => {
+    const year = month.dateSample.getFullYear();
+    if (!yearlyTotals[year]) {
+      yearlyTotals[year] = { toBeInvoiced: 0, alreadyInvoiced: 0 };
+    }
+    month.items.forEach((item) => {
+      const amount = item.amount + item.revision;
+      if (item.invoiced) {
+        yearlyTotals[year].alreadyInvoiced += amount;
+      } else {
+        yearlyTotals[year].toBeInvoiced += amount;
+      }
+    });
+  });
+
+  console.log("Totaux par année :", yearlyTotals);
+  const selectedYear =
+    selectedMonthKey &&
+    monthlyBilling[selectedMonthKey]?.dateSample?.getFullYear();
+
+  const monthsByYear = {};
+
+  sortedMonths.forEach(([monthKey, data]) => {
+    const year = data.dateSample.getFullYear();
+    if (!monthsByYear[year]) {
+      monthsByYear[year] = [];
+    }
+    monthsByYear[year].push([monthKey, data]);
+  });
+
+  const toggleYear = (year) => {
+    setOpenYears((prev) => ({
+      ...prev,
+      [year]: !prev[year],
+    }));
+  };
+
   return (
     <div className={styles.billingContainer}>
-      <h1>Facturation</h1>
+      <h1>Plan de Facturation - {selectedMonthKey} </h1>
       <div className={styles.twoColumns}>
         <aside className={styles.monthSidebar}>
           <h3>Mois</h3>
-          {sortedMonths.map(([month, data]) => {
-            const isCurrentMonth = isSameMonth(data.dateSample, currentDate);
-            const isSelected = selectedMonthKey === month;
 
-            return (
-              <div
-                key={month}
-                ref={(el) => {
-                  if (el) monthRefs.current[month] = el;
-                }}
-                className={`${styles.monthItem} ${
-                  isCurrentMonth ? styles.currentMonth : ""
-                } ${isSelected ? styles.selectedMonth : ""}`}
-                onClick={() => setSelectedMonthKey(month)}
-              >
-                <strong>
-                  {" "}
-                  🗓 {month.charAt(0).toUpperCase() + month.slice(1)}{" "}
-                </strong>
-                <br />
-                <br />
-                {formatEuro(data.total)} €
-              </div>
-            );
-          })}
+          {Object.entries(monthsByYear)
+            .sort((a, b) => b[0] - a[0]) // années décroissantes
+            .map(([year, months]) => {
+              const isOpen = openYears[year];
+
+              return (
+                <div key={year}>
+                  <div
+                    onClick={() => toggleYear(year)}
+                    className={styles.yearHeader}
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      padding: "8px 0",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    {isOpen ? "▼" : "▶"} {year}
+                  </div>
+
+                  {isOpen &&
+                    months.map(([month, data]) => {
+                      const isCurrentMonth = isSameMonth(
+                        data.dateSample,
+                        currentDate
+                      );
+                      const isSelected = selectedMonthKey === month;
+
+                      return (
+                        <div
+                          key={month}
+                          ref={(el) => {
+                            if (el) monthRefs.current[month] = el;
+                          }}
+                          className={`${styles.monthItem} ${
+                            isCurrentMonth ? styles.currentMonth : ""
+                          } ${isSelected ? styles.selectedMonth : ""}`}
+                          onClick={() => setSelectedMonthKey(month)}
+                        >
+                          <strong>
+                            🗓 {month.charAt(0).toUpperCase() + month.slice(1)}
+                          </strong>
+                          <br />
+                          <br />
+                          {formatEuro(data.total)} €
+                        </div>
+                      );
+                    })}
+                </div>
+              );
+            })}
         </aside>
 
         <main className={styles.monthDetails}>
           <div className={styles.charts}>
             <div className={styles.chart1}>
+              {/* Affichage des totaux par année (facturation à venir et déjà facturée) : */}
+              {selectedYear && yearlyTotals[selectedYear] && (
+                <div className={styles.yearlyTotals}>
+                  <h3>Total {selectedYear}</h3>
+                  <p>
+                    <span style={{ color: "#00ab39" }}>
+                      Déjà facturé :{" "}
+                      {formatEuro(yearlyTotals[selectedYear].alreadyInvoiced)} €
+                    </span>
+                    <br />
+                    <span style={{ color: "#ff5a3d" }}>
+                      À facturer :{" "}
+                      {formatEuro(yearlyTotals[selectedYear].toBeInvoiced)} €
+                    </span>
+                  </p>
+                </div>
+              )}
               {selectedMonthKey && (
                 <BillingSummaryChart
                   dataForMonth={monthlyBilling[selectedMonthKey]}
@@ -238,7 +317,7 @@ export default function Billing() {
           </div>
           {selectedMonthKey && monthlyBilling[selectedMonthKey] ? (
             <>
-              <h3>Détails : {selectedMonthKey}</h3>
+              <h3>Détails</h3>
 
               {/* Filtrage */}
               {(() => {

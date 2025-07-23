@@ -37,16 +37,14 @@ export default function BillingSummaryChart({ dataForMonth, monthName }) {
   }
 
   return (
-    <div style={{ maxWidth: "280px", margin: "0px auto" }}>
-      <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
-        Synthèse de facturation – {monthName}
-      </h3>
+    <div style={{ maxWidth: "220px", margin: "0px auto" }}>
+      <h3 style={{ textAlign: "center", marginBottom: "10px" }}>{monthName}</h3>
       <Doughnut data={data} />
       <div style={{ textAlign: "center", marginTop: "10px" }}>
-        <p style={{ marginBottom: "10px" }}>
-          <strong>Facturé :</strong> {formatEuro(totalFactured)} €
+        <p style={{ marginBottom: "5px", color: "#00ab39" }}>
+          <strong>Déjà facturé :</strong> {formatEuro(totalFactured)} €
         </p>
-        <p>
+        <p style={{ color: "#ff5a3d" }}>
           <strong>À facturer :</strong> {formatEuro(totalToBeFactured)} €
         </p>
       </div>
