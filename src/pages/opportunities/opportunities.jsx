@@ -9,8 +9,6 @@ import {
   Tooltip,
   CartesianGrid,
   AreaChart,
-  PieChart,
-  Pie,
 } from "recharts";
 
 export default function Opportunities() {

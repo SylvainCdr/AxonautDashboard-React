@@ -75,7 +75,9 @@ function Homepage() {
           <Link to="/billing">Facturation</Link>
         </motion.div>
         <motion.div variants={item}>
-          <Link to="/opportunities">Analyse prévisionnelle CA</Link>
+          <Link to="/opportunities">
+            Opportunités <br /> & <br /> Analyse prévi
+          </Link>
         </motion.div>
       </motion.div>
     </motion.div>

@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchCompanies } from "../../services/api/companies";
 import { DotLoader } from "react-spinners";
 import styles from "./style.module.scss";
-import { useNavigate } from "react-router-dom";
 import SearchCompany from "../../components/searchCompany/searchCompany";
 
 export default function Companies() {
   const [companies, setCompanies] = useState([]);
-  const [filteredCompanies, setFilteredCompanies] = useState([]);
+  const [setFilteredCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadCompanies = async () => {

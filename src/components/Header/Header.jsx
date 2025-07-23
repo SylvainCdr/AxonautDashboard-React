@@ -90,6 +90,15 @@ function Header() {
           </li>
           <li className={styles.navLi}>
             <NavLink
+              to="/opportunities"
+              onClick={handleLinkClick}
+              className={({ isActive }) => (isActive ? styles.activeLink : "")}
+            >
+              Opportunités / Prévi
+            </NavLink>
+          </li>
+          <li className={styles.navLi}>
+            <NavLink
               to="/billing"
               onClick={handleLinkClick}
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
