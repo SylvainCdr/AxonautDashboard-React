@@ -171,9 +171,7 @@
       color: #222;
 
       h3 {
-        background-color: var(--col2)
-       
-     
+        background-color: var(--col2);
       }
 
       table {
@@ -209,30 +207,29 @@
           }
         }
       }
-   
 
-    .closeButton {
-      position: absolute;
-      top: 0.05rem;
-      right: 01rem;
-      background-color: #6e6e6e;
-      color: white;
-      border: none;
-      padding: 0.4rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+      .closeButton {
+        position: absolute;
+        top: 0.05rem;
+        right: 01rem;
+        background-color: #6e6e6e;
+        color: white;
+        border: none;
+        padding: 0.4rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
 
-       &:hover {
-        background-color: #004f99;
-      }
+        &:hover {
+          background-color: #004f99;
+        }
 
-      &:focus {
-        outline: 2px solid #004f99;
-        outline-offset: 2px;
+        &:focus {
+          outline: 2px solid #004f99;
+          outline-offset: 2px;
+        }
       }
     }
-     }
   }
 }

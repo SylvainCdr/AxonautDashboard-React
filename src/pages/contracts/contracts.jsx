@@ -242,6 +242,17 @@ export default function Contracts() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isFetchingMore, hasMore, page]);
 
+  // on calcule le pourcentage du montant facturé par rapport au montant HT
+  const calculateInvoicePercentage = (quotation) => {
+    if (!quotation.invoices_id || quotation.invoices_id.length === 0) return 0;
+    const totalInvoiced = quotation.invoices_id.reduce((acc, invoiceId) => {
+      const invoice = invoiceDataMap?.[invoiceId.toString()];
+      return acc + (invoice?.preTaxAmount || 0);
+    }, 0);
+    const preTaxAmount = quotation.quotation?.pre_tax_amount || 0;
+    return preTaxAmount > 0 ? (totalInvoiced / preTaxAmount) * 100 : 0;
+  };
+
   if (loading) {
     return (
       <div className={styles.loaderContainer}>
@@ -393,7 +404,7 @@ export default function Contracts() {
                     <span style={{ color: "#888" }}>–</span>
                   )}
                 </td> */}
-                <td>
+                <td style={{ textAlign: "center", width: "130px" }}>
                   {quotation.invoices_id && quotation.invoices_id.length > 0 ? (
                     (() => {
                       const total = quotation.invoices_id.reduce(
@@ -408,19 +419,47 @@ export default function Contracts() {
                       const formattedTotal = total.toLocaleString("fr-FR", {
                         style: "currency",
                         currency: "EUR",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
                       });
 
-                      // Optionnel : couleur en fonction du signe
-                      const color = total >= 0 ? "#006400" : "#C60F7B"; // vert ou rose
+                      const color = total >= 0 ? "#006400" : "#C60F7B";
+                      const percentage = Math.round(
+                        calculateInvoicePercentage(quotation)
+                      );
 
-                      return <span style={{ color }}>{formattedTotal}</span>;
+                      // Couleur selon % facturation
+                      const bgColor =
+                        percentage >= 100
+                          ? "rgba(189, 252, 182, 0.79)"
+                          : "rgba(255, 200, 100, 0.6)";
+
+                      return (
+                        <span style={{ color }}>
+                          {formattedTotal}{" "}
+                          <span
+                            style={{
+                              color: "#000000",
+                              backgroundColor: bgColor,
+                              padding: "5px 5px",
+                              marginLeft: 6,
+                              borderRadius: "4px",
+                              fontSize: "0.8rem",
+                              minWidth: "36px",
+                              display: "inline-block",
+                              textAlign: "center",
+                            }}
+                          >
+                            {percentage}%
+                          </span>
+                        </span>
+                      );
                     })()
                   ) : (
                     <span style={{ color: "#888" }}>–</span>
                   )}
                 </td>
 
-                {/* Plan de facturation */}
                 <td className={styles.actionCell}>
                   {quotation.hasBillingPlan ? (
                     <button
@@ -434,7 +473,22 @@ export default function Contracts() {
                       Plan
                     </button>
                   ) : (
-                    <span style={{ color: "#888" }}>–</span>
+                    <button
+                      style={{
+                        background: "#eee",
+                        color: "#C60F7B",
+                        border: "1px dashed #C60F7B",
+                        fontSize: "0.8rem",
+                      }}
+                      onClick={() =>
+                        window.open(
+                          `/quotation/${quotation.quotation?.id}/billing-plan`,
+                          "_blank"
+                        )
+                      }
+                    >
+                      Créer
+                    </button>
                   )}
                 </td>
 

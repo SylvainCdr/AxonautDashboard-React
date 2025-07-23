@@ -43,7 +43,7 @@ export default function BillingPlan({ onClose }) {
   const [deliveryInfoLines, setDeliveryInfoLines] = useState([]);
   const [showDetails, setShowDetails] = useState(false); // État pour contrôler l'affichage des détails
   const [monthlyBilling, setMonthlyBilling] = useState({});
-
+  const [confirmMismatch, setConfirmMismatch] = useState(false);
   const isPaidInvoice = (invoice) => {
     return invoice.paid_date ? "green" : "red";
   };
@@ -185,31 +185,35 @@ export default function BillingPlan({ onClose }) {
       const EPSILON = 0.01; // Tolérance d'arrondi à 1 centime
 
       if (
+        !confirmMismatch &&
         !isRevisionChecked &&
         Math.abs(totalStepAmount - quotation.pre_tax_amount) > EPSILON
       ) {
-        toast.error(
-          `Le total des étapes (${totalStepAmount.toFixed(
+        toast.warning(
+          `⚠️ Le total des étapes est de ${totalStepAmount.toFixed(
             2
-          )} €) doit être égal au montant HT du devis (${quotation.pre_tax_amount.toFixed(
+          )} €, alors que le montant HT du devis est de ${quotation.pre_tax_amount.toFixed(
             2
-          )} €).`
+          )} €. Cliquez à nouveau sur "Enregistrer" pour confirmer.`
         );
+        setConfirmMismatch(true);
         setGenerating(false);
         return;
       }
 
       if (
+        !confirmMismatch &&
         isRevisionChecked &&
-        Math.abs(totalWithRevision - quotation.total_amount) < -EPSILON
+        Math.abs(totalWithRevision - quotation.total_amount) > EPSILON
       ) {
-        toast.error(
-          `Le total des étapes avec révisions (${totalWithRevision.toFixed(
+        toast.warning(
+          `⚠️ Le total des étapes avec révision est de ${totalWithRevision.toFixed(
             2
-          )} €) doit être supérieur au montant TTC du devis (${quotation.total_amount.toFixed(
+          )} €, alors que le montant TTC du devis est de ${quotation.total_amount.toFixed(
             2
-          )} €).`
+          )} €. Cliquez à nouveau sur "Enregistrer" pour confirmer.`
         );
+        setConfirmMismatch(true);
         setGenerating(false);
         return;
       }
@@ -247,6 +251,8 @@ export default function BillingPlan({ onClose }) {
           : "Plan de facturation créé avec succès."
       );
       setExistingPlan(billingPlan);
+      setConfirmMismatch(false);
+
       navigate("/billing");
       onClose();
     } catch (err) {
