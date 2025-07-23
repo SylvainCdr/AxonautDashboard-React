@@ -30,16 +30,33 @@
     line-height: 1.7rem;
   }
 
+  .lineChartContainer {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 350px;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+
   .filterContainer {
     display: flex;
     justify-content: right;
     align-items: right;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0rem;
     gap: 2rem;
+    background-color: var(--col7);
+    padding: 0.3rem;
+    border-radius: 8px;
 
     label {
       font-size: 1rem;
-      color: #0a0a0a;
+
+      font-weight: 500;
     }
 
     select {
@@ -93,7 +110,7 @@
     }
 
     thead {
-      background-color: #0066cc;
+      background-color: var(--col5);
       color: #fff;
       text-transform: uppercase;
       font-size: 1.2rem;
@@ -196,7 +213,7 @@
     }
 
     .closeButton {
-      position: absolute; // Au lieu de fixed
+      position: absolute;
       top: 0.05rem;
       right: 0.1rem;
       background-color: #6e6e6e;
@@ -207,7 +224,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.2s ease;
-
       &:hover {
         background-color: #004f99;
       }

@@ -2,6 +2,17 @@ import styles from "./style.module.scss";
 import React, { useState, useEffect } from "react";
 import { fetchOpportunities } from "../../services/api/opportunities";
 import DotLoader from "react-spinners/DotLoader";
+import {
+  LineChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  AreaChart,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 export default function Opportunities() {
   const [opportunities, setOpportunities] = useState([]);
@@ -218,8 +229,10 @@ export default function Opportunities() {
     {}
   );
 
-  // Tri les années par ordre décroissant (optionnel)
-  const sortedYears = Object.keys(revenueByYear).sort((a, b) => b - a);
+  // Tri les années par ordre croissant (optionnel)
+  const sortedYears = Object.keys(revenueByYear)
+    .map(Number)
+    .sort((a, b) => a - b);
 
   // Fonction toggle année ouverte
   const toggleYear = (year) => {
@@ -252,15 +265,20 @@ export default function Opportunities() {
 
   if (error) return <p>Erreur : {error}</p>;
 
+  const chartData = sortedMonthlyRevenueEntries.map(([mois, montant]) => ({
+    mois,
+    montant: Math.round(montant),
+  }));
+
+  console.log("chartData", chartData);
+
   return (
     <div className={styles.opportunitiesContainer}>
       <h1>Opportunités</h1>
-
       <h2>
         Projection du chiffre d'affaires pondéré
         {selectedUser ? ` – ${selectedUser}` : ""}
       </h2>
-
       <p className={styles.description}>
         Cette projection permet d’estimer le chiffre d’affaires mensuel à venir
         en fonction des opportunités en cours et de leur plan de facturation.
@@ -271,8 +289,40 @@ export default function Opportunities() {
         pondérée du chiffre d’affaires attendu, en tenant compte de l’avancement
         commercial et opérationnel.
       </p>
+
+      <div className={styles.lineChartContainer}>
+        <AreaChart
+          width={1200}
+          height={350}
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="mois" angle={-35} textAnchor="end" height={70} />
+          <YAxis />
+          <Tooltip
+            formatter={(value) =>
+              new Intl.NumberFormat("fr-FR", {
+                style: "currency",
+                currency: "EUR",
+                maximumFractionDigits: 0,
+              }).format(value)
+            }
+          />
+          <Area
+            type="monotone"
+            dataKey="montant"
+            stroke="#C60F7B"
+            fill="#C60F7B"
+            fillOpacity={0.15}
+            strokeWidth={2}
+            activeDot={{ r: 8 }}
+          />
+        </AreaChart>
+      </div>
+
       <div className={styles.filterContainer}>
-        <label>Filtrer par commercial :</label>
+        <label>Filtrer par commercial(e) :</label>
         <select
           value={selectedUser || ""}
           onChange={(e) => setSelectedUser(e.target.value || null)}
@@ -342,7 +392,6 @@ export default function Opportunities() {
           ))}
         </tbody>
       </table>
-
       {showModal && selectedMonth && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -356,7 +405,7 @@ export default function Opportunities() {
                   <th>Date de fin estimée</th>
                   <th>Montant initial (€)</th>
                   <th>Probabilité (%)</th>
-                  <th>CA pondéré (€)</th>
+                  <th>Total CA pondéré (€)</th>
                   <th>Plan prévi de factu</th>
                   <th>Montants par étape de factu</th>
                 </tr>
@@ -365,7 +414,8 @@ export default function Opportunities() {
                 {opportunities
                   .filter((opp) => {
                     if (opp.is_archived) return false;
-
+                    if (selectedUser && opp.user_name !== selectedUser)
+                      return false; // 👈 AJOUT
                     const dueDate = parseDate(opp.due_date);
                     const finDate =
                       parseDate(opp.custom_fields?.["Date de Fin estimée"]) ||
