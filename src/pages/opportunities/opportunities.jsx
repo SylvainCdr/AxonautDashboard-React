@@ -3,15 +3,14 @@ import React, { useState, useEffect } from "react";
 import { fetchOpportunities } from "../../services/api/opportunities";
 import DotLoader from "react-spinners/DotLoader";
 import {
-  LineChart,
   Area,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   AreaChart,
-  ResponsiveContainer,
-  Legend,
+  PieChart,
+  Pie,
 } from "recharts";
 
 export default function Opportunities() {
@@ -265,12 +264,10 @@ export default function Opportunities() {
 
   if (error) return <p>Erreur : {error}</p>;
 
-  const chartData = sortedMonthlyRevenueEntries.map(([mois, montant]) => ({
+  const areaChartData = sortedMonthlyRevenueEntries.map(([mois, montant]) => ({
     mois,
     montant: Math.round(montant),
   }));
-
-  console.log("chartData", chartData);
 
   return (
     <div className={styles.opportunitiesContainer}>
@@ -294,7 +291,7 @@ export default function Opportunities() {
         <AreaChart
           width={1200}
           height={350}
-          data={chartData}
+          data={areaChartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
@@ -393,9 +390,15 @@ export default function Opportunities() {
         </tbody>
       </table>
       {showModal && selectedMonth && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3>Détails de {selectedMonth}</h3>
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()} // ← bloque la propagation
+          >
+            <h3>
+              Détails de {selectedMonth}{" "}
+              {selectedUser ? ` – ${selectedUser}` : ""}
+            </h3>
             <table className={styles.detailsTable}>
               <thead>
                 <tr>
@@ -667,9 +670,6 @@ export default function Opportunities() {
 
             <button className={styles.closeButton} onClick={closeModal}>
               X
-            </button>
-            <button className={styles.closeButton2} onClick={closeModal}>
-              Fermer
             </button>
           </div>
         </div>

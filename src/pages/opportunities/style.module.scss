@@ -160,7 +160,8 @@
     .modalContent {
       position: relative; // Ajoute cette ligne
       background: #ffffff;
-      padding: 2rem;
+      padding: 1rem;
+      padding-top: 2.5rem;
       border-radius: 10px;
       width: 95%;
       max-width: 1200px;
@@ -169,12 +170,10 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       color: #222;
 
-      h2 {
-        margin-top: 0;
-        margin-bottom: 1.5rem;
-        font-size: 1.6rem;
-        font-weight: 600;
-        color: #333;
+      h3 {
+        background-color: var(--col2)
+       
+     
       }
 
       table {
@@ -210,21 +209,22 @@
           }
         }
       }
-    }
+   
 
     .closeButton {
       position: absolute;
       top: 0.05rem;
-      right: 0.1rem;
+      right: 01rem;
       background-color: #6e6e6e;
       color: white;
       border: none;
-      padding: 0.4rem 1.2rem;
-      border-radius: 6px;
+      padding: 0.4rem 1.5rem;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.2s ease;
-      &:hover {
+
+       &:hover {
         background-color: #004f99;
       }
 
@@ -233,5 +233,6 @@
         outline-offset: 2px;
       }
     }
+     }
   }
 }
