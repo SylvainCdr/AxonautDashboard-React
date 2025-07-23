@@ -289,7 +289,7 @@ export default function Billing() {
               {/* Affichage des totaux par année (facturation à venir et déjà facturée) : */}
               {selectedYear && yearlyTotals[selectedYear] && (
                 <div className={styles.yearlyTotals}>
-                  <h3>Total {selectedYear}</h3>
+                  <h3>Année {selectedYear}</h3>
                   <p>
                     <span style={{ color: "#00ab39" }}>
                       Déjà facturé :{" "}
