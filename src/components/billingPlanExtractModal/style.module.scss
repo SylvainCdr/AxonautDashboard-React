@@ -1,0 +1,77 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); // overlay foncé
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modalContent {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+
+  &:hover {
+    color: #d00;
+  }
+}
+
+.extractForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+
+  label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  select {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    &:disabled {
+      background-color: #f0f0f0;
+      color: #999;
+    }
+  }
+
+  button {
+    margin-top: 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-start;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}

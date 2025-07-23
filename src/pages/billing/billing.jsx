@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import BillingSummaryChart from "../../components/billingSummaryChart/billingSummaryChart";
 import YearlyBillingBarChart from "../../components/yearlyBillingBarChart/yearlyBillingBarChart";
+import BillingPlanExtractModal from "../../components/billingPlanExtractModal/billingPlanExtractModal.jsx";
 
 export default function Billing() {
   const [monthlyBilling, setMonthlyBilling] = useState({});
@@ -20,6 +21,12 @@ export default function Billing() {
   });
 
   const monthRefs = useRef({}); // 👈 Pour garder une ref sur chaque mois affiché
+  const [showModal, setShowModal] = useState(false);
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  }
+
 
   useEffect(() => {
     const fetchPlansGroupedByMonth = async () => {
@@ -225,7 +232,14 @@ export default function Billing() {
 
   return (
     <div className={styles.billingContainer}>
+
+      {showModal && (
+        <BillingPlanExtractModal onClose={toggleModal} billingData={monthlyBilling} />
+      )}
       <h1>Plan de Facturation - {selectedMonthKey} </h1>
+      <button onClick={toggleModal} className={styles.extractButton}>
+        Extraction
+      </button>
       <div className={styles.twoColumns}>
         <aside className={styles.monthSidebar}>
           <h3>Mois</h3>

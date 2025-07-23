@@ -45,10 +45,17 @@ export default function Opportunities() {
     loadOpportunities();
   }, [page]);
 
-  console.log("Opportunités chargées :", opportunities);
-  //count
-  const totalCount = opportunities.length;
-  console.log("Total d'opportunités :", totalCount);
+  // compte total d'opportunités et des opportunités par user_name
+  const filteredOpps = selectedUser
+    ? opportunities.filter((o) => o.user_name === selectedUser)
+    : opportunities;
+
+  const totalCount = filteredOpps.length;
+
+  const opportunitiesByUser = opportunities.reduce((acc, opp) => {
+    acc[opp.user_name] = (acc[opp.user_name] || 0) + 1;
+    return acc;
+  }, {});
 
   // Utilitaires dates
   function parseDate(dateStr) {
@@ -166,10 +173,6 @@ export default function Opportunities() {
   // Projection calculée
   // const monthlyRevenue = getMonthlyProjectedRevenue(opportunities);
 
-  const filteredOpps = selectedUser
-    ? opportunities.filter((o) => o.user_name === selectedUser)
-    : opportunities;
-
   const monthlyRevenue = getMonthlyProjectedRevenue(filteredOpps);
 
   // Gestion clic mois
@@ -284,6 +287,13 @@ export default function Opportunities() {
         pondérée du chiffre d’affaires attendu, en tenant compte de l’avancement
         commercial et opérationnel.
       </p>
+
+      <span className={styles.oppCount}>
+        {selectedUser
+          ? `Nombre d'opportunités :`
+          : "Nombre total d'opportunités :"}{" "}
+        <strong>{totalCount}</strong>
+      </span>
 
       <div className={styles.lineChartContainer}>
         <AreaChart
