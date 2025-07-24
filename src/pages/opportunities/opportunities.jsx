@@ -9,6 +9,7 @@ import {
   Tooltip,
   CartesianGrid,
   AreaChart,
+  ResponsiveContainer,
 } from "recharts";
 
 export default function Opportunities() {
@@ -170,10 +171,104 @@ export default function Opportunities() {
     return monthlyRevenue;
   };
 
+  const getMonthlyRevenueBruteSansPonderation = (opps) => {
+    const monthlyRevenue = {};
+
+    opps.forEach((opp) => {
+      if (opp.is_archived) return;
+      const probability = opp.probability || 0;
+      if (probability < 25) return; // exclure < 25%
+
+      const amount = parseFloat(
+        opp.amount?.toString().replace(/[^0-9.-]+/g, "") || 0
+      );
+      const plan = opp.custom_fields?.["Plan de facturation"] || [
+        "100% - Livraison",
+      ];
+      const dueDate = parseDate(opp.due_date);
+      const finDate =
+        parseDate(opp.custom_fields?.["Date de Fin estimée"]) || dueDate;
+      if (!dueDate || !finDate || finDate < new Date("2025-01-01")) return;
+
+      plan.forEach((ligne) => {
+        const match = ligne.match(/(\d+)%\s*-\s*([\wÀ-ÿ]+)/i);
+        if (!match) return;
+        const pourcentage = parseFloat(match[1]) / 100;
+        const step = match[2].toLowerCase();
+
+        if (step.includes("avancement")) return;
+
+        let dateClé = null;
+        if (step.includes("commande")) dateClé = dueDate;
+        else if (step.includes("livraison") || step.includes("réception"))
+          dateClé = finDate;
+        else if (step.includes("etude") || step.includes("étude"))
+          dateClé = new Date((dueDate.getTime() + finDate.getTime()) / 2);
+
+        if (dateClé) {
+          const montantPartiel = amount * pourcentage; // pas de proba ici
+          const mois = formatDateToMonthYear(dateClé);
+          monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + montantPartiel;
+        }
+      });
+    });
+
+    return monthlyRevenue;
+  };
+
+  const getMonthlyRevenueHauteProba = (opps) => {
+    const monthlyRevenue = {};
+
+    opps.forEach((opp) => {
+      if (opp.is_archived) return;
+      const probability = (opp.probability || 0) / 100;
+      if (probability < 0.8) return;
+
+      const amount = parseFloat(
+        opp.amount?.toString().replace(/[^0-9.-]+/g, "") || 0
+      );
+      const caPondere = amount * probability;
+
+      const plan = opp.custom_fields?.["Plan de facturation"] || [
+        "100% - Livraison",
+      ];
+      const dueDate = parseDate(opp.due_date);
+      const finDate =
+        parseDate(opp.custom_fields?.["Date de Fin estimée"]) || dueDate;
+      if (!dueDate || !finDate || finDate < new Date("2025-01-01")) return;
+
+      plan.forEach((ligne) => {
+        const match = ligne.match(/(\d+)%\s*-\s*([\wÀ-ÿ]+)/i);
+        if (!match) return;
+        const pourcentage = parseFloat(match[1]) / 100;
+        const step = match[2].toLowerCase();
+
+        if (step.includes("avancement")) return;
+
+        let dateClé = null;
+        if (step.includes("commande")) dateClé = dueDate;
+        else if (step.includes("livraison") || step.includes("réception"))
+          dateClé = finDate;
+        else if (step.includes("etude") || step.includes("étude"))
+          dateClé = new Date((dueDate.getTime() + finDate.getTime()) / 2);
+
+        if (dateClé) {
+          const montantPartiel = caPondere * pourcentage;
+          const mois = formatDateToMonthYear(dateClé);
+          monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + montantPartiel;
+        }
+      });
+    });
+
+    return monthlyRevenue;
+  };
+
   // Projection calculée
   // const monthlyRevenue = getMonthlyProjectedRevenue(opportunities);
 
   const monthlyRevenue = getMonthlyProjectedRevenue(filteredOpps);
+  const revenueBrute = getMonthlyRevenueBruteSansPonderation(filteredOpps);
+  const revenueHauteProba = getMonthlyRevenueHauteProba(filteredOpps);
 
   // Gestion clic mois
   const handleMonthClick = (mois) => {
@@ -265,9 +360,19 @@ export default function Opportunities() {
 
   if (error) return <p>Erreur : {error}</p>;
 
-  const areaChartData = sortedMonthlyRevenueEntries.map(([mois, montant]) => ({
+  const allMonths = Array.from(
+    new Set([
+      ...Object.keys(monthlyRevenue),
+      ...Object.keys(revenueBrute),
+      ...Object.keys(revenueHauteProba),
+    ])
+  ).sort((a, b) => parseDateMonthYear(a) - parseDateMonthYear(b));
+
+  const areaChartData = allMonths.map((mois) => ({
     mois,
-    montant: Math.round(montant),
+    theorique: Math.round(monthlyRevenue[mois] || 0),
+    brute: Math.round(revenueBrute[mois] || 0),
+    hauteProba: Math.round(revenueHauteProba[mois] || 0),
   }));
 
   return (
@@ -278,15 +383,47 @@ export default function Opportunities() {
         {selectedUser ? ` – ${selectedUser}` : ""}
       </h2>
       <p className={styles.description}>
-        Cette projection permet d’estimer le chiffre d’affaires mensuel à venir
-        en fonction des opportunités en cours et de leur plan de facturation.
-        Chaque étape (Commande, Études, Réception, Livraison, etc.) est pondérée
-        selon le pourcentage associé dans l’opportunité, puis répartie sur la
-        période correspondante (date de commande, fin estimée, ou échéance
-        intermédiaire). L’objectif est de fournir une vision réaliste et
-        pondérée du chiffre d’affaires attendu, en tenant compte de l’avancement
-        commercial et opérationnel.
+        Cette projection mensuelle du chiffre d’affaires s’appuie sur les
+        opportunités en cours, en croisant leur plan de facturation et leur
+        probabilité de concrétisation. Trois scénarios sont visualisés pour
+        aider à anticiper et piloter l’activité.
       </p>
+
+      <table className={styles.scenarioTable}>
+        <thead>
+          <tr>
+            <th>CA Théorique Pondéré</th>
+            <th>CA Brut (≥ 25%)</th>
+            <th>CA Haute Probabilité (≥ 80%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>Objectif :</strong> Estimation réaliste du chiffre
+              d'affaires en prenant en compte les probabilités de succès.
+              <br />
+              <strong>Utilisation :</strong> Prévisions de trésorerie et
+              reporting prévisionnel.
+            </td>
+            <td>
+              <strong>Objectif :</strong> Visualisation du potentiel brut des
+              opportunités (non pondérées), filtrées à partir de 25% de
+              probabilité.
+              <br />
+              <strong>Utilisation :</strong> Estimation optimiste du pipe
+              commercial.
+            </td>
+            <td>
+              <strong>Objectif :</strong> Suivi des opportunités quasiment
+              certaines (≥ 80%), avec pondération pour rester réaliste.
+              <br />
+              <strong>Utilisation :</strong> Préparation à la facturation et
+              clôture commerciale.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <span className={styles.oppCount}>
         {selectedUser
@@ -296,34 +433,52 @@ export default function Opportunities() {
       </span>
 
       <div className={styles.lineChartContainer}>
-        <AreaChart
-          width={1200}
-          height={350}
-          data={areaChartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="mois" angle={-35} textAnchor="end" height={70} />
-          <YAxis />
-          <Tooltip
-            formatter={(value) =>
-              new Intl.NumberFormat("fr-FR", {
-                style: "currency",
-                currency: "EUR",
-                maximumFractionDigits: 0,
-              }).format(value)
-            }
-          />
-          <Area
-            type="monotone"
-            dataKey="montant"
-            stroke="#C60F7B"
-            fill="#C60F7B"
-            fillOpacity={0.15}
-            strokeWidth={2}
-            activeDot={{ r: 8 }}
-          />
-        </AreaChart>
+        <ResponsiveContainer width="100%" height={350}>
+          <AreaChart
+            data={areaChartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="mois" angle={-35} textAnchor="end" height={70} />
+            <YAxis />
+            <Tooltip
+              formatter={(value) =>
+                new Intl.NumberFormat("fr-FR", {
+                  style: "currency",
+                  currency: "EUR",
+                  maximumFractionDigits: 0,
+                }).format(value)
+              }
+            />
+            <Area
+              type="monotone"
+              dataKey="theorique"
+              stroke="#C60F7B"
+              fill="#C60F7B"
+              fillOpacity={0.1}
+              strokeWidth={2}
+              name="CA Théorique Pondéré"
+            />
+            <Area
+              type="monotone"
+              dataKey="brute"
+              stroke="#007BFF"
+              fill="#007BFF"
+              fillOpacity={0.1}
+              strokeWidth={2}
+              name="CA Brut (≥25%)"
+            />
+            <Area
+              type="monotone"
+              dataKey="hauteProba"
+              stroke="#28a745"
+              fill="#28a745"
+              fillOpacity={0.15}
+              strokeWidth={2}
+              name="CA Haute Proba (≥80%)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
 
       <div className={styles.filterContainer}>
@@ -344,7 +499,7 @@ export default function Opportunities() {
         <thead>
           <tr>
             <th>Année / Mois</th>
-            <th>CA pondéré estimé (€)</th>
+            <th>CA théorique pondéré (€)</th>
           </tr>
         </thead>
         <tbody>
