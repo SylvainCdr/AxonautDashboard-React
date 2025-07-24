@@ -29,6 +29,12 @@ export default function BillingPlanExtractModal({ onClose, billingData }) {
           rows.push({
             Mois: monthKey,
             Projet: item.title,
+
+
+                // <td style={{ width: "20px", whiteSpace: "nowrap" }}>
+                //               {item.stepIndex + 1}/{item.totalSteps}
+                //             </td>
+            Etape : item.stepIndex + 1 + "/" + item.totalSteps,
             Montant: item.amount,
             Révision: item.revision,
             Facturé: item.invoiced ? "Oui" : "Non",

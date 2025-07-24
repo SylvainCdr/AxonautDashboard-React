@@ -156,12 +156,17 @@ export default function Opportunities() {
         const montantAvancement = caPondere * pourcentageAvancement;
         const nbMois = monthDiff(dueDate, finDate);
 
-        if (nbMois > 0 && montantAvancement > 0) {
-          const partParMois = montantAvancement / nbMois;
-          for (let i = 0; i < nbMois; i++) {
+        if (nbMois > 1 && montantAvancement > 0) {
+          const nbMoisAvancement = nbMois - 1; // Commencer à M+1 (mois suivant la commande)
+          const partParMois = montantAvancement / nbMoisAvancement;
+
+          // Répartir l'avancement sur les mois à partir du mois suivant la commande
+          for (let i = 1; i <= nbMoisAvancement; i++) {
             const moisDate = new Date(dueDate);
-            moisDate.setMonth(moisDate.getMonth() + i);
+            moisDate.setMonth(moisDate.getMonth() + i); // Commence à M+1
             const mois = formatDateToMonthYear(moisDate);
+
+            // Ajouter l'avancement à ce mois
             monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + partParMois;
           }
         }
@@ -196,7 +201,7 @@ export default function Opportunities() {
         const pourcentage = parseFloat(match[1]) / 100;
         const step = match[2].toLowerCase();
 
-        if (step.includes("avancement")) return;
+        if (step.includes("avancement")) return; // On l'ignore ici
 
         let dateClé = null;
         if (step.includes("commande")) dateClé = dueDate;
@@ -206,11 +211,39 @@ export default function Opportunities() {
           dateClé = new Date((dueDate.getTime() + finDate.getTime()) / 2);
 
         if (dateClé) {
-          const montantPartiel = amount * pourcentage; // pas de proba ici
+          const montantPartiel = amount * pourcentage;
           const mois = formatDateToMonthYear(dateClé);
           monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + montantPartiel;
         }
       });
+
+      // Cas "Avancement" sur le revenu brut
+      const montantDéjàAlloué = plan
+        .filter((ligne) => !ligne.toLowerCase().includes("avancement"))
+        .map((ligne) => {
+          const match = ligne.match(/(\d+)%/);
+          return match ? parseFloat(match[1]) / 100 : 0;
+        })
+        .reduce((acc, val) => acc + val, 0);
+
+      const ligneAvancement = plan.find((l) =>
+        l.toLowerCase().includes("avancement")
+      );
+      if (ligneAvancement) {
+        const pourcentageAvancement = 1 - montantDéjàAlloué;
+        const montantAvancement = amount * pourcentageAvancement;
+        const nbMois = monthDiff(dueDate, finDate);
+
+        if (nbMois > 0 && montantAvancement > 0) {
+          const partParMois = montantAvancement / nbMois;
+          for (let i = 0; i < nbMois; i++) {
+            const moisDate = new Date(dueDate);
+            moisDate.setMonth(moisDate.getMonth() + i);
+            const mois = formatDateToMonthYear(moisDate);
+            monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + partParMois;
+          }
+        }
+      }
     });
 
     return monthlyRevenue;
@@ -222,7 +255,7 @@ export default function Opportunities() {
     opps.forEach((opp) => {
       if (opp.is_archived) return;
       const probability = (opp.probability || 0) / 100;
-      if (probability < 0.8) return;
+      if (probability < 0.8) return; // Exclure si probabilité < 80%
 
       const amount = parseFloat(
         opp.amount?.toString().replace(/[^0-9.-]+/g, "") || 0
@@ -243,7 +276,7 @@ export default function Opportunities() {
         const pourcentage = parseFloat(match[1]) / 100;
         const step = match[2].toLowerCase();
 
-        if (step.includes("avancement")) return;
+        if (step.includes("avancement")) return; // On l'ignore ici
 
         let dateClé = null;
         if (step.includes("commande")) dateClé = dueDate;
@@ -258,6 +291,34 @@ export default function Opportunities() {
           monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + montantPartiel;
         }
       });
+
+      // Cas "Avancement" sur les revenus haute probabilité
+      const montantDéjàAlloué = plan
+        .filter((ligne) => !ligne.toLowerCase().includes("avancement"))
+        .map((ligne) => {
+          const match = ligne.match(/(\d+)%/);
+          return match ? parseFloat(match[1]) / 100 : 0;
+        })
+        .reduce((acc, val) => acc + val, 0);
+
+      const ligneAvancement = plan.find((l) =>
+        l.toLowerCase().includes("avancement")
+      );
+      if (ligneAvancement) {
+        const pourcentageAvancement = 1 - montantDéjàAlloué;
+        const montantAvancement = caPondere * pourcentageAvancement;
+        const nbMois = monthDiff(dueDate, finDate);
+
+        if (nbMois > 0 && montantAvancement > 0) {
+          const partParMois = montantAvancement / nbMois;
+          for (let i = 0; i < nbMois; i++) {
+            const moisDate = new Date(dueDate);
+            moisDate.setMonth(moisDate.getMonth() + i);
+            const mois = formatDateToMonthYear(moisDate);
+            monthlyRevenue[mois] = (monthlyRevenue[mois] || 0) + partParMois;
+          }
+        }
+      }
     });
 
     return monthlyRevenue;
@@ -392,9 +453,9 @@ export default function Opportunities() {
       <table className={styles.scenarioTable}>
         <thead>
           <tr>
-            <th>CA Théorique Pondéré</th>
-            <th>CA Brut (≥ 25%)</th>
-            <th>CA Haute Probabilité (≥ 80%)</th>
+            <th style={{ color: "#C60F7B" }}>CA Théorique Pondéré</th>
+            <th style={{ color: "#007BFF" }}>CA Brut (≥ 25%)</th>
+            <th style={{ color: "#28a745" }}>CA Haute Probabilité (≥ 80%)</th>
           </tr>
         </thead>
         <tbody>
