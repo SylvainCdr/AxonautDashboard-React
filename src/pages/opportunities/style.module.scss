@@ -105,6 +105,74 @@
     -ms-border-radius: 5px;
     -o-border-radius: 5px;
   }
+  .oppInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .oppCount {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .totalCount {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2b7df9; // Couleur accentuée pour mettre en évidence le nombre
+  }
+
+  .percentage {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-style: italic;
+  }
+
+  .businessTypes {
+    margin-top: 16px;
+  }
+
+  .businessList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .businessType {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    background-color: var(--col4);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid #e0e4e9;
+    color: #2c3e50;
+  }
+
+  .businessType strong {
+    font-weight: bold;
+    margin-right: 6px;
+  }
+
+  .businessCount,
+  .businessPercentage {
+    font-size: 14px;
+    color: #7f8c8d;
+  }
+
+  .businessCount {
+    font-weight: normal;
+  }
+
+  .businessPercentage {
+    font-style: italic;
+    color: #3498db;
+  }
 
   .lineChartContainer {
     margin-top: 2rem;

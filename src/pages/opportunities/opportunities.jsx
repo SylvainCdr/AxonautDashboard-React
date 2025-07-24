@@ -20,6 +20,7 @@ export default function Opportunities() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [businessTypes, setBusinessTypes] = useState([]);
 
   useEffect(() => {
     const loadOpportunities = async () => {
@@ -46,17 +47,15 @@ export default function Opportunities() {
     loadOpportunities();
   }, [page]);
 
+  console.log("Opportunités chargées :", opportunities.length);
+  console.log(opportunities);
+
   // compte total d'opportunités et des opportunités par user_name
   const filteredOpps = selectedUser
     ? opportunities.filter((o) => o.user_name === selectedUser)
     : opportunities;
 
   const totalCount = filteredOpps.length;
-
-  const opportunitiesByUser = opportunities.reduce((acc, opp) => {
-    acc[opp.user_name] = (acc[opp.user_name] || 0) + 1;
-    return acc;
-  }, {});
 
   // Utilitaires dates
   function parseDate(dateStr) {
@@ -436,6 +435,62 @@ export default function Opportunities() {
     hauteProba: Math.round(revenueHauteProba[mois] || 0),
   }));
 
+  // Fonction pour calculer le nombre et le pourcentage de chaque type d'affaire
+  const calculateBusinessTypeStatistics = (filteredOpps) => {
+    // Vérifier si filteredOpps est valide
+    if (!filteredOpps || filteredOpps.length === 0) {
+      console.log("Aucune opportunité trouvée.");
+      return [];
+    }
+
+    // Extraire les types d'affaires, inclure un cas "Non défini" pour les valeurs null ou undefined
+    const businessTypes = Array.from(
+      new Set(
+        filteredOpps
+          .map((opp) => opp.custom_fields?.["Type d'affaires"])
+          .filter((type) => type !== undefined && type !== null) // Filtre les undefined et null
+      )
+    ).sort();
+
+    // Ajouter un cas "Non défini" pour les types null ou undefined
+    const undefinedCount = filteredOpps.filter(
+      (opp) =>
+        opp.custom_fields?.["Type d'affaires"] === undefined ||
+        opp.custom_fields?.["Type d'affaires"] === null
+    ).length;
+
+    // Si on a des affaires non définies, les ajouter à la liste des types
+    if (undefinedCount > 0) {
+      businessTypes.push("Non défini");
+    }
+
+    const totalOpportunities = filteredOpps.length;
+
+    // Créer les statistiques avec comptage et pourcentage
+    const businessStats = businessTypes.map((type) => {
+      let count = 0;
+
+      if (type === "Non défini") {
+        count = undefinedCount;
+      } else {
+        count = filteredOpps.filter(
+          (opp) => opp.custom_fields?.["Type d'affaires"] === type
+        ).length;
+      }
+
+      const percentage = ((count / totalOpportunities) * 100).toFixed(2); // Calcul du pourcentage
+      return { type, count, percentage };
+    });
+
+    return businessStats;
+  };
+
+  // Exemple d'appel de la fonction avec filteredOpps
+  const businessStats = calculateBusinessTypeStatistics(filteredOpps);
+
+  // Affichage des résultats dans la console
+  console.log("Statistiques des types d'affaires :", businessStats);
+
   return (
     <div className={styles.opportunitiesContainer}>
       <h1>Opportunités</h1>
@@ -500,11 +555,40 @@ export default function Opportunities() {
           ))}
         </select>
       </div>
-      <span className={styles.oppCount}>
-        {selectedUser
-          ? `Nombre d'opportunités :`
-          : "Nombre total d'opportunités :"}{" "}
-        <strong>{totalCount}</strong>
+      <span className={styles.oppInfo}>
+        {/* Affichage du nombre d'opportunités */}
+        <div className={styles.oppCount}>
+          {selectedUser
+            ? `Nombre d'opportunités :`
+            : "Nombre total d'opportunités :"}{" "}
+          <strong className={styles.totalCount}>{totalCount}</strong>
+          {/* <span className={styles.percentage}>
+            {selectedUser
+              ? `(${((totalCount / filteredOpps.length) * 100).toFixed(2)}%)`
+              : ``}
+          </span> */}
+        </div>
+
+        {/* Affichage des types d'affaires */}
+        <div className={styles.businessTypes}>
+      
+          <div className={styles.businessList}>
+  {businessStats.length > 0 ? (
+    businessStats.map((stat) => (
+      <div key={stat.type} className={styles.businessType}>
+        <strong>{stat.type}</strong>
+        <span className={styles.businessPercentage}>
+          {stat.percentage}%
+        </span>
+        <span className={styles.businessCount}>({stat.count})</span>
+      </div>
+    ))
+  ) : (
+    <div>Aucune opportunité de type d'affaire disponible</div>
+  )}
+</div>
+
+        </div>
       </span>
 
       <div className={styles.lineChartContainer}>
@@ -627,6 +711,7 @@ export default function Opportunities() {
               <thead>
                 <tr>
                   <th>Nom de l'opportunité</th>
+                  <th> Type d'affaire</th>
                   <th>Commercial(e)</th>
                   <th>Date de C° estimée</th>
                   <th>Date de fin estimée</th>
@@ -831,6 +916,7 @@ export default function Opportunities() {
                           style={{ cursor: "pointer", ...ligneAlerteStyle }}
                         >
                           <td>{opp.name}</td>
+                          <td>{opp.custom_fields?.["Type d'affaires"]}</td>
                           <td>{opp.user_name}</td>
                           <td>{dueDate?.toLocaleDateString("fr-FR")}</td>
                           <td>{finDate?.toLocaleDateString("fr-FR")}</td>
