@@ -88,19 +88,15 @@ export const fetchSuppliers = async () => {
 };
 
 export const searchCompanyByName = async (companyName) => {
-  const response = await fetch(
-    `${BASE_URL}/companies/search/${companyName}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(`${BASE_URL}/companies/search/${companyName}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des données du projet");
   }
   return response.json();
 };
-

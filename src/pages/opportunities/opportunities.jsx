@@ -486,6 +486,20 @@ export default function Opportunities() {
         </tbody>
       </table>
 
+      <div className={styles.filterContainer}>
+        <label>Filtrer par commercial(e) :</label>
+        <select
+          value={selectedUser || ""}
+          onChange={(e) => setSelectedUser(e.target.value || null)}
+        >
+          <option value="">Tous</option>
+          {users.map((user) => (
+            <option key={user} value={user}>
+              {user}
+            </option>
+          ))}
+        </select>
+      </div>
       <span className={styles.oppCount}>
         {selectedUser
           ? `Nombre d'opportunités :`
@@ -542,20 +556,6 @@ export default function Opportunities() {
         </ResponsiveContainer>
       </div>
 
-      <div className={styles.filterContainer}>
-        <label>Filtrer par commercial(e) :</label>
-        <select
-          value={selectedUser || ""}
-          onChange={(e) => setSelectedUser(e.target.value || null)}
-        >
-          <option value="">Tous</option>
-          {users.map((user) => (
-            <option key={user} value={user}>
-              {user}
-            </option>
-          ))}
-        </select>
-      </div>
       <table className={styles.revenueTable}>
         <thead>
           <tr>

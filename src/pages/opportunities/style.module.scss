@@ -64,15 +64,46 @@
     }
   }
 
+  .filterContainer {
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    margin-bottom: 1rem;
+    gap: 2rem;
+    background-color: var(--col5);
+    padding: 0.2rem;
+    border-radius: 8px;
+
+    label {
+      font-size: 0.9rem;
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    select {
+      padding: 0.15rem 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: var(--col3);
+      }
+    }
+  }
+
   .oppCount {
     font-size: 1.1rem;
-    background: var(--col1);
-    position: relative;
-    top: 0.5rem;
-    right: 0.5rem;
-    padding: 0.3rem 0.8rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background-color: var(--col4);
     border-radius: 5px;
-    color: #fff;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
   }
 
   .lineChartContainer {
@@ -86,36 +117,6 @@
     background-color: #fff;
     padding: 1.5rem;
     border-radius: 8px;
-  }
-
-  .filterContainer {
-    display: flex;
-    justify-content: right;
-    align-items: right;
-    margin-bottom: 0rem;
-    gap: 2rem;
-    background-color: var(--col7);
-    padding: 0.3rem;
-    border-radius: 8px;
-
-    label {
-      font-size: 1rem;
-
-      font-weight: 500;
-    }
-
-    select {
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      cursor: pointer;
-
-      &:focus {
-        outline: none;
-        border-color: var(--col3);
-      }
-    }
   }
 
   .revenueTable {
