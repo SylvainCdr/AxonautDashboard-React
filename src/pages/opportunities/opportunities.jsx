@@ -478,7 +478,7 @@ export default function Opportunities() {
         ).length;
       }
 
-      const percentage = ((count / totalOpportunities) * 100).toFixed(2); // Calcul du pourcentage
+      const percentage = ((count / totalOpportunities) * 100).toFixed(0); // Calcul du pourcentage
       return { type, count, percentage };
     });
 
@@ -562,32 +562,25 @@ export default function Opportunities() {
             ? `Nombre d'opportunités :`
             : "Nombre total d'opportunités :"}{" "}
           <strong className={styles.totalCount}>{totalCount}</strong>
-          {/* <span className={styles.percentage}>
-            {selectedUser
-              ? `(${((totalCount / filteredOpps.length) * 100).toFixed(2)}%)`
-              : ``}
-          </span> */}
         </div>
 
         {/* Affichage des types d'affaires */}
         <div className={styles.businessTypes}>
-      
           <div className={styles.businessList}>
-  {businessStats.length > 0 ? (
-    businessStats.map((stat) => (
-      <div key={stat.type} className={styles.businessType}>
-        <strong>{stat.type}</strong>
-        <span className={styles.businessPercentage}>
-          {stat.percentage}%
-        </span>
-        <span className={styles.businessCount}>({stat.count})</span>
-      </div>
-    ))
-  ) : (
-    <div>Aucune opportunité de type d'affaire disponible</div>
-  )}
-</div>
-
+            {businessStats.length > 0 ? (
+              businessStats.map((stat) => (
+                <div key={stat.type} className={styles.businessType}>
+                  <strong>{stat.type}</strong>
+                  <span className={styles.businessPercentage}>
+                    {stat.percentage}%
+                  </span>
+                  <span className={styles.businessCount}>({stat.count})</span>
+                </div>
+              ))
+            ) : (
+              <div>Aucune opportunité de type d'affaire disponible</div>
+            )}
+          </div>
         </div>
       </span>
 
