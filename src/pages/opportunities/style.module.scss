@@ -134,13 +134,12 @@
   }
 
   .businessTypes {
-    margin-top: 16px;
+    margin-top: 0.5rem;
   }
 
   .businessList {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    justify-content: space-around;
   }
 
   .businessType {
@@ -148,7 +147,7 @@
     display: flex;
     align-items: center;
     background-color: var(--col4);
-    padding: 6px 12px;
+    padding: 6px 30px;
     border-radius: 12px;
     border: 1px solid #e0e4e9;
     color: #2c3e50;
@@ -170,8 +169,9 @@
   }
 
   .businessPercentage {
-    font-style: italic;
     color: #3498db;
+    font-weight: bold;
+    margin-right: 1rem;
   }
 
   .lineChartContainer {
@@ -215,7 +215,7 @@
       transition: background-color 0.3s;
 
       td {
-        padding-left: 2.5rem; // indentation visuelle
+        padding-left: 2.5rem;
       }
 
       &:hover {
@@ -224,7 +224,7 @@
     }
 
     thead {
-      background-color: var(--col5);
+      background-color: var(--col4);
       color: #fff;
       text-transform: uppercase;
       font-size: 1.2rem;

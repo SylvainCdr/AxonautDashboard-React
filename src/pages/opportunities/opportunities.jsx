@@ -338,13 +338,13 @@ export default function Opportunities() {
   const closeModal = () => setShowModal(false);
 
   // Tri des mois par date (année + mois)
-  const sortedMonthlyRevenueEntries = Object.entries(monthlyRevenue).sort(
-    ([moisA], [moisB]) => {
-      const dateA = parseDateMonthYear(moisA);
-      const dateB = parseDateMonthYear(moisB);
-      return dateA - dateB;
-    }
-  );
+  // const sortedMonthlyRevenueEntries = Object.entries(monthlyRevenue).sort(
+  //   ([moisA], [moisB]) => {
+  //     const dateA = parseDateMonthYear(moisA);
+  //     const dateB = parseDateMonthYear(moisB);
+  //     return dateA - dateB;
+  //   }
+  // );
 
   // Fonction pour parser "janvier 2025" en Date
   function parseDateMonthYear(str) {
@@ -372,17 +372,32 @@ export default function Opportunities() {
   const [openYears, setOpenYears] = useState({});
 
   // Transformation des données par année
-  const revenueByYear = Object.entries(monthlyRevenue).reduce(
-    (acc, [mois, montant]) => {
-      const date = parseDateMonthYear(mois);
-      const year = date.getFullYear();
-      if (!acc[year]) acc[year] = { total: 0, months: {} };
-      acc[year].total += montant;
-      acc[year].months[mois] = montant;
-      return acc;
-    },
-    {}
-  );
+  const revenueByYear = {};
+
+  Object.keys(monthlyRevenue).forEach((mois) => {
+    const date = parseDateMonthYear(mois);
+    const year = date.getFullYear();
+
+    if (!revenueByYear[year]) {
+      revenueByYear[year] = {
+        total: 0, // CA pondéré
+        brute: 0, // CA brut
+        hauteProba: 0, // CA haute proba
+        months: {}, // détails mensuels
+      };
+    }
+
+    revenueByYear[year].total += monthlyRevenue[mois] || 0;
+    revenueByYear[year].brute += revenueBrute[mois] || 0;
+    revenueByYear[year].hauteProba += revenueHauteProba[mois] || 0;
+
+    // Enregistrement par mois
+    revenueByYear[year].months[mois] = {
+      pondéré: monthlyRevenue[mois] || 0,
+      brut: revenueBrute[mois] || 0,
+      hauteProba: revenueHauteProba[mois] || 0,
+    };
+  });
 
   // Tri les années par ordre croissant (optionnel)
   const sortedYears = Object.keys(revenueByYear)
@@ -488,8 +503,17 @@ export default function Opportunities() {
   // Exemple d'appel de la fonction avec filteredOpps
   const businessStats = calculateBusinessTypeStatistics(filteredOpps);
 
-  // Affichage des résultats dans la console
-  console.log("Statistiques des types d'affaires :", businessStats);
+  // function pour compter le total BRUT de ttes les opportunités sans pondération
+  const calculateTotalBrut = (opps) => {
+    return opps.reduce((total, opp) => {
+      const amount = parseFloat(
+        opp.amount?.toString().replace(/[^0-9.-]+/g, "") || 0
+      );
+      return total + amount;
+    }, 0);
+  };
+
+  const totalBrut = calculateTotalBrut(filteredOpps);
 
   return (
     <div className={styles.opportunitiesContainer}>
@@ -508,34 +532,29 @@ export default function Opportunities() {
       <table className={styles.scenarioTable}>
         <thead>
           <tr>
-            <th style={{ color: "#C60F7B" }}>CA Théorique Pondéré</th>
             <th style={{ color: "#007BFF" }}>CA Brut (≥ 25%)</th>
+            <th style={{ color: "#C60F7B" }}>CA Théorique Pondéré</th>
             <th style={{ color: "#28a745" }}>CA Haute Probabilité (≥ 80%)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>
-              <strong>Objectif :</strong> Estimation réaliste du chiffre
-              d'affaires en prenant en compte les probabilités de succès.
-              <br />
-              <strong>Utilisation :</strong> Prévisions de trésorerie et
-              reporting prévisionnel.
-            </td>
-            <td>
               <strong>Objectif :</strong> Visualisation du potentiel brut des
               opportunités (non pondérées), filtrées à partir de 25% de
               probabilité.
               <br />
-              <strong>Utilisation :</strong> Estimation optimiste du pipe
-              commercial.
             </td>
+            <td>
+              <strong>Objectif :</strong> Estimation réaliste du chiffre
+              d'affaires en prenant en compte les probabilités de succès.
+              <br />
+            </td>
+
             <td>
               <strong>Objectif :</strong> Suivi des opportunités quasiment
               certaines (≥ 80%), avec pondération pour rester réaliste.
               <br />
-              <strong>Utilisation :</strong> Préparation à la facturation et
-              clôture commerciale.
             </td>
           </tr>
         </tbody>
@@ -559,9 +578,19 @@ export default function Opportunities() {
         {/* Affichage du nombre d'opportunités */}
         <div className={styles.oppCount}>
           {selectedUser
-            ? `Nombre d'opportunités :`
+            ? `Nombre d'opportunités pour ${selectedUser} :`
             : "Nombre total d'opportunités :"}{" "}
           <strong className={styles.totalCount}>{totalCount}</strong>
+          {" — "}
+          <span>
+            Montant brut cumulé :{" "}
+            <strong className={styles.totalCount}>
+              {totalBrut.toLocaleString("fr-FR", {
+                style: "currency",
+                currency: "EUR",
+              })}
+            </strong>
+          </span>
         </div>
 
         {/* Affichage des types d'affaires */}
@@ -636,10 +665,13 @@ export default function Opportunities() {
       <table className={styles.revenueTable}>
         <thead>
           <tr>
-            <th>Année / Mois</th>
-            <th>CA théorique pondéré (€)</th>
+            <th style={{ color: "#313131ff" }}>Année / Mois</th>
+            <th style={{ color: "#007BFF" }}>CA Brut (≥ 25%)</th>
+            <th style={{ color: "#C60F7B" }}>CA Pondéré</th>
+            <th style={{ color: "#28a745" }}>CA Haute Proba (≥ 80%)</th>
           </tr>
         </thead>
+
         <tbody>
           {sortedYears.map((year) => (
             <React.Fragment key={year}>
@@ -654,9 +686,20 @@ export default function Opportunities() {
                   </span>
                   {year}
                 </td>
-
+                <td>
+                  {revenueByYear[year].brute.toLocaleString("fr-FR", {
+                    style: "currency",
+                    currency: "EUR",
+                  })}
+                </td>
                 <td>
                   {revenueByYear[year].total.toLocaleString("fr-FR", {
+                    style: "currency",
+                    currency: "EUR",
+                  })}
+                </td>
+                <td>
+                  {revenueByYear[year].hauteProba.toLocaleString("fr-FR", {
                     style: "currency",
                     currency: "EUR",
                   })}
@@ -665,21 +708,31 @@ export default function Opportunities() {
 
               {openYears[year] &&
                 Object.entries(revenueByYear[year].months)
-                  .sort(([moisA], [moisB]) => {
-                    const dateA = parseDateMonthYear(moisA);
-                    const dateB = parseDateMonthYear(moisB);
-                    return dateA - dateB;
-                  })
-                  .map(([mois, montant]) => (
+                  .sort(
+                    ([a], [b]) => parseDateMonthYear(a) - parseDateMonthYear(b)
+                  )
+                  .map(([mois, data]) => (
                     <tr
                       key={mois}
                       onClick={() => handleMonthClick(mois)}
-                      style={{ cursor: "pointer" }}
                       className={styles.monthRow}
+                      style={{ cursor: "pointer" }}
                     >
                       <td style={{ paddingLeft: "2em" }}>{mois}</td>
                       <td>
-                        {montant.toLocaleString("fr-FR", {
+                        {data.brut.toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })}
+                      </td>
+                      <td>
+                        {data.pondéré.toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })}
+                      </td>
+                      <td>
+                        {data.hauteProba.toLocaleString("fr-FR", {
                           style: "currency",
                           currency: "EUR",
                         })}
