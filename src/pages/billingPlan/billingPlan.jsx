@@ -29,6 +29,8 @@ export default function BillingPlan({ onClose }) {
     {
       amount: "",
       date: "",
+      // ajout d' un indice de fiabilité
+      reliability: "",
       stepsComment: "",
       revision: "",
       invoiced: false, // Ajout de la propriété invoiced
@@ -230,6 +232,7 @@ export default function BillingPlan({ onClose }) {
         steps: steps.map((step) => ({
           amount: parseFloat(step.amount),
           date: new Date(step.date).toISOString(),
+          reliability: step.reliability || "", // Ajout de l'indice de fiabilité
           stepsComment: step.stepsComment || "",
           revision: step.revision ? parseFloat(step.revision || 0) : null,
           invoiced: step.invoiced || false,
@@ -653,6 +656,7 @@ export default function BillingPlan({ onClose }) {
                 <th>Révision?</th>
                 <th>Révision(€)</th>
                 <th>Total(€)</th>
+                <th>Fiabilité</th>
                 {isEditable && <th>Action</th>}
                 <th> Statut</th>
                 <th> Facturé?</th>
@@ -742,6 +746,23 @@ export default function BillingPlan({ onClose }) {
                       parseFloat(step.amount || 0) +
                         (step.revision ? parseFloat(step.revision || 0) : 0)
                     )}
+                  </td>
+                  <td>
+                    {/* // select avec 25.50.75 ou 100%  */}
+                    <select
+                      value={step.reliability || ""}
+                      onChange={(e) =>
+                        updateStep(index, "reliability", e.target.value)
+                      }
+                      required
+                      disabled={!isEditable}
+                    >
+                      <option value="">Sélect. fiabilité</option>
+                      <option value="25">25%</option>
+                      <option value="50">50%</option>
+                      <option value="75">75%</option>
+                      <option value="100">100%</option>
+                    </select>
                   </td>
                   {isEditable && (
                     <td>

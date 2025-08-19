@@ -25,8 +25,7 @@ export default function Billing() {
 
   const toggleModal = () => {
     setShowModal(!showModal);
-  }
-
+  };
 
   useEffect(() => {
     const fetchPlansGroupedByMonth = async () => {
@@ -58,6 +57,7 @@ export default function Billing() {
               quotationId,
               title: decodeHtmlEntities(projectTitle),
               date: stepDate,
+              reliability: step.reliability,
               stepsComment: step.stepsComment,
               amount: parseFloat(step.amount || 0),
               revision: parseFloat(step.revision || 0),
@@ -232,9 +232,11 @@ export default function Billing() {
 
   return (
     <div className={styles.billingContainer}>
-
       {showModal && (
-        <BillingPlanExtractModal onClose={toggleModal} billingData={monthlyBilling} />
+        <BillingPlanExtractModal
+          onClose={toggleModal}
+          billingData={monthlyBilling}
+        />
       )}
       <h1>Plan de Facturation - {selectedMonthKey} </h1>
       <button onClick={toggleModal} className={styles.extractButton}>
@@ -370,6 +372,7 @@ export default function Billing() {
                           <th style={{ width: "45px", whiteSpace: "nowrap" }}>
                             Montant(€)
                           </th>
+                          <th>Fiabilité</th>
                           <th>Facturé?</th>
                         </tr>
                       </thead>
@@ -414,6 +417,11 @@ export default function Billing() {
                             </td>
                             <td style={{ width: "45px", whiteSpace: "nowrap" }}>
                               {formatEuro(item.amount + item.revision)}
+                            </td>
+                            <td style={{ width: "45px", whiteSpace: "nowrap" }}>
+                              {item.reliability
+                                ? item.reliability + "%"
+                                : "Non défini"}
                             </td>
                             <td>
                               <input
