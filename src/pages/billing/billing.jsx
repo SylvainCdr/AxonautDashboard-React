@@ -230,6 +230,30 @@ export default function Billing() {
     }));
   };
 
+  // fonction pour afficher le total du mois a facturer avec indice de fiabilité a 100%
+
+  const getTotalToBeInvoiced = () => {
+    if (!selectedMonthKey) return 0;
+    const monthData = monthlyBilling[selectedMonthKey];
+    return monthData ? monthData.total : 0;
+  };
+
+  const getTotalReliableToBeInvoiced = () => {
+    if (!selectedMonthKey) return 0;
+    const monthData = monthlyBilling[selectedMonthKey];
+    if (!monthData) return 0;
+
+    return monthData.items.reduce((sum, item) => {
+      const amount = item.amount + item.revision;
+      if (!item.invoiced && parseInt(item.reliability) === 100) {
+        return sum + amount;
+      }
+      return sum;
+    }, 0);
+  };
+
+  const totalReliableToBeInvoiced = getTotalReliableToBeInvoiced();
+
   return (
     <div className={styles.billingContainer}>
       {showModal && (
@@ -325,6 +349,16 @@ export default function Billing() {
                   monthName={selectedMonthKey}
                 />
               )}
+              <span
+                style={{
+                  color: "#0073e6",
+                  fontWeight: "bold",
+                  marginTop: "20px",
+                }}
+              >
+                ✅ À facturer (fiabilité 100%) :{" "}
+                {formatEuro(totalReliableToBeInvoiced)} €
+              </span>
             </div>
 
             <div className={styles.chart2}>
