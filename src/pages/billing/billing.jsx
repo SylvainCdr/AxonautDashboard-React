@@ -232,12 +232,6 @@ export default function Billing() {
 
   // fonction pour afficher le total du mois a facturer avec indice de fiabilité a 100%
 
-  const getTotalToBeInvoiced = () => {
-    if (!selectedMonthKey) return 0;
-    const monthData = monthlyBilling[selectedMonthKey];
-    return monthData ? monthData.total : 0;
-  };
-
   const getTotalReliableToBeInvoiced = () => {
     if (!selectedMonthKey) return 0;
     const monthData = monthlyBilling[selectedMonthKey];
@@ -253,6 +247,21 @@ export default function Billing() {
   };
 
   const totalReliableToBeInvoiced = getTotalReliableToBeInvoiced();
+
+  // fonction pour afficher le total du mois a facturer avec indice de fiabilité a 75%
+  const getTotalReliable75ToBeInvoiced = () => {
+    if (!selectedMonthKey) return 0;
+    const monthData = monthlyBilling[selectedMonthKey];
+    if (!monthData) return 0;
+    return monthData.items.reduce((sum, item) => {
+      const amount = item.amount + item.revision;
+      if (!item.invoiced && parseInt(item.reliability) === 75) {
+        return sum + amount;
+      }
+      return sum;
+    }, 0);
+  };
+  const totalReliable75ToBeInvoiced = getTotalReliable75ToBeInvoiced();
 
   return (
     <div className={styles.billingContainer}>
@@ -349,6 +358,7 @@ export default function Billing() {
                   monthName={selectedMonthKey}
                 />
               )}
+              <br />
               <span
                 style={{
                   color: "#0073e6",
@@ -358,6 +368,18 @@ export default function Billing() {
               >
                 ✅ À facturer (fiabilité 100%) :{" "}
                 {formatEuro(totalReliableToBeInvoiced)} €
+              </span>
+              <br />
+              <br />
+              <span
+                style={{
+                  color: "#fe720dff",
+                  fontWeight: "bold",
+                  marginTop: "10px",
+                }}
+              >
+                ⚠️ À facturer (fiabilité 75%) :{" "}
+                {formatEuro(totalReliable75ToBeInvoiced)} €
               </span>
             </div>
 
