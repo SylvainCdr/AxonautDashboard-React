@@ -11,9 +11,10 @@ import CompanyDetails from "./pages/companyDetails/companyDetails";
 import QuotationAndProjectDetails from "./pages/quotationAndProjectDetails/quotationAndProjectDetails";
 import Billing from "./pages/billing/billing";
 import SupplyStudy from "./pages/supplyStudy/supplyStudy";
-
 import BillingPlan from "./pages/billingPlan/billingPlan";
 import Opportunities from "./pages/opportunities/opportunities";
+import TenderOffers from "./pages/tenderOffers/tenderOffers";
+import TenderOffersFavorites from "./pages/tenderOffersFavorites/tenderOffersFavorites";
 
 import ProtectedRoute from "./utils/protectedRoute";
 import { ToastContainer } from "react-toastify";
@@ -54,6 +55,8 @@ function App() {
             element={<BillingPlan />}
           />
           <Route path="/opportunities" element={<Opportunities />} />
+          <Route path="/tender-offers" element={<TenderOffers />} />
+          <Route path="/tender-offers-favorites" element={<TenderOffersFavorites />} />
         </Route>
       </Routes>
 
