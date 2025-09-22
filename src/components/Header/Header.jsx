@@ -106,6 +106,15 @@ function Header() {
               Facturation
             </NavLink>
           </li>
+          <li className={styles.navLi}>
+            <NavLink
+              to="/tender-offers"
+              onClick={handleLinkClick}
+              className={({ isActive }) => (isActive ? styles.activeLink : "")}
+            >
+              AO (v1)
+            </NavLink>
+          </li>
           <button
             onClick={handleSignOut}
             className={styles.logoutButton}

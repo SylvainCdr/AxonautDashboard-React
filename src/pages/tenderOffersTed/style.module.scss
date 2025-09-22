@@ -18,40 +18,6 @@
       text-decoration: underline;
     }
   }
-// <div className={styles.sourceContainer}>
-//           <div className={styles.sourceToggle}>
-//         {Object.keys(sourcesConfig).map((key) => (
-//           <label key={key}>
-//             <input
-//               type="radio"
-//               name="source"
-//               value={key}
-//               checked={source === key}
-//               onChange={() => setSource(key)}
-//             />
-//             {sourcesConfig[key].label}
-//           </label>
-//         ))}
-//       </div>
-//       </div>
-
-  .sourceContainer {
-   display: flex;
-   gap: 10px;
-
-  }
-
-  // .sourceToggle {
-  //   display: flex;
-  //   gap: 10px;
-  //   align-items: center;
-  //   margin-bottom: 1rem;
-  //   font-size: 0.9rem;
-  //   color: #333;
-
-  //   .sourceC
-  // }
-
 
   .filters {
     margin-bottom: 20px;

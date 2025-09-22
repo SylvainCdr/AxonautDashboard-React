@@ -9,23 +9,52 @@ export default function TenderOffers() {
   const [loading, setLoading] = useState(true);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [availableDepartments, setAvailableDepartments] = useState([]);
+  const [source, setSource] = useState("pixecurity"); // toggle source
+
+  const sourcesConfig = {
+    pixecurity: {
+      label: "Pixecurity",
+      keywords: [
+        "surete",
+        "videoprotection",
+        "videosurveillance",
+        "supervision",
+        "hypervision",
+      ],
+      url: (query) =>
+        `https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?where=${encodeURIComponent(
+          query
+        )}&limit=100&order_by=-dateparution`,
+    },
+    diviniti: {
+      label: "Diviniti",
+      keywords: [
+        "hypervision",
+        "supervision",
+        "IA",
+        "detection",
+        "analytique",
+        "data management",
+      ],
+      url: (query) =>
+        `https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?where=${encodeURIComponent(
+          query
+        )}&limit=100&order_by=-dateparution`,
+    },
+  };
 
   useEffect(() => {
-    const keywords = [
-      "surete",
-      "videoprotection",
-      "supervision",
-      "hypervision",
-    ];
+    async function fetchOffers() {
+      setLoading(true);
+      setTenderOffers([]);
+      setAvailableDepartments([]);
+      const config = sourcesConfig[source];
+      const query = config.keywords.map((k) => `"${k}"`).join(" OR ");
+      const url = config.url(query);
 
-    const query = keywords.map((k) => `"${k}"`).join(" OR ");
-    const url = `https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?where=${encodeURIComponent(
-      query
-    )}&limit=100&order_by=-dateparution`;
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
         const results = data.results || [];
 
         // Récupérer tous les départements uniques
@@ -36,13 +65,15 @@ export default function TenderOffers() {
 
         setAvailableDepartments(Array.from(deps).sort());
         setTenderOffers(results);
+      } catch (err) {
+        console.error(`Erreur API ${config.label}:`, err);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erreur API BOAMP:", err);
-        setLoading(false);
-      });
-  }, []);
+      }
+    }
+
+    fetchOffers();
+  }, [source]); // relance la recherche quand le toggle change
 
   function addFavorite(tenderOffer) {
     const ref = doc(db, "tenderOffers", tenderOffer.idweb);
@@ -54,29 +85,44 @@ export default function TenderOffers() {
       .catch((err) => console.error("Erreur sauvegarde :", err));
   }
 
-  // Appliquer le filtre
-  const filteredOffers = tenderOffers.filter((f) => {
-    if (selectedDepartments.length === 0) return true;
-    return f.code_departement?.some((d) => selectedDepartments.includes(d));
-  });
-
   function toggleDepartment(dep) {
     setSelectedDepartments((prev) =>
       prev.includes(dep) ? prev.filter((d) => d !== dep) : [...prev, dep]
     );
   }
 
+  const filteredOffers = tenderOffers.filter((f) => {
+    if (selectedDepartments.length === 0) return true;
+    return f.code_departement?.some((d) => selectedDepartments.includes(d));
+  });
+
   return (
     <div className={styles.aoContainer}>
-      <h1>Appels d’offres (BOAMP)</h1>
+      <h1>Appels d’offres</h1>
 
       <Link to="/tender-offers-favorites" className={styles.favLink}>
         Favoris
       </Link>
 
+      <div className={styles.sourceContainer}>
+        <div className={styles.sourceToggle}>
+          {Object.keys(sourcesConfig).map((key) => (
+            <label key={key}>
+              <input
+                type="radio"
+                name="source"
+                value={key}
+                checked={source === key}
+                onChange={() => setSource(key)}
+              />
+              {sourcesConfig[key].label}
+            </label>
+          ))}
+        </div>
+      </div>
+
       <br />
       <h3>Filtrer par département</h3>
-      {/* Filtres départements */}
       <div className={styles.filters}>
         <div className={styles.deps}>
           {availableDepartments.map((dep) => (
