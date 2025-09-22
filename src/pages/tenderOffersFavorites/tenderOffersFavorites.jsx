@@ -12,7 +12,7 @@ export default function TenderOffersFavorites() {
       try {
         const querySnapshot = await getDocs(collection(db, "tenderOffers"));
         const favoritesList = querySnapshot.docs.map((doc) => ({
-          idweb: doc.id,       // <-- correspond à l'ID du doc Firestore (idweb)
+          idweb: doc.id, // <-- correspond à l'ID du doc Firestore (idweb)
           ...doc.data(),
         }));
         setTenderOffers(favoritesList);
@@ -27,13 +27,15 @@ export default function TenderOffersFavorites() {
   }, []);
 
   function removeFavorite(idweb) {
-    const ref = doc(db, "tenderOffers", idweb); 
+    const ref = doc(db, "tenderOffers", idweb);
     deleteDoc(ref)
       .then(() => {
         console.log("Favori supprimé !");
-        setTenderOffers(prev => prev.filter(offer => offer.idweb !== idweb));
+        setTenderOffers((prev) =>
+          prev.filter((offer) => offer.idweb !== idweb)
+        );
       })
-      .catch(err => console.error("Erreur suppression :", err));
+      .catch((err) => console.error("Erreur suppression :", err));
   }
 
   return (
@@ -57,7 +59,8 @@ export default function TenderOffersFavorites() {
 
             {f.type_procedure && (
               <p>
-                <strong>Procédure :</strong> {f.type_procedure} / {f.procedure_libelle}
+                <strong>Procédure :</strong> {f.type_procedure} /{" "}
+                {f.procedure_libelle}
               </p>
             )}
 

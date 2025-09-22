@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 export default function TenderOffers() {
   const [tenderOffers, setTenderOffers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [availableDepartments, setAvailableDepartments] = useState([]);
 
   useEffect(() => {
     const keywords = [
@@ -14,23 +16,26 @@ export default function TenderOffers() {
       "videoprotection",
       "supervision",
       "hypervision",
-      // "controle d acces"
     ];
 
-    // Construire clause OR en plein texte
     const query = keywords.map((k) => `"${k}"`).join(" OR ");
-
     const url = `https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?where=${encodeURIComponent(
       query
     )}&limit=100&order_by=-dateparution`;
 
-    console.log("URL générée:", url);
-
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Résultats BOAMP:", data);
-        setTenderOffers(data.results || []);
+        const results = data.results || [];
+
+        // Récupérer tous les départements uniques
+        const deps = new Set();
+        results.forEach((f) => {
+          f.code_departement?.forEach((d) => deps.add(d));
+        });
+
+        setAvailableDepartments(Array.from(deps).sort());
+        setTenderOffers(results);
         setLoading(false);
       })
       .catch((err) => {
@@ -39,10 +44,7 @@ export default function TenderOffers() {
       });
   }, []);
 
-  console.log("tenderOffers", tenderOffers);
-
   function addFavorite(tenderOffer) {
-    // sauvegarde dans la collection "tenderOffers" avec l'id BOAMP
     const ref = doc(db, "tenderOffers", tenderOffer.idweb);
     setDoc(ref, {
       ...tenderOffer,
@@ -52,56 +54,51 @@ export default function TenderOffers() {
       .catch((err) => console.error("Erreur sauvegarde :", err));
   }
 
+  // Appliquer le filtre
+  const filteredOffers = tenderOffers.filter((f) => {
+    if (selectedDepartments.length === 0) return true;
+    return f.code_departement?.some((d) => selectedDepartments.includes(d));
+  });
+
+  function toggleDepartment(dep) {
+    setSelectedDepartments((prev) =>
+      prev.includes(dep) ? prev.filter((d) => d !== dep) : [...prev, dep]
+    );
+  }
+
   return (
     <div className={styles.aoContainer}>
       <h1>Appels d’offres (BOAMP)</h1>
-
-      <ul>
-        notes :
-        <li>
-          {" "}
-          les appels d'offres sont filtrés par mots-clés (sureté,
-          vidéoprotection, supervision, hypervision)
-        </li>
-        <li>
-          - les appels d'offres sont triés par date de parution (les plus
-          récents en premier)
-        </li>
-        <li>
-          - cliquer sur "Voir l'annonce" ouvre le lien dans un nouvel onglet
-        </li>
-        <li>
-          - cliquer sur "Ajouter aux favoris" sauvegarde l'appel d'offre dans la
-          collection "tenderOffers"
-        </li>
-      </ul>
-
-      <br />
-
-      <ul>
-        {" "}
-        reflexions :
-        <li>
-          {" "}
-          Scrap / fetch & duplicate data from boamp, ted europa, maximilien...
-        </li>
-        <li>Back up in database</li>
-        <li>Filter by notices (avis de marché & résultats de marché)</li>
-        <li>Use IA for analyse results (attributaires, montant…) </li>
-        <li>Make stats ?</li>
-      </ul>
-      <br />
-      <br />
-
-      {loading && <p>Chargement…</p>}
-      {!loading && tenderOffers.length === 0 && <p>Aucun résultat.</p>}
 
       <Link to="/tender-offers-favorites" className={styles.favLink}>
         Favoris
       </Link>
 
+      <br />
+      <h3>Filtrer par département</h3>
+      {/* Filtres départements */}
+      <div className={styles.filters}>
+        <div className={styles.deps}>
+          {availableDepartments.map((dep) => (
+            <label key={dep} className={styles.depLabel}>
+              <input
+                type="checkbox"
+                checked={selectedDepartments.includes(dep)}
+                onChange={() => toggleDepartment(dep)}
+              />
+              {dep}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {loading && <p>Chargement…</p>}
+      {!loading && filteredOffers.length === 0 && (
+        <p>Aucun résultat pour ce filtre.</p>
+      )}
+
       <div className={styles.listing}>
-        {tenderOffers.map((f, i) => (
+        {filteredOffers.map((f, i) => (
           <div key={i} className={styles.card}>
             <div className={styles.header}>
               <h3 className={styles.title}>{f.objet}</h3>

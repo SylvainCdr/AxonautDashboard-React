@@ -4,7 +4,7 @@
   max-width: 1440px;
   margin: 0 auto;
 
-   .favLink{
+  .favLink {
     text-decoration: none;
     color: white;
     font-weight: bold;
@@ -13,13 +13,55 @@
     padding: 0.5rem 1rem;
     background-color: var(--col3);
     border-radius: 6px;
-  
+
     &:hover {
       text-decoration: underline;
     }
   }
-}
 
+  .filters {
+    margin-bottom: 20px;
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .deps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .depLabel {
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+
+      .checkbox {
+        display: none; // cacher le vrai checkbox
+      }
+
+      /* Style du "badge" */
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      background-color: #f8f8f8;
+      color: #444;
+      transition: all 0.2s ease;
+
+      input:checked + & {
+        background-color: #007acc;
+        color: white;
+        border-color: #007acc;
+      }
+    }
+  }
+}
 
 .listing {
   display: grid;
