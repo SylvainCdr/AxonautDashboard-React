@@ -16,6 +16,7 @@ import Opportunities from "./pages/opportunities/opportunities";
 import TenderOffers from "./pages/tenderOffers/tenderOffers";
 import TenderOffersFavorites from "./pages/tenderOffersFavorites/tenderOffersFavorites";
 import TenderOffersTed from "./pages/tenderOffersTed/tenderOffersTed";
+import ExpensesTest from "./pages/expenses-test/expenses-test";
 
 import ProtectedRoute from "./utils/protectedRoute";
 import { ToastContainer } from "react-toastify";
@@ -59,6 +60,7 @@ function App() {
           <Route path="/tender-offers" element={<TenderOffers />} />
           <Route path="/tender-offers-favorites" element={<TenderOffersFavorites />} />
         <Route path="/tender-offers-ted" element={<TenderOffersTed />} />
+        <Route path="/expenses-test" element={<ExpensesTest />} />
         </Route>
 
       </Routes>

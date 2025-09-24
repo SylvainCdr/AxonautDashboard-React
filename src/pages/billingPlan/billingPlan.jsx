@@ -410,6 +410,16 @@ export default function BillingPlan({ onClose }) {
     });
   }
 
+  const totalInvoicedAmount = invoices.reduce(
+    (sum, invoice) => sum + parseFloat(invoice.pre_tax_amount || 0),
+    0
+  );
+
+  const invoiceProgressPercent =
+    quotation.pre_tax_amount > 0
+      ? totalInvoicedAmount / quotation.pre_tax_amount
+      : 0;
+
   const chartStyle = {
     height: 140,
     width: 350,
@@ -460,7 +470,7 @@ export default function BillingPlan({ onClose }) {
                 </div>
 
                 <div className={styles.headerRight}>
-                  AVANCEMENT
+                  <h3>Avancement Planification</h3>
                   <GaugeChart
                     className={`${styles.headerRight} ${styles.chartFadeIn}`}
                     style={chartStyle}
@@ -498,6 +508,28 @@ export default function BillingPlan({ onClose }) {
                     </strong>
                   </p>
                 </div>
+
+                <div className={styles.headerRight}>
+                  <h3>Avancement des Factures</h3>
+                  <GaugeChart
+                    className={`${styles.headerRight} ${styles.chartFadeIn}`}
+                    style={chartStyle}
+                    id="gauge-chart-invoices"
+                    colors={["#f07167", "#ffbc42", "#91f5ad"]}
+                    nrOfLevels={6}
+                    arcWidth={0.3}
+                    percent={invoiceProgressPercent}
+                    textColor="#000000"
+                  />
+                  <p>
+                    Total facturé :
+                    <strong>
+                      {formatEuro(totalInvoicedAmount)} /{" "}
+                      {formatEuro(quotation.pre_tax_amount)} €
+                    </strong>
+                  </p>
+                </div>
+
                 <div className={styles.invoicesSection}>
                   <h3>📄 Facture(s) liée(s) sur Axonaut</h3>
                   {invoices.length > 0 ? (
@@ -538,6 +570,8 @@ export default function BillingPlan({ onClose }) {
                               >
                                 Voir la facture
                               </a>
+                            </td>
+                            <td>
                               <button
                                 onClick={() => addInvoiceToSteps(invoice)}
                                 disabled={!isEditable}
@@ -549,6 +583,8 @@ export default function BillingPlan({ onClose }) {
                                   color: "white",
                                   border: "none",
                                   borderRadius: 3,
+                                  fontSize: 12,
+                                  fontWeight: "600",
                                 }}
                               >
                                 Intégrer au plan
