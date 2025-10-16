@@ -430,7 +430,7 @@ export default function BillingPlan({ onClose }) {
       <div className={styles.billingPlan}>
         <h1>
           {existingPlan
-            ? "Modifier le plan de facturation"
+            ? `Plan de facturation ${decodeHtmlEntities(quotation.title).slice(0, 6)}`
             : "Créer un plan de facturation"}
         </h1>
 

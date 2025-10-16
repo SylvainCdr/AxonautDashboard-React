@@ -9,17 +9,19 @@ export default function TenderOffers() {
   const [loading, setLoading] = useState(true);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [availableDepartments, setAvailableDepartments] = useState([]);
-  const [source, setSource] = useState("pixecurity"); // toggle source
+  const [source, setSource] = useState("pixecurity");
+  const [offerType, setOfferType] = useState("avis"); // "avis" ou "resultats"
 
   const sourcesConfig = {
     pixecurity: {
       label: "Pixecurity",
       keywords: [
-        "surete",
-        "videoprotection",
-        "videosurveillance",
+        "sûreté",
+        "vidéoprotection",
+        "vidéosurveillance",
         "supervision",
         "hypervision",
+        "contrôle d'accès",
       ],
       url: (query) =>
         `https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?where=${encodeURIComponent(
@@ -34,7 +36,21 @@ export default function TenderOffers() {
         "IA",
         "detection",
         "analytique",
-        "data management",
+        "sûreté",
+        "intrusion",
+        "smart city",
+        "vidéoprotection",
+        "vidéosurveillance",
+        "géolocalisation",
+        "interphonie",
+        "vidéophonie",
+        "contrôle d'accès",
+        "GTB",
+        "GTC",
+        "3D",
+        "IoT",
+        "intelligence artificielle",
+        "IA",
       ],
       url: (query) =>
         `https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records?where=${encodeURIComponent(
@@ -57,11 +73,9 @@ export default function TenderOffers() {
         const data = await res.json();
         const results = data.results || [];
 
-        // Récupérer tous les départements uniques
+        // Récupération des départements uniques
         const deps = new Set();
-        results.forEach((f) => {
-          f.code_departement?.forEach((d) => deps.add(d));
-        });
+        results.forEach((f) => f.code_departement?.forEach((d) => deps.add(d)));
 
         setAvailableDepartments(Array.from(deps).sort());
         setTenderOffers(results);
@@ -73,7 +87,7 @@ export default function TenderOffers() {
     }
 
     fetchOffers();
-  }, [source]); // relance la recherche quand le toggle change
+  }, [source]);
 
   function addFavorite(tenderOffer) {
     const ref = doc(db, "tenderOffers", tenderOffer.idweb);
@@ -91,7 +105,25 @@ export default function TenderOffers() {
     );
   }
 
+  // 🧠 Filtrage par type et département
   const filteredOffers = tenderOffers.filter((f) => {
+    const nature = f.nature?.toUpperCase() || "";
+    const typeavis = f.typeavis?.toLowerCase() || "";
+    const facette = f.type_avis_facette?.join(" ").toLowerCase() || "";
+
+    const isAvis =
+      nature.includes("APPEL_OFFRE") ||
+      typeavis.includes("appel") ||
+      facette.includes("avis de marché");
+
+    const isResult =
+      nature.includes("ATTRIBUTION") ||
+      typeavis.includes("résultat") ||
+      facette.includes("résultat de marché");
+
+    if (offerType === "avis" && !isAvis) return false;
+    if (offerType === "resultats" && !isResult) return false;
+
     if (selectedDepartments.length === 0) return true;
     return f.code_departement?.some((d) => selectedDepartments.includes(d));
   });
@@ -104,6 +136,7 @@ export default function TenderOffers() {
         Favoris
       </Link>
 
+      {/* Sélecteur de source */}
       <div className={styles.sourceContainer}>
         <div className={styles.sourceToggle}>
           {Object.keys(sourcesConfig).map((key) => (
@@ -119,6 +152,30 @@ export default function TenderOffers() {
             </label>
           ))}
         </div>
+      </div>
+
+      {/* 🔘 Sélecteur de type d’annonce */}
+      <div className={styles.typeToggle}>
+        <label>
+          <input
+            type="radio"
+            name="offerType"
+            value="avis"
+            checked={offerType === "avis"}
+            onChange={() => setOfferType("avis")}
+          />
+          Avis de marché
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="offerType"
+            value="resultats"
+            checked={offerType === "resultats"}
+            onChange={() => setOfferType("resultats")}
+          />
+          Résultats de marché
+        </label>
       </div>
 
       <br />
@@ -148,7 +205,13 @@ export default function TenderOffers() {
           <div key={i} className={styles.card}>
             <div className={styles.header}>
               <h3 className={styles.title}>{f.objet}</h3>
-              <span className={styles.nature}>{f.nature_libelle}</span>
+              <span className={styles.nature}>
+                {f.nature === "APPEL_OFFRE"
+                  ? "🟢 Avis de marché"
+                  : f.nature === "ATTRIBUTION"
+                  ? "🔵 Résultat de marché"
+                  : f.nature_libelle}
+              </span>
             </div>
 
             <p className={styles.acheteur}>

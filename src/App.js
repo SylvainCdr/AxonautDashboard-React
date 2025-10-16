@@ -15,7 +15,7 @@ import BillingPlan from "./pages/billingPlan/billingPlan";
 import Opportunities from "./pages/opportunities/opportunities";
 import TenderOffers from "./pages/tenderOffers/tenderOffers";
 import TenderOffersFavorites from "./pages/tenderOffersFavorites/tenderOffersFavorites";
-import TenderOffersTed from "./pages/tenderOffersTed/tenderOffersTed";
+import TenderOffersResults from "./pages/tenderOffersResults/tenderOffersResults";
 import ExpensesTest from "./pages/expenses-test/expenses-test";
 
 import ProtectedRoute from "./utils/protectedRoute";
@@ -59,7 +59,7 @@ function App() {
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/tender-offers" element={<TenderOffers />} />
           <Route path="/tender-offers-favorites" element={<TenderOffersFavorites />} />
-        <Route path="/tender-offers-ted" element={<TenderOffersTed />} />
+        <Route path="/tender-offers-results" element={<TenderOffersResults />} />
         <Route path="/expenses-test" element={<ExpensesTest />} />
         </Route>
 
