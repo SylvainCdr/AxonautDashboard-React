@@ -58,11 +58,16 @@ function App() {
           />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/tender-offers" element={<TenderOffers />} />
-          <Route path="/tender-offers-favorites" element={<TenderOffersFavorites />} />
-        <Route path="/tender-offers-results" element={<TenderOffersResults />} />
-        <Route path="/expenses-test" element={<ExpensesTest />} />
+          <Route
+            path="/tender-offers-favorites"
+            element={<TenderOffersFavorites />}
+          />
+          <Route
+            path="/tender-offers-results"
+            element={<TenderOffersResults />}
+          />
+          <Route path="/expenses-test" element={<ExpensesTest />} />
         </Route>
-
       </Routes>
 
       <ToastContainer position="bottom-center" />
