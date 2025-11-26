@@ -58,6 +58,9 @@ function Homepage() {
         />
       </div>
 
+      {/* ===================== */}
+      {/*   BLOC PRINCIPAUX     */}
+      {/* ===================== */}
       <motion.div className={styles.categories} variants={container}>
         <motion.div variants={item}>
           <Link to="/quotations">
@@ -79,6 +82,33 @@ function Homepage() {
             Opportunités <br /> & <br /> Analyse prévi
           </Link>
         </motion.div>
+      </motion.div>
+
+      {/* ===================== */}
+      {/*     APPS EXTERNES     */}
+      {/* ===================== */}
+      <motion.div  variants={container} className={styles.externalAppsContainer}>
+        <p className={styles.externalTitle}>Apps externes :</p>
+       < div className={styles.externalApps}>
+        <motion.div variants={item}>
+          <Link
+            to="https://pixecuritytechapp.web.app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src="assets/techapp.png" alt="Tech-App" />
+          </Link>
+        </motion.div>
+        <motion.div variants={item}>
+          <Link
+            to="https://my-web-app--boamp-analyzer.europe-west4.hosted.app/login"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src="assets/boamp-logo.png" alt="BOAMP Analyzer" />
+          </Link>
+        </motion.div>
+        </div>
       </motion.div>
     </motion.div>
   );

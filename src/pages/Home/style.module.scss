@@ -17,7 +17,7 @@
 
     img {
       width: 100%;
-      max-width: 45%;
+      max-width: 30%;
     }
 
     .cross {
@@ -70,6 +70,46 @@
       background-color: #03b3ff;
       color: white;
       scale: 1.01;
+    }
+  }
+  .externalAppsContainer {
+    margin-top: 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #242323;
+    padding: 1.5rem 3rem;
+    border-radius: 1.5rem;
+    gap: 1.5rem;
+
+    .externalApps {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 3rem;
+    }
+
+    a {
+      margin-top: 1rem;
+      display: inline-block;
+
+      img {
+        width: 150px;
+        height: auto;
+      }
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .externalTitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: white;
     }
   }
 }
