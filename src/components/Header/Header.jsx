@@ -108,11 +108,24 @@ function Header() {
           </li>
           <li className={styles.navLi}>
             <NavLink
-              to="/tender-offers"
+              to="https://my-web-app--boamp-analyzer.europe-west4.hosted.app/login"
               onClick={handleLinkClick}
+              target="_blank"
+              rel="noopener noreferrer"
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              AO (v1)
+              <img src="assets/boamp-logo.png" alt="BOAMP" />
+            </NavLink>
+          </li>
+          <li className={styles.navLi}>
+            <NavLink
+              to="https://pixecuritytechapp.web.app"
+              onClick={handleLinkClick}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={({ isActive }) => (isActive ? styles.activeLink : "")}
+            >
+              <img src="assets/techapp.png" alt="BOAMP" />
             </NavLink>
           </li>
           <button

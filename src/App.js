@@ -13,11 +13,6 @@ import Billing from "./pages/billing/billing";
 import SupplyStudy from "./pages/supplyStudy/supplyStudy";
 import BillingPlan from "./pages/billingPlan/billingPlan";
 import Opportunities from "./pages/opportunities/opportunities";
-import TenderOffers from "./pages/tenderOffers/tenderOffers";
-import TenderOffersFavorites from "./pages/tenderOffersFavorites/tenderOffersFavorites";
-import TenderOffersResults from "./pages/tenderOffersResults/tenderOffersResults";
-import ExpensesTest from "./pages/expenses-test/expenses-test";
-
 import ProtectedRoute from "./utils/protectedRoute";
 import { ToastContainer } from "react-toastify";
 
@@ -57,16 +52,6 @@ function App() {
             element={<BillingPlan />}
           />
           <Route path="/opportunities" element={<Opportunities />} />
-          <Route path="/tender-offers" element={<TenderOffers />} />
-          <Route
-            path="/tender-offers-favorites"
-            element={<TenderOffersFavorites />}
-          />
-          <Route
-            path="/tender-offers-results"
-            element={<TenderOffersResults />}
-          />
-          <Route path="/expenses-test" element={<ExpensesTest />} />
         </Route>
       </Routes>
 

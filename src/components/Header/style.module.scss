@@ -15,8 +15,8 @@
 
     .logo {
       width: 5rem;
-      margin-left: 5%;
-      margin-right: 6em;
+      margin-left: 3%;
+      margin-right: 3em;
       justify-items: center;
       justify-self: center;
       justify-content: center;
@@ -40,7 +40,7 @@
 
     .navUl {
       display: flex;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 500;
       font-family: "barlow", sans-serif;
       text-transform: uppercase;
@@ -79,7 +79,7 @@
     }
 
     .logoutButton {
-      padding: 2px 8px;
+      padding: 2px 9px;
       background-color: #ff4d4f;
       text-transform: uppercase;
       color: white;
@@ -153,5 +153,11 @@
 
   .navLi {
     padding: 0.8rem 0;
+  }
+}
+a {
+  img {
+    width: 90px;
+    height: auto;
   }
 }
