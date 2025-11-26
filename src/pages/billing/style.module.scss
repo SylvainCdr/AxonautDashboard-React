@@ -76,6 +76,11 @@ h4 {
   margin-top: 10px;
   margin-bottom: 5px;
   color: #001427;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .billingContainer .monthSidebar h3 {
@@ -133,6 +138,16 @@ h4 {
   border: 1px solid #dee2e6;
   text-align: left;
   width: 100%;
+  vertical-align: middle;
+
+  a {
+    text-decoration: none;
+    color: #001427;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .pastDate {

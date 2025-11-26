@@ -125,8 +125,52 @@ export default function BillingPlan({ onClose }) {
     loadQuotationData();
   }, [quotationId]);
 
+  // const addStep = () => {
+  //   setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
+  // };
+
+  // const addInvoiceToSteps = (invoice) => {
+  //   // Eviter doublons via id ou numéro facture
+  //   if (steps.some((step) => step.invoiceId === invoice.id)) return;
+
+  //   const newStep = {
+  //     amount: invoice.pre_tax_amount,
+  //     date: invoice.date,
+  //     stepsComment: `Facture #${invoice.number}`,
+  //     revision: "",
+  //     invoiced: true,
+  //     invoiceId: invoice.id, // Pour référence future
+  //   };
+
+  //   setSteps((prev) => [...prev, newStep]);
+  // };
+
+  // Ajoute un palier manuel et trie par date
   const addStep = () => {
-    setSteps([...steps, { amount: "", date: "", stepsComment: "" }]);
+    const newSteps = [
+      ...steps,
+      { amount: "", date: "", stepsComment: "", reliability: "" },
+    ];
+    newSteps.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    setSteps(newSteps);
+  };
+
+  // Ajoute une facture au plan et trie par date
+  const addInvoiceToSteps = (invoice) => {
+    if (steps.some((step) => step.invoiceId === invoice.id)) return;
+
+    const newStep = {
+      amount: invoice.pre_tax_amount,
+      date: invoice.date,
+      stepsComment: `Facture #${invoice.number}`,
+      revision: "",
+      invoiced: true,
+      invoiceId: invoice.id,
+    };
+
+    const newSteps = [...steps, newStep];
+    newSteps.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    setSteps(newSteps);
   };
 
   const updateStep = (index, key, value) => {
@@ -144,22 +188,6 @@ export default function BillingPlan({ onClose }) {
     const updatedSteps = [...steps];
     updatedSteps.splice(index, 1);
     setSteps(updatedSteps);
-  };
-
-  const addInvoiceToSteps = (invoice) => {
-    // Eviter doublons via id ou numéro facture
-    if (steps.some((step) => step.invoiceId === invoice.id)) return;
-
-    const newStep = {
-      amount: invoice.pre_tax_amount,
-      date: invoice.date,
-      stepsComment: `Facture #${invoice.number}`,
-      revision: "",
-      invoiced: true,
-      invoiceId: invoice.id, // Pour référence future
-    };
-
-    setSteps((prev) => [...prev, newStep]);
   };
 
   const handleManualBillingPlanSave = async (steps, mainComment) => {
@@ -430,7 +458,10 @@ export default function BillingPlan({ onClose }) {
       <div className={styles.billingPlan}>
         <h1>
           {existingPlan
-            ? `Plan de facturation ${decodeHtmlEntities(quotation.title).slice(0, 6)}`
+            ? `Plan de facturation ${decodeHtmlEntities(quotation.title).slice(
+                0,
+                6
+              )}`
             : "Créer un plan de facturation"}
         </h1>
 

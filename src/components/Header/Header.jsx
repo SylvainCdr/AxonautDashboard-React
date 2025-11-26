@@ -106,6 +106,7 @@ function Header() {
               Facturation
             </NavLink>
           </li>
+          <p>|</p>
           <li className={styles.navLi}>
             <NavLink
               to="https://my-web-app--boamp-analyzer.europe-west4.hosted.app/login"
@@ -114,7 +115,7 @@ function Header() {
               rel="noopener noreferrer"
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              <img src="assets/boamp-logo.png" alt="BOAMP" />
+              <img src="assets/boamp-logo.png" alt="BOAMP Analyzer" />
             </NavLink>
           </li>
           <li className={styles.navLi}>
@@ -125,7 +126,7 @@ function Header() {
               rel="noopener noreferrer"
               className={({ isActive }) => (isActive ? styles.activeLink : "")}
             >
-              <img src="assets/techapp.png" alt="BOAMP" />
+              <img src="assets/techapp.png" alt="Tech-App" />
             </NavLink>
           </li>
           <button

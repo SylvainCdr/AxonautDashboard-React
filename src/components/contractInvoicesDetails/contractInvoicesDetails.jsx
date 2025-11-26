@@ -6,7 +6,7 @@ import { fetchInvoiceById } from "../../services/api/invoices";
 import { DotLoader } from "react-spinners";
 import styles from "./style.module.scss";
 import { db, auth } from "../../firebase/firebase";
-import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { getUserByUid } from "../../utils/getUserByUid";
 
 export default function ContractInvoicesDetails() {
@@ -18,7 +18,7 @@ export default function ContractInvoicesDetails() {
   const [showPopup, setShowPopup] = useState(false);
   const [quotation, setQuotation] = useState(null);
   const [generating, setGenerating] = useState(false);
-  const [showBillingModal, setShowBillingModal] = useState(false);
+  // const [showBillingModal, setShowBillingModal] = useState(false);
   const user = auth.currentUser;
   const [hasBillingPlan, setHasBillingPlan] = useState(false);
   const navigate = useNavigate();
