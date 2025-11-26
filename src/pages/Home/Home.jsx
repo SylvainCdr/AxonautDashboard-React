@@ -87,27 +87,36 @@ function Homepage() {
       {/* ===================== */}
       {/*     APPS EXTERNES     */}
       {/* ===================== */}
-      <motion.div  variants={container} className={styles.externalAppsContainer}>
+      <motion.div variants={container} className={styles.externalAppsContainer}>
         <p className={styles.externalTitle}>Apps externes :</p>
-       < div className={styles.externalApps}>
-        <motion.div variants={item}>
-          <Link
-            to="https://pixecuritytechapp.web.app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src="assets/techapp.png" alt="Tech-App" />
-          </Link>
-        </motion.div>
-        <motion.div variants={item}>
-          <Link
-            to="https://my-web-app--boamp-analyzer.europe-west4.hosted.app/login"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src="assets/boamp-logo.png" alt="BOAMP Analyzer" />
-          </Link>
-        </motion.div>
+        <div className={styles.externalApps}>
+          <motion.div variants={item}>
+            <Link
+              to="https://pixecuritytechapp.web.app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="assets/techapp.png" alt="Tech-App" />
+            </Link>
+          </motion.div>
+          <motion.div variants={item}>
+            <Link
+              to="https://my-web-app--boamp-analyzer.europe-west4.hosted.app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="assets/boamp-logo.png" alt="BOAMP Analyzer" />
+            </Link>
+          </motion.div>
+          <motion.div variants={item}>
+            <Link
+              to="https://ratp.pixecurity.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="assets/pixratp.png" alt="RATP Pixecurity" />
+            </Link>
+          </motion.div>
         </div>
       </motion.div>
     </motion.div>

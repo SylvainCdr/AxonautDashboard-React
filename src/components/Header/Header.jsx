@@ -106,7 +106,7 @@ function Header() {
               Facturation
             </NavLink>
           </li>
-          <p>|</p>
+          {/* <p>|</p>
           <li className={styles.navLi}>
             <NavLink
               to="https://my-web-app--boamp-analyzer.europe-west4.hosted.app/login"
@@ -128,7 +128,7 @@ function Header() {
             >
               <img src="assets/techapp.png" alt="Tech-App" />
             </NavLink>
-          </li>
+          </li> */}
           <button
             onClick={handleSignOut}
             className={styles.logoutButton}
