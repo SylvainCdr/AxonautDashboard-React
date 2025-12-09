@@ -104,6 +104,8 @@ export default function Login() {
           damping: 20,
         }}
       />
+
+      <form className={styles.loginForm}>
       <h2>Connexion</h2>
       <input
         type="email"
@@ -123,6 +125,7 @@ export default function Login() {
         {loading ? "Connexion en cours..." : "Se connecter"}
       </button>
       {error && <p>{error}</p>}
+      </form>
     </div>
   );
 }
