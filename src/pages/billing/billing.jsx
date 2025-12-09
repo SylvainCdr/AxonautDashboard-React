@@ -322,25 +322,40 @@ export default function Billing() {
           onClose={toggleModal}
           billingData={monthlyBilling}
         />
-      )}{" "}
-      <h1>Plan de Facturation - {selectedMonthKey}</h1>{" "}
-      <button onClick={toggleModal} className={styles.extractButton}>
-        Extraction
-      </button>
+      )}
+
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <h1 className={styles.pageTitle}>
+            📊 Plan de Facturation
+            {selectedMonthKey && (
+              <span className={styles.selectedMonth}>{selectedMonthKey}</span>
+            )}
+          </h1>
+          <button onClick={toggleModal} className={styles.extractButton}>
+            📋 Extraction
+          </button>
+        </div>
+      </div>
       <div className={styles.twoColumns}>
         <aside className={styles.monthSidebar}>
-          <h3>Mois</h3>
+          <div className={styles.sidebarHeader}>
+            <h3>📅 Navigation mensuelle</h3>
+          </div>
           {Object.entries(monthsByYear)
             .sort((a, b) => b[0] - a[0])
             .map(([year, months]) => {
               const isOpen = openYears[year];
               return (
-                <div key={year}>
+                <div key={year} className={styles.yearSection}>
                   <div
                     onClick={() => toggleYear(year)}
                     className={styles.yearHeader}
                   >
-                    {isOpen ? "▼" : "▶"} {year}
+                    <span className={styles.yearToggle}>
+                      {isOpen ? "📂" : "📁"}
+                    </span>
+                    <span className={styles.yearText}>{year}</span>
                   </div>
                   {isOpen &&
                     months.map(([month, data]) => {
@@ -355,15 +370,23 @@ export default function Billing() {
                           ref={(el) => el && (monthRefs.current[month] = el)}
                           className={`${styles.monthItem} ${
                             isCurrentMonth ? styles.currentMonth : ""
-                          } ${isSelected ? styles.selectedMonth : ""}`}
+                          } ${isSelected ? styles.selectedMonthItem : ""}`}
                           onClick={() => setSelectedMonthKey(month)}
                         >
-                          <strong>
-                            🗓 {month.charAt(0).toUpperCase() + month.slice(1)}
-                          </strong>
-                          <br />
-                          <br />
-                          {formatEuro(data.total)} €
+                          <div className={styles.monthHeader}>
+                            <span className={styles.monthIcon}>📊</span>
+                            <strong className={styles.monthName}>
+                              {month.charAt(0).toUpperCase() + month.slice(1)}
+                            </strong>
+                            {isCurrentMonth && (
+                              <span className={styles.currentBadge}>
+                                Actuel
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles.monthAmount}>
+                            {formatEuro(data.total)} €
+                          </div>
                         </div>
                       );
                     })}
@@ -375,55 +398,65 @@ export default function Billing() {
         <main className={styles.monthDetails}>
           <div className={styles.charts}>
             <div className={styles.chart1}>
-              {selectedYear && yearlyTotals[selectedYear] && (
-                <div className={styles.yearlyTotals}>
-                  <h3>Année {selectedYear}</h3>
-                  <p>
-                    <span style={{ color: "#00ab39" }}>
-                      Déjà facturé :{" "}
-                      {formatEuro(yearlyTotals[selectedYear].alreadyInvoiced)} €
-                    </span>
-                    <br />
-                    <span style={{ color: "#ff5a3d" }}>
-                      À facturer :{" "}
-                      {formatEuro(yearlyTotals[selectedYear].toBeInvoiced)} €
-                    </span>
-                  </p>
+              <div className={styles.chartContainer}>
+                {selectedMonthKey && (
+                  <BillingSummaryChart
+                    dataForMonth={monthlyBilling[selectedMonthKey]}
+                    monthName={selectedMonthKey}
+                  />
+                )}
+              </div>
+
+              <div className={styles.summarySection}>
+                <div className={styles.reliabilityCompact}>
+                  <div className={styles.reliabilityItem}>
+                    <span className={styles.reliabilityIcon}>💎</span>
+                    <div className={styles.reliabilityContent}>
+                      <span className={styles.reliabilityLabel}>
+                        Fiabilité 100%
+                      </span>
+                      <span className={styles.reliabilityAmount}>
+                        {formatEuro(totalReliableToBeInvoiced)} €
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.reliabilityItem}>
+                    <span className={styles.reliabilityIcon}>⚡</span>
+                    <div className={styles.reliabilityContent}>
+                      <span className={styles.reliabilityLabel}>
+                        Fiabilité 75%
+                      </span>
+                      <span className={styles.reliabilityAmount}>
+                        {formatEuro(totalReliable75ToBeInvoiced)} €
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              )}
-              {selectedMonthKey && (
-                <BillingSummaryChart
-                  dataForMonth={monthlyBilling[selectedMonthKey]}
-                  monthName={selectedMonthKey}
-                />
-              )}
-              <br />
-              <span
-                style={{
-                  color: "#0073e6",
-                  fontWeight: "bold",
-                  marginTop: "20px",
-                }}
-              >
-                ✅ À facturer (fiabilité 100%) :{" "}
-                {formatEuro(totalReliableToBeInvoiced)} €
-              </span>
-              <br />
-              <br />
-              <span
-                style={{
-                  color: "#fe720dff",
-                  fontWeight: "bold",
-                  marginTop: "10px",
-                }}
-              >
-                ⚠️ À facturer (fiabilité 75%) :{" "}
-                {formatEuro(totalReliable75ToBeInvoiced)} €
-              </span>
+              </div>
             </div>
 
             <div className={styles.chart2}>
               <YearlyBillingBarChart monthlyBilling={monthlyBilling} />
+              {selectedYear && yearlyTotals[selectedYear] && (
+                <div className={styles.yearlyTotalsCompact}>
+                  <h3>📊 {selectedYear}</h3>
+                  <div className={styles.compactStats}>
+                    <div className={styles.statLine + " " + styles.invoiced}>
+                      <span className={styles.statLabel}>Facturé</span>
+                      <span className={styles.statValue}>
+                        {formatEuro(yearlyTotals[selectedYear].alreadyInvoiced)}{" "}
+                        €
+                      </span>
+                    </div>
+                    <div className={styles.statLine + " " + styles.pending}>
+                      <span className={styles.statLabel}>À facturer</span>
+                      <span className={styles.statValue}>
+                        {formatEuro(yearlyTotals[selectedYear].toBeInvoiced)} €
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -449,39 +482,41 @@ export default function Billing() {
 
               return (
                 <>
-                  <h3>Détails</h3>
+                  <div className={styles.detailsHeader}>
+                    <h3>🔍 Détails de facturation</h3>
 
-                  {/* Champ de recherche */}
-                  <div className={styles.searchContainer}>
-                    <input
-                      type="text"
-                      placeholder="Rechercher par nom d'affaire ou établi par..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className={styles.searchInput}
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={() => setSearchTerm("")}
-                        className={styles.clearButton}
-                      >
-                        ✕
-                      </button>
-                    )}
+                    {/* Champ de recherche amélioré */}
+                    <div className={styles.searchContainer}>
+                      <div className={styles.searchInputWrapper}>
+                        <span className={styles.searchIcon}>🔍</span>
+                        <input
+                          type="text"
+                          placeholder="Rechercher par nom d'affaire ou établi par..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className={styles.searchInput}
+                        />
+                        {searchTerm && (
+                          <button
+                            onClick={() => setSearchTerm("")}
+                            className={styles.clearButton}
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Tableau Reste à facturer */}
-                  <h4
-                    style={{
-                      marginTop: "2rem",
-                      backgroundColor: "#ff5a3d",
-                      color: "white",
-                      textAlign: "center",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Reste à facturer
-                  </h4>
+                  <div className={styles.sectionHeader}>
+                    <h4 className={styles.toBillHeader}>
+                      ⏳ Reste à facturer
+                      <span className={styles.itemCount}>
+                        ({processItems(sortedToBeInvoiced).length})
+                      </span>
+                    </h4>
+                  </div>
                   <table className={styles.billingTable}>
                     <thead>
                       <tr>
@@ -527,7 +562,8 @@ export default function Billing() {
                             <Link
                               to={`/quotation/${item.quotationId}/billing-plan`}
                             >
-                              {item.title}
+                              {item.title.slice(0, 150) +
+                                (item.title.length > 150 ? "..." : "")}
                             </Link>
                           </td>
                           <td>
@@ -569,17 +605,14 @@ export default function Billing() {
                   </table>
 
                   {/* Tableau Déjà facturé */}
-                  <h4
-                    style={{
-                      marginTop: "2rem",
-                      backgroundColor: "#00ab39",
-                      color: "white",
-                      textAlign: "center",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Déjà facturé
-                  </h4>
+                  <div className={styles.sectionHeader}>
+                    <h4 className={styles.billedHeader}>
+                      ✅ Déjà facturé
+                      <span className={styles.itemCount}>
+                        ({processItems(sortedAlreadyInvoiced).length})
+                      </span>
+                    </h4>
+                  </div>
                   <table className={styles.billingTable}>
                     <thead>
                       <tr>
@@ -619,7 +652,8 @@ export default function Billing() {
                             <Link
                               to={`/quotation/${item.quotationId}/billing-plan`}
                             >
-                              {item.title}
+                              {item.title.slice(0, 150) +
+                                (item.title.length > 150 ? "..." : "")}
                             </Link>
                           </td>
                           <td>

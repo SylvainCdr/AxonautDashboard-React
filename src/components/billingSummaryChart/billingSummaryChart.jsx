@@ -37,7 +37,7 @@ export default function BillingSummaryChart({ dataForMonth, monthName }) {
   }
 
   return (
-    <div style={{ maxWidth: "220px", margin: "0px auto" }}>
+    <div style={{ maxWidth: "250px", margin: "0px auto" }}>
       <h3 style={{ textAlign: "center", marginBottom: "10px" }}>{monthName}</h3>
       <div style={{ textAlign: "center", marginTop: "10px" }}>
         <p style={{ marginBottom: "5px", color: "#00ab39" }}>
