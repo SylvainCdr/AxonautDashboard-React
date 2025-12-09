@@ -75,12 +75,69 @@
       font-weight: 500;
       cursor: pointer;
       margin-top: 10px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #039749;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        background-color: #888;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+
+    .forgotPasswordBtn {
+      background-color: transparent !important;
+      color: #d51a87 !important;
+      text-decoration: underline;
+      font-size: 0.9rem !important;
+      padding: 5px 0 !important;
+      margin-top: 15px !important;
+
+      &:hover {
+        background-color: transparent !important;
+        color: #a00d65 !important;
+        transform: none !important;
+      }
+    }
+
+    .backBtn {
+      background-color: #6c757d !important;
+
+      &:hover {
+        background-color: #5a6268 !important;
+      }
+    }
+
+    .resetInfo {
+      color: #ffffff !important;
+      font-size: 0.85rem !important;
+      text-align: center;
+      margin: 1rem 0;
+      text-transform: none !important;
+      font-weight: 400 !important;
+      line-height: 1.4;
+    }
+
+    .error {
+      color: #e53e3e !important;
+      font-size: 0.9rem !important;
+      text-transform: none !important;
+      font-weight: 500 !important;
+      margin-top: 1rem !important;
+      text-align: center;
+      padding: 8px;
+      background-color: rgba(229, 62, 62, 0.1);
+      border-radius: 5px;
+      border: 1px solid rgba(229, 62, 62, 0.3);
     }
 
     p {
       color: var(--col2);
       font-size: 0.9rem;
-
       text-transform: uppercase;
       font-weight: 500;
       margin-top: 2rem;
