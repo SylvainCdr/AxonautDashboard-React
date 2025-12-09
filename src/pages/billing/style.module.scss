@@ -177,3 +177,67 @@ h4 {
 .billingContainer .projectLink:visited {
   color: #001427;
 }
+
+/* Styles pour le champ de recherche */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+  max-width: 400px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #efb140;
+    box-shadow: 0 0 0 2px rgba(239, 177, 64, 0.2);
+  }
+
+  &::placeholder {
+    color: #6c757d;
+  }
+}
+
+.clearButton {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: #efb140;
+    background-color: rgba(239, 177, 64, 0.1);
+    border-radius: 50%;
+  }
+}
+
+/* Styles pour les en-têtes triables */
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  position: relative;
+
+  &:hover {
+    background-color: #e9ecef !important;
+  }
+
+  &:active {
+    background-color: #dee2e6 !important;
+  }
+}

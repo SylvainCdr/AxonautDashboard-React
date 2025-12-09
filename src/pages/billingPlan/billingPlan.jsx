@@ -136,6 +136,20 @@ export default function BillingPlan({ onClose }) {
         ...newSteps[index],
         [key]: value,
       };
+
+      // Si on modifie une date, on re-trie le tableau pour maintenir l'ordre chronologique
+      if (key === "date" && value) {
+        return newSteps.sort((a, b) => {
+          // Les étapes sans date restent en fin
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateA - dateB;
+        });
+      }
+
       return newSteps;
     });
   };
@@ -159,7 +173,15 @@ export default function BillingPlan({ onClose }) {
       invoiceId: invoice.id, // Pour référence future
     };
 
-    setSteps((prev) => [...prev, newStep]);
+    setSteps((prev) => {
+      const updatedSteps = [...prev, newStep];
+      // Trier les étapes par date pour maintenir l'ordre chronologique
+      return updatedSteps.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+      });
+    });
   };
 
   const handleManualBillingPlanSave = async (steps, mainComment) => {
