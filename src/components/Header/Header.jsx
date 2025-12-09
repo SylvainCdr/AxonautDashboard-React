@@ -106,7 +106,7 @@ function Header() {
               Facturation
             </NavLink>
           </li>
-   
+
           {/* <p>|</p>
           <li className={styles.navLi}>
             <NavLink
